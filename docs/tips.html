@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GIF Loop Coder Documentation</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+    <a href="http://gifloopcoder.com">Home</a>
+    <a name="top"></a>
+    <h1>GIF Loop Coder (GLC) Documentation</h1>
+    <ul>
+        <li><a href="index.html">TOC</span></a></li>
+        <li><a href="intro.html">1. Introduction to GIF Loop Coder (GLC)</a></li>
+        <li><a href="objects.html">2. Objects</a></li>
+        <li><a href="styles.html">3. Styles</a></li>
+        <li><a href="properties.html">4. Property Types</a></li>
+        <li><span class="current_section">5. Tips and Advanced Use</span>
+            <ul>
+                <li><a href="#singlemode">Single Mode</a></li>
+                <li><a href="#optimization">GIF Size and Optimization</a></li>
+                <li><a href="#phase">The Phase Property</a></li>
+                <li><a href="#sketches">Moving the Sketches Folder</a></li>
+                <li><a href="#jif">GIF or JIF?</a></li>
+            </ul>
+
+        </li>
+    </ul>
+
+
+    <!-- ================================================================================== -->
+    <h2><a name="tips"></a>5. Tips and Advanced Use</h2>
+    <!-- ================================================================================== -->
+    <div class="section">
+
+    <!-- ================================================================================== -->
+    <h3><a name="singlemode"></a>Single Mode Animations</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>When you first make a simple animation and see it playing smoothly back and forth in bounce mode, and then switch over to single mode, you'll likely not be very happy with the results. If you are moving an object from, say, 0 to 100 pixels on the x-axis. You're going to see it smoothly glide over to 100, and then instantly jump back to 0. Over and over. Yuck.</p>
+
+    <p>So initially, you might think that single mode is useless. But, once you know how to work around this, it's very powerful and can create a totally different type of animation. The trick is that you want the end state to <em>look</em> like the the start state. This often involves using multiple objects. Let's look at an example</p>
+
+    <p>First I'll set up a circle. This will be centered vertically, and move from -25 on the x-axis to the center of the canvas horizontally. Because the radius is 25-pixels, that means it's going to start out off screen, and move to center screen, and then disappear.</p>
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    // glc.playOnce();
+    glc.size(400, 200);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
+
+    <span class="bold">list.addCircle({
+        x: [-25, 200],
+        y: 200,
+        radius: 25
+    });</span>
+
+    glc.loop();
+}
+    </code></pre></div>
+
+    <img src="images/5.1.gif">
+
+    <p>So, at the end of the animation we have a circle sitting at the center of the screen. But when it starts the next cycle, there's nothing there. To handle that, we put the same type of object in that position at the start of the animation. And we have that move OFF the screen.</p>
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    // glc.playOnce();
+    glc.size(400, 200);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
+
+    list.addCircle({
+        x: [-25, 200],
+        y: 100,
+        radius: 25
+    });
+    <span class="bold">list.addCircle({
+        x: [200, 425],
+        y: 100,
+        radius: 25
+    });</span>
+
+    glc.loop();
+}
+    </code></pre></div>
+
+    <img src="images/5.2.gif">
+
+    <p>That's much better. You can even chain several objects together like this, and animate other properties as well. Just remember that the end state of one object has to match up with the start state of another, or the start or end needs to be off screen or invisible.</p>
+
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    // glc.playOnce();
+    glc.size(400, 200);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
+
+    <span class="bold">list.addCircle({
+        x: [-25, 150],
+        y: [0, 175],
+        radius: 25,
+        fillStyle: [0xff0000, 0x00ff00]
+    });
+    list.addCircle({
+        x: [150, 300],
+        y: [175, 25],
+        radius: 25,
+        fillStyle: [0x00ff00, 0x0000ff]
+    });
+    list.addCircle({
+        x: [300, 425],
+        y: [25, 200],
+        radius: 25,
+        fillStyle: [0x0000ff, 0xff0000]
+    });</span>
+
+    glc.loop();
+}
+    </code></pre></div>
+
+    <img src="images/5.3.gif">
+
+
+    <p>Once you get the idea of this, it opens up the doors to all kinds of different animations.</p>
+    </div>
+
+    <!-- ================================================================================== -->
+    <h3><a name="optimization"></a>GIF Size and Optimization</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>When you are making an animated gif, you are basically making a bunch of images and assembling them into a single file that can be played back later. The animated gif format takes care of a lot of optimizing to try to get the size as small as possible, but the encoder that is built into glc is probably not the best at this. So, there are some things you might want to consider when making gifs.</p>
+
+    <p>First of all, consider the frame rate, length and physical size of your animation. While glc will make animations up to 60 fps, there's probably no reason to do so. This will inflate the file size dramatically, and not really look any better. Play with the fps slider and see how low you can set it while still looking good.</p>
+
+    <p>The duration is what it is. If you want a 10 second animation, just realize that it's going to have twice as many frames as a 5 second animation. And it's going to be larger.</p>
+
+    <p>And for size, try to make the animation as small as you can. Not meaning that to make everything tiny, but if your animation only covers the center 100 pixels of the canvas, there's no reason to make it 400 pixels tall. Crop it to the size of the moving objects.</p>
+
+    <p>If you've done all you can and you still feel the animation is too heavy, there are a number of animated gif optimization tools. Some are web-based - you upload the gif, it optimizes it and you download the optimized version. Others are executable programs you download. Some of these can dramatically reduce file size with very little noticeable change in quality. Do a search and try some of them out.</p>
+
+    <p>When you have your gif all rendered and playing back, right click it and save it to your computer. Or, right click and open it in a new tab and save it from there. Do NOT right click and copy to the clipboard. This is not the same as copying and pasting from the file system on your computer. Copying the image from the web page will copy a binary string of the data that makes up the image. It's huge and will will take forever to copy onto the clipboard and may even hang or crash your browser.</p>
+
+    <p>As mentioned in the intro section, sometimes on larger animations, the right click to save method will fail. If this happens try dragging and dropping the animation to a file system window. I've saved gifs that were over 9.5 megs that way, so this is a pretty reliable fallback.</p>
+
+    <p>You may have noticed in some of the screenshots that there is a "Save gif" link in the Output panel. I removed this as it was very unreliable and would fail way more often than the right click and save method. However, if you want to try it out, look for the <code>glc.js</code> file and you'll see the lines that create this link, commented out. Uncomment them to get the link back.</p>
+    </div>
+
+    <!-- ================================================================================== -->
+    <h3><a name="phase"></a>The Phase Property</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>There's actually one, more advanced property that I've withheld from you until now. It's called <code>phase</code>.</p>
+
+    <p>As described earlier, glc works by increasing an internal <code>t</code> variable from 0 to 1 and basing all its object animations from that. You've seen this <code>t</code> variable in the Canvas Panel scrubber and in the custom functions used for setting properties. Because everything is based on t, every object is perfectly in sync. This is good, as it results in perfectly loopable animations. However, it can make some more advanced effects more difficult. Judicious use of the <code>phase</code> property can provide you with an easy way of creating much more intricate animations, very simply.</p>
+
+    <p>Here, I've set up 5 circles with a simple x-axis animation. They are spaced out on the y-axis via a for loop.</p>
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    // glc.playOnce();
+    // glc.size(400, 400);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
+
+    for(var i = 0; i &lt; 5; i++) {
+        list.addCircle({
+            x: [50, 350],
+            y: 50 + i * 75,
+            radius: 25,
+        });
+    }
+
+    glc.loop();
+}
+    </code></pre></div>
+
+    <img src="images/5.4.gif">
+
+
+    <p>Now this is fine, but they're all moving exactly in sync, which is rather boring. Say you wanted them to all move back and forth exactly as they are, but you wanted them all to start at different times, so they were out of sync. That would be pretty tough, though you could get it working with a custom function property. However, with the <code>phase</code> property, it's a piece of cake.</p>
+
+    <p>Setting the <code>phase</code> property for an object changes the <code>t</code> value that it uses for its animations. If you set <code>phase</code> to 0.25 for an object, then, while all other objects were at a <code>t</code> of 0, it would get a <code>t</code> of 0.25. When all other objects got to <code>t</code> = 0.75, it would be at 1, and when the others got to 1, that object's <code>t</code> would already be moving backwards and would be back to 0.75. It just shifts the whole timeline.</p>
+
+    <p>So, say I gave each one of these circles a different <code>phase</code>, and spaced them out using the for loop i variable...</p>
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    // glc.playOnce();
+    // glc.size(400, 400);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
+
+    for(var i = 0; i &lt; 5; i++) {
+        list.addCircle({
+            x: [50, 350],
+            y: 50 + i * 75,
+            radius: 25,
+            <span class="bold">phase: i * 0.2</span>
+        });
+    }
+
+    glc.loop();
+}
+    </code></pre></div>
+
+    <img src="images/5.5.gif">
+
+    <p>Now, this is WAY more interesting! And, it only took one line of code! And, it doesn't break the looping of the animation at all. This is just the tip of the iceberg as far as what you can do with the <code>phase</code> property. Explore it.</p>
+
+    <p>Before you ask, no, it's NOT possible to animate the <code>phase</code> value. It can only be a single value. Animating the thing that's animating the things... I don't know. I think the universe would implode or something.</p>
+
+    </div>
+
+    <!-- ================================================================================== -->
+    <h3><a name="sketches"></a>Moving the Sketches Folder</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>The <code>sketches</code> folder is set up to be the place where you keep the HTML and JavaScript files for your various animations. If you just keep all your JavaScript files in the <code>code</code> folder and reference them from the <code>index.html</code> file, things will work fine. However, for whatever reason, you may want to rearrange things. Here's how to do that.</p>
+
+    <p>First of all, you can put your JavaScript sketch files wherever you want, as long as you add the correct relative or absolute path to them in the HTML file. The JavaScript files can be in any folder on the same drive, a different drive, or even somewhere else on the network. As long as the HTML has the correct path to the file, it should load and run.</p>
+
+    <p>But say you still want to move that sketch folder, or set up multiple sketch folders. That can be done too, but takes a few more steps. The important thing to know is that in addition to the HTML file needing to know where your JavaScript file is, it needs to know where the <code>require.js</code> file is. In addition to that, the <code>glcloader.js</code> file  needs to know the location of the <code>glc</code> folder.</p>
+
+    <p>Here again is the <code>index.html</code> file, with the important bit highlighted.</p>
+
+    <div class="code"><pre><code>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;GIF Loop Coder&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- This should point to the sketch you want to run --&gt;
+    &lt;script type="text/javascript" src="examples/allshapes.js"&gt;&lt;/script&gt;
+
+    &lt;!-- Don't touch this unless you move your sketches folder. If so, update the path to require.js --&gt;
+    &lt;script type="text/javascript" <span class="bold">src="../glc/libs/require.js"</span> data-main="glcloader"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+    </code></pre></div>
+
+    <p>Currently, it's saying that to find <code>require.js</code> from the <code>sketches</code> folder, go up one directory, and then down the given path. So, if that no longer points to <code>require.js</code>, adjust that path so it does.</p>
+
+    <p>Next, here is <code>glcloader.js</code>:</p>
+
+    <div class="code"><pre><code>
+// if you move your sketches folder somewhere other than the default,
+// update this baseUrl property so it continues to point to the glc directory.
+require.config({
+    <span class="bold">baseUrl: "../glc"</span>
+});
+
+
+if(document.location.hash) {
+    var script = document.createElement("script");
+    script.src = document.location.hash.substring(1);
+    document.head.appendChild(script);
+}
+
+window.onhashchange = function() {
+    document.location.reload();
+}
+
+require(["app/glc"], function(glc) {
+    if(window.onGLC) {
+        window.onGLC(glc);
+    }
+});
+    </code></pre></div>
+
+    <p>Here, you see a <code>require.config</code> block that contains a <code>baseUrl</code> property. This needs to point to the <code>glc</code> folder. Again, from the <code>sketches</code> folder, that's up one level. So if you move things around, this is the other path you'll have to adjust.</p>
+
+    <p>Once those two items point to the right places, your newly located sketches folder should work just fine.</p>
+
+    </div>
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="jif"></a>GIF or JIF?</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>The "g" in "gif" is pronounced exactly the same way it is in "git" and "gin".</p>
+
+    </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GIF Loop Coder Documentation</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+    <a href="http://gifloopcoder.com">Home</a>
+    <a name="top"></a>
+    <h1>GIF Loop Coder (GLC) Documentation</h1>
+    <ul>
+        <li><a href="index.html">TOC</span></a></li>
+        <li><a href="intro.html">1. Introduction to GIF Loop Coder (GLC)</a></li>
+        <li><a href="objects.html">2. Objects</a></li>
+        <li><span class="current_section">3. Styles</span></li>
+        <li><a href="properties.html">4. Property Types</a></li>
+        <li><a href="tips.html">5. Tips and Advanced Use</a></li>
+    </ul>
+
+
+    <!-- ================================================================================== -->
+    <h2><a name="styles"></a>3. Styles</h2>
+    <!-- ================================================================================== -->
+    <div class="section">
+
+    <p>The following properties can be set on any object when creating it. This also lists their default values if they are not set.</p>
+
+    <div class="code"><pre><code>
+lineWidth       5
+strokeStyle     "#000000"
+fillStyle       "#000000"
+lineCap         "round"
+lineJoin        "miter"
+lineDash        []
+miterLimit      10
+shadowColor     null
+shadowOffsetX   0
+shadowOffsetY   0
+shadowBlur      0
+globalAlpha     1
+translationX    0
+translationY    0
+    </code></pre></div>
+
+    <p>All of these defaults are defined on the <code>glc.styles</code> property. So you can change any of these globally by writing, for example:</p>
+
+    <div class="code"><pre><code>
+<span class="bold">glc.styles.lineWidth = 20;</span>
+
+list.addCircle({
+    stroke: true,
+    fill: false,
+    radius: [50, 80]
+});
+    </code></pre></div>
+
+    <img src="images/3.1.gif">
+
+    <p>Now, all objects will be drawn with a line width of 20 pixels, unless they explicitly set their own <code>lineWidth</code> property.</p>
+
+    <p>Note that you can not set default animations on <code>glc.styles</code>, only single values. Animations are only parsed within an object's property definition.</p>
+
+
+    <p>There is one additional property on <code>glc.styles</code> that does not apply to individual objects:</p>
+
+    <div class="code"><pre><code>
+backgroundColor "#ffffff"
+    </code></pre></div>
+
+    <p>This is a global style only. The <code>backgroundColor</code> is only used to draw the main background of the animation and is not used by objects. It is not animatable. If you want to animate the background color, just create a rect behind all the other objects and animate its color.</p>
+
+    <p>All of the other styles do pretty much what they do in the HTML5 Canvas drawing API. The only exceptions are:</p>
+
+    <ul>
+        <li>The <code>lineDash</code> property, which is a <code>setLineDash</code> method on the 2d rendering context.</li>
+        <li><code>translationX</code> and <code>translationY</code>, which are <code>translate(x, y)</code> on the context.</li>
+        <li>The fact that you can specify hex colors with an alpha channel here, which you can't do directly on the 2d renering context. e.g. <code>"#80ff0000"</code></li>
+    </ul>
+
+    </div>
+
+</body>
+</html>
