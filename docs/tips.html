@@ -52,6 +52,7 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
+    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
         height = glc.h;
@@ -79,6 +80,7 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
+    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
         height = glc.h;
@@ -112,6 +114,7 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
+    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
         height = glc.h;
@@ -156,6 +159,8 @@ function onGLC(glc) {
 
     <p>The duration is what it is. If you want a 10 second animation, just realize that it's going to have twice as many frames as a 5 second animation. And it's going to be larger.</p>
 
+    <p>The maximum colors slider can have a big effect on the size of your animation. By default, GLC creates GIFs with 256 colors. This is often way more than you need. Try changing this to a lower number and recompiling your gif. You may find that the lower setting looks just as good as the higher one while giving you a much smaller file size.</p>
+
     <p>And for size, try to make the animation as small as you can. Not meaning that to make everything tiny, but if your animation only covers the center 100 pixels of the canvas, there's no reason to make it 400 pixels tall. Crop it to the size of the moving objects.</p>
 
     <p>If you've done all you can and you still feel the animation is too heavy, there are a number of animated gif optimization tools. Some are web-based - you upload the gif, it optimizes it and you download the optimized version. Others are executable programs you download. Some of these can dramatically reduce file size with very little noticeable change in quality. Do a search and try some of them out.</p>
@@ -164,7 +169,7 @@ function onGLC(glc) {
 
     <p>As mentioned in the intro section, sometimes on larger animations, the right click to save method will fail. If this happens try dragging and dropping the animation to a file system window. I've saved gifs that were over 9.5 megs that way, so this is a pretty reliable fallback.</p>
 
-    <p>You may have noticed in some of the screenshots that there is a "Save gif" link in the Output panel. I removed this as it was very unreliable and would fail way more often than the right click and save method. However, if you want to try it out, look for the <code>glc.js</code> file and you'll see the lines that create this link, commented out. Uncomment them to get the link back.</p>
+    <p>If you ever get brave enough to dive into the <code>glc.js</code> source code, you might notice that there is some disabled code to add a "Save gif" link to the Output panel. I removed this as it was very unreliable and would fail way more often than the right click and save method. However, if you want to try it out, look for the <code>glc.js</code> file and you'll see the lines that create this link, commented out. Uncomment them to get the link back.</p>
     </div>
 
     <!-- ================================================================================== -->
@@ -187,6 +192,7 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
+    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
         height = glc.h;
@@ -221,6 +227,7 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
+    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
         height = glc.h;

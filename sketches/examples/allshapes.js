@@ -6,6 +6,7 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
+    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
         height = glc.h;

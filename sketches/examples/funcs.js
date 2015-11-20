@@ -4,6 +4,7 @@ function onGLC(glc) {
 	// glc.size(400, 400);
 	// glc.setDuration(5);
 	// glc.setFPS(20);
+	// glc.setMaxColors(256);
 	glc.setMode("single");
 	glc.setEasing(false);
 	glc.styles.backgroundColor = "black";

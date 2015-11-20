@@ -22,7 +22,8 @@ function(
 		creditsPanel,
 		capture = false,
 		w = 400,
-		h = 400;
+		h = 400,
+		maxColors = 256;
 
 
 	function init() {
@@ -78,7 +79,7 @@ function(
 	}
 
 	function createInfoPanel() {
-		infoPanel = QuickSettings.create(renderList.getCanvas().width + 50, 320, "GIF Loop Coder");
+		infoPanel = QuickSettings.create(renderList.getCanvas().width + 50, 350, "GIF Loop Coder");
 		infoPanel.addInfo("Info", "Howdy! Welcome to GIF Loop Coder (GLC). This program is offered free and is open source. Lots of hours went into it, so if you find it useful, pay it back or pay it forward.");
 		infoPanel.addInfo("tips", "<a href='https://www.paypal.me/bit101'>Buy me a beer (or two)</a>");
 		infoPanel.addButton("Credits", function() {
@@ -124,6 +125,9 @@ function(
 		panel = QuickSettings.create(renderList.getCanvas().width + 50, 20, "Control Panel");
 		panel.addRange("duration", 0.5, 10, scheduler.getDuration(), 0.5, scheduler.setDuration);
 		panel.addRange("fps", 1, 60, scheduler.getFPS(), 1, scheduler.setFPS);
+		panel.addRange("Max Colors", 2, 256, maxColors, 1, function(value) {
+			maxColors = value;
+		});
 		panel.bindDropDown("mode", ["bounce", "single"], interpolation);
 		panel.bindBoolean("easing", interpolation.easing, interpolation);
 		panel.addButton("Play Once", playOnce);
@@ -144,6 +148,7 @@ function(
 			outputPanel.removeControl("Save");
 			outputPanel.setImageURL("Capture", "");
 			capture = true;
+			GIFEncoder.setMaxColors(maxColors);
 			GIFEncoder.setRepeat(0);
 			GIFEncoder.setDelay(1000 / scheduler.getFPS());
 			GIFEncoder.start();
@@ -269,6 +274,12 @@ function(
 		panel.setBoolean("easing", value);
 	}
 
+	function setMaxColors(value) {
+		value = Math.max(2, value);
+		value = Math.min(256, value);
+		panel.setRangeValue("Max Colors", value);
+	}
+
 
 
 	var glc =  {
@@ -282,7 +293,8 @@ function(
 		setFPS: setFPS,
 		setDuration: setDuration,
 		setMode: setMode,
-		setEasing: setEasing
+		setEasing: setEasing,
+		setMaxColors: setMaxColors
 	};
 
 	init();

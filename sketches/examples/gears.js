@@ -6,6 +6,7 @@ function onGLC(glc) {
 	// glc.setFPS(20);
 	glc.setMode("single");
 	glc.setEasing(false);
+	// glc.setMaxColors(256);
 	glc.styles.shadowColor = "rgba(0,0,0,0.4)";
 	glc.styles.shadowOffsetX = 10;
 	glc.styles.shadowOffsetY = 10;

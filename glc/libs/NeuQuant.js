@@ -124,8 +124,18 @@ define(function() {
 		}
 		this.process = process;
 		this.map = map;
+		this.setMaxColors = setMaxColors;
 
 	}
+
+	function setMaxColors(maxColors) {
+		netsize = maxColors;
+		maxnetpos = (netsize - 1);
+		initrad = (netsize >> 3); /* for 256 cols, radius starts */
+		initradius = (initrad * radiusbias); /* and decreases by a */
+	}
+
+
 	function process() {
 		learn();
 		unbiasnet();
