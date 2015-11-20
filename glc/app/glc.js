@@ -110,6 +110,7 @@ function(
 		outputPanel = QuickSettings.create(renderList.getCanvas().width + 220, 20, "Output");
 		outputPanel.setWidth(renderList.getCanvas().width + 10);
 		outputPanel.addImage("Capture", "");
+		outputPanel.addInfo("size", "");
 		outputPanel.addButton("Clear Image", clear);
 
 		downloadLink = document.createElement("div");
@@ -147,6 +148,7 @@ function(
 		if(!scheduler.running) {
 			outputPanel.removeControl("Save");
 			outputPanel.setImageURL("Capture", "");
+			outputPanel.setInfo("size", "");
 			capture = true;
 			GIFEncoder.setMaxColors(maxColors);
 			GIFEncoder.setRepeat(0);
@@ -163,9 +165,12 @@ function(
 		var canvas = renderList.getCanvas(),
 			dataURL = canvas.toDataURL();
 		outputPanel.setImageURL("Capture", dataURL);
-		outputPanel.removeControl("Save");
+		var header = 'data:image/png;base64,';
+		var imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
+		outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
 
 		// disabled save link for consistency. see note in onComplete().
+		// outputPanel.removeControl("Save");
 		// downloadLink.innerHTML = "<a href='" + dataURL + "' download='" + getFileName(".png") + "'>Save PNG</a>";
 		// outputPanel.addElement("Save", downloadLink);
 	}
@@ -203,6 +208,10 @@ function(
 			var binaryGIF = GIFEncoder.stream().getData();
 			var dataURL = "data:image/gif;base64," + encode64(binaryGIF);
 			outputPanel.setImageURL("Capture", dataURL);
+
+			var header = 'data:image/gif;base64,';
+			var imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
+			outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
 
 			// the save link is disabled as it was failing far too often.
 			// more predictable to right click and save or drag and drop image to file system.

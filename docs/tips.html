@@ -155,6 +155,8 @@ function onGLC(glc) {
 
     <p>When you are making an animated gif, you are basically making a bunch of images and assembling them into a single file that can be played back later. The animated gif format takes care of a lot of optimizing to try to get the size as small as possible, but the encoder that is built into glc is probably not the best at this. So, there are some things you might want to consider when making gifs.</p>
 
+    <p>In the current version of GLC, the output panel displays the approximate file size of the animated gif before you even save it. This makes it much easier to get an idea of how big the output will be, and whether or not you need to do some optimization, before you even save it.</p>
+
     <p>First of all, consider the frame rate, length and physical size of your animation. While glc will make animations up to 60 fps, there's probably no reason to do so. This will inflate the file size dramatically, and not really look any better. Play with the fps slider and see how low you can set it while still looking good.</p>
 
     <p>The duration is what it is. If you want a 10 second animation, just realize that it's going to have twice as many frames as a 5 second animation. And it's going to be larger.</p>
