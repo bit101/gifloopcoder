@@ -18,6 +18,7 @@
                         <li><a href="#arrow">Arrow</a></li>
                         <li><a href="#beziercurve">BezierCurve</a></li>
                         <li><a href="#circle">Circle</a></li>
+                        <li><a href="#cube">Cube</a></li>
                         <li><a href="#curve">Curve</a></li>
                         <li><a href="#gear">Gear</a></li>
                         <li><a href="#grid">Grid</a></li>
@@ -149,6 +150,35 @@ endAngle (360)  The end angle of the arc. (degrees)
 rotation (0)    The rotation of the circle. (degrees).
 stroke (false)  Whether the object will be stroked.
 fill (true)     Whether the object will be filled.
+    </code></pre></div>
+
+    </div>
+
+    <!-- ================================================================================== -->
+        <h3><a name="cube"></a>Cube</a></h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>A cube object is created with:</p>
+
+    <div class="code"><pre><code>
+glc.renderList.addCube(properties);
+    </code></pre></div>
+
+    <p>This draws a wireframe cube. At this time, only a stroke is available, no fill.</p>
+
+    <img src="images/2.21.gif">
+
+    <p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+
+    <div class="code"><pre><code>
+x (100)         The position value of the cube.
+y (100)         The position value of the cube.
+z (0)           The x position of the cube.
+size (100)      The size of the cube.
+rotationX (0)   The rotation of the cube on the x-axis (degrees).
+rotationY (0)   The rotation of the cube on the y-axis (degrees).
+rotationZ (0)   The rotation of the cube on the z-axis (degrees).
     </code></pre></div>
 
     </div>

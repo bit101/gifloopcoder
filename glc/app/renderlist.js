@@ -5,6 +5,7 @@ define([
 	"app/shapes/beziercurve",
 	"app/shapes/beziersegment",
 	"app/shapes/circle",
+	"app/shapes/cube",
 	"app/shapes/curve",
 	"app/shapes/curvesegment",
 	"app/shapes/gear",
@@ -28,6 +29,7 @@ define([
 		BezierCurve,
 		BezierSegment, 
 		Circle,
+		Cube,
 		Curve,
 		CurveSegment,
 		Gear,
@@ -95,6 +97,10 @@ define([
 
 	function addCircle(props) {
 		add(Shape.create(Circle, props));
+	}
+
+	function addCube(props) {
+		add(Shape.create(Cube, props));
 	}
 
 	function addCurve(props) {
@@ -185,6 +191,7 @@ define([
 		addBezierCurve: addBezierCurve,
 		addBezierSegment: addBezierSegment,
 		addCircle: addCircle,
+		addCube: addCube,
 		addCurve: addCurve,
 		addCurveSegment: addCurveSegment,
 		addGear: addGear,
