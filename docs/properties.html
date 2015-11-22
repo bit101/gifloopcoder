@@ -240,16 +240,7 @@ fillStyle: ["#ff0000", "#00ff00", "#0000ff"]
 
     <p>In this case, the colors would not be interpolated, but would jump from one to the other.</p>
 
-    <p>And of course, you can assign a function. This function must return a valid color string! If you're using numerical values to calculate a color, you need to convert that back into a color string before returning it. Something like this will work:</p>
-
-    <div class="code"><pre><code>
-fillStyle: function(t) {
-    var red = Math.floor(255 * t),
-        green = 255,
-        blue = Math.floor(255 - 255 * t);
-    return "rgb(" + red + "," + green + "," + blue + ")";
-}
-    </code></pre></div>
+    <p>And of course, you can assign a function. This function must return a valid color string! If you're using numerical values to calculate a color, you need to convert that back into a color string before returning it. You can use the color module described in the Styles section to do this easily with the <code>color.num</code> method.
 
     <!-- ================================================================================== -->
         <h3><a name="boolean"></a>Boolean</a></h3>

@@ -4,7 +4,8 @@ define([
 	"app/styles",
 	"app/interpolation",
 	"libs/quicksettings",
-	"libs/GIFEncoder"],
+	"libs/GIFEncoder",
+	"libs/color"],
 	
 function(
 	renderList, 
@@ -12,7 +13,8 @@ function(
 	styles,
 	interpolation,
 	QuickSettings,
-	GIFEncoder) {
+	GIFEncoder,
+	color) {
 
 	var panel,
 		canvasPanel,
@@ -303,7 +305,8 @@ function(
 		setDuration: setDuration,
 		setMode: setMode,
 		setEasing: setEasing,
-		setMaxColors: setMaxColors
+		setMaxColors: setMaxColors,
+		color: color
 	};
 
 	init();

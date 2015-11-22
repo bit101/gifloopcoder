@@ -9,7 +9,8 @@ function onGLC(glc) {
 	// glc.setMaxColors(256);
 	var list = glc.renderList,
 		width = glc.w,
-		height = glc.h;
+		height = glc.h,
+		color = glc.color;
 
 	// your code goes here:
 

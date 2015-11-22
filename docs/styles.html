@@ -12,7 +12,12 @@
         <li><a href="index.html">TOC</span></a></li>
         <li><a href="intro.html">1. Introduction to GIF Loop Coder (GLC)</a></li>
         <li><a href="objects.html">2. Objects</a></li>
-        <li><span class="current_section">3. Styles</span></li>
+        <li><span class="current_section">3. Styles</span>
+            <ul>
+                <li><a href="#styles">Styles</a></li>
+                <li><a href="#color">The Color Module</a></li>
+            </ul>
+        </li>
         <li><a href="properties.html">4. Property Types</a></li>
         <li><a href="tips.html">5. Tips and Advanced Use</a></li>
     </ul>
@@ -76,6 +81,114 @@ backgroundColor "#ffffff"
         <li><code>translationX</code> and <code>translationY</code>, which are <code>translate(x, y)</code> on the context.</li>
         <li>The fact that you can specify hex colors with an alpha channel here, which you can't do directly on the 2d renering context. e.g. <code>"#80ff0000"</code></li>
     </ul>
+
+    <!-- ================================================================================== -->
+    <h3><a name="color"></a>The Color Module</a></h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>Although colors are already pretty powerful in GLC, I added a color module that makes defining colors even easier. You can access this as <code>glc.color</code> and it is now aliased in the template to simply be <code>color</code>.</p>
+
+    <p>The color module contains several methods that return color strings that can be used for fill styles, stroke styles, shadow colors or background colors. Some of these simply make it easier to define colors using numbers for the component channels:</p>
+    
+    <div class="code"><pre><code>
+fillStyle: color.rgb(255, 128, 0)
+    </code></pre></div>
+
+    <p>or...</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.rgba(255, 128, 0, 0.5)
+    </code></pre></div>
+
+    <p>The <code>color.num</code> method lets you pass in a single integer that will be converted to a color string. This is usually done with a hexadecimal based number.
+
+    <div class="code"><pre><code>
+fillStyle: color.num(0xff8000)
+    </code></pre></div>
+
+    <p>Note that the <code>num</code> method only supports 24-bit numbers, so no alpha channel. Which is to say that the color will always be fully opaque.</p>
+
+    <p>You can also easily define a grayscale color with the <code>color.gray</code> method. Just pass it a value from 0 to 255.</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.gray(128)
+    </code></pre></div>
+
+    <p>Then there are methods for generating random colors or grays. <code>color.randomRGB()</code> will return a random color with full alpha.</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.randomRGB()
+    </code></pre></div>
+
+    <p>You can also pass minimum and maximum parameters to this method. For example, the following will generate a random color where all of the components have a value between 0 and 128. This will be a darker color, whatever it winds up being.</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.randomRGB(0, 128)
+    </code></pre></div>
+
+    <p>Whereas this example will generate colors where all the components have higher values - between 128 and 255:</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.randomRGB(128, 255)
+    </code></pre></div>
+
+    <p>Then there's the <code>color.randomGray()</code> method. This works the same way. With no parameters, you'll get a random gray from the full spectrum of grays.</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.randomGray()
+    </code></pre></div>
+
+    <p>Or you can pass in min and max values to set a range of grays where your random one will be pulled from.</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.randomGray(0, 128)
+    </code></pre></div>
+
+    <p>Finally, there are two methods for getting HSV (hue, saturation, value) based colors. First there is <code>color.hsv(h, s, v)</code>. Here, you pass a value from 0 to 360 for hue. This determines the base color. Then a value from 0 to 1 for saturation and 0 to 1 for value. Saturation controls how much of the base hue will be in the final color, where 1 is a fully saturated value and 0 will give you white. And value controls how dark the color is, where 1 is as bright as it can be and 0 will be black.</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.hsv(30, 1, 1)
+    </code></pre></div>
+
+    <p>And, of course, there's a random method for hsv: <code>color.randomHue(min, max, s, v)</code>. With this one, the <code>min</code> and <code>max</code> parameters, as well as <code>s</code> and <code>v</code>, are all required. The following will generate colors with a orange to yellow hue:</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.randomHue(30, 60, 1, 1)
+    </code></pre></div>
+
+    <p>A note on animating with the color module. All of these methods return valid color strings, so they can all be animated just as if you'd assigned any other basic string. For example:</p>
+
+    <div class="code"><pre><code>
+fillStyle: [color.rgb(255, 0, 0), color.gray(128)]
+    </code></pre></div>
+
+    <p>And you can mix and match them with any other color strings:</p>
+
+    <div class="code"><pre><code>
+fillStyle: [color.randomRGB(), "blue"]
+    </code></pre></div>
+
+    <p>The only caveat is on using hsv values. These will be converted to color strings, which are rgb based BEFORE animating. So you may not get the result you're looking for when animating between two hsv-defined colors. Take the following example:</p>
+
+    <div class="code"><pre><code>
+fillStyle: [color.hsv(0, 1, 1), color.hsv(360, 1, 1)]
+    </code></pre></div>
+
+    <p>You might expect that to animate through the full spectrum of colors, giving you a rainbow effect. That's not what you'll get though. Actually <code>hsv(0, 1, 1)</code> will be converted to <code>"#ff0000"</code>. And <code>hsv(1, 1, 1)</code> will convert to the exact same thing. So you'll be animating from red to red - no visible animation at all. However, there is a way to do this with a function:</p>
+
+    <div class="code"><pre><code>
+fillStyle: function(t) {
+    var minHue = 0,
+        maxHue = 360
+    return color.hsv(minHue + t * (maxHue - minHue), 1, 1);
+}
+    </code></pre></div>
+
+    <p>This will recalculate a new hsv value on each frame, based on the current <code>t</code> value, so it is actually animating through various hues. If you try this one, I suggest you try it in single mode, no easing, with a duration of at least 5. Otherwise, the entire spectrum will be moving by so quickly, it will just look like random flashing colors. Animating hues often works better for smaller ranges, such as a min and max of 30 and 60, which will move between an orange and a yellow color.</p>
+
+
+    </div>
 
     </div>
 
