@@ -37,8 +37,11 @@ define(function() {
 		return rgb(red, green, blue);
 	}
 
-	function randomHue(minH, maxH, s, v) {
-		return hsv(minH + Math.random() * (maxH - minH), s, v);
+	function randomHSV(minH, maxH, minS, maxS, minV, maxV) {
+		var h = minH + Math.random() * (maxH - minH),
+			s = minS + Math.random() * (maxS - minS),
+			v = minV + Math.random() * (maxV - minV);
+		return hsv(h, s, v);
 	}
 
 	function hsv(h, s, v) {
@@ -61,6 +64,15 @@ define(function() {
 			Math.floor(g * 255),
 			Math.floor(b * 255)
 		);
+	}
+
+	function animHSV(startH, endH, startS, endS, startV, endV) {
+		return function(t) {
+			var h = startH + t * (endH - startH),
+				s = startS + t * (endS - startS),
+				v = startV + t * (endV - startV);
+			return hsv(h, s, v);
+		}
 	}
 
 
@@ -91,6 +103,7 @@ define(function() {
 		gray: gray,
 		num: num,
 		hsv: hsv,
-		randomHue: randomHue
+		animHSV: animHSV,
+		randomHSV: randomHSV
 	};
 });
