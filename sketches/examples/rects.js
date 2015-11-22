@@ -1,6 +1,5 @@
 function onGLC(glc) {
 	glc.loop();
-	// glc.playOnce();
 	glc.size(300, 300);
 	// glc.setDuration(5);
 	// glc.setFPS(20);
