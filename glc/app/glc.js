@@ -5,7 +5,8 @@ define([
 	"app/interpolation",
 	"libs/quicksettings",
 	"libs/GIFEncoder",
-	"libs/color"],
+	"libs/color",
+	"app/ui/controlpanel"],
 	
 function(
 	renderList, 
@@ -14,41 +15,73 @@ function(
 	interpolation,
 	QuickSettings,
 	GIFEncoder,
-	color) {
+	color,
+	controlPanel) {
 
-	var panel,
-		canvasPanel,
+	var canvasPanel,
 		outputPanel,
 		downloadLink,
 		infoPanel,
 		creditsPanel,
-		capture = false,
-		w = 400,
-		h = 400,
-		maxColors = 256;
+		model = {
+			scheduler: scheduler,
+			interpolation: interpolation,
+			maxColors: 256,
+			w: 400,
+			h: 400,
+			capture: false,
+			getDuration: function() {
+				return scheduler.getDuration();
+			},
+			setDuration: function(value) {
+				scheduler.setDuration(value);
+			},
+			getFPS: function() {
+				return scheduler.getFPS();
+			},
+			setFPS: function(value) {
+				scheduler.setFPS(value);
+			},
+			getIsRunning: function() {
+				return scheduler.isRunning();
+			}
+		},
+		controller = {
+			playOnce: scheduler.playOnce,
+			loop: scheduler.loop,
+			stop: scheduler.stop,
+			enableControls: enableControls,
+			disableControls: disableControls,
+			clearOutput: clearOutput,
+			captureStill: captureStill
+		};
+
+
+
 
 
 	function init() {
 		loadCSS();
-		renderList.init(w, h, styles, interpolation);
+		renderList.init(model.w, model.h, styles, interpolation);
 		scheduler.init(onRender, onComplete);
-		createControlPanel();
 		createCanvasPanel();
 		createOutputPanel();
 		createInfoPanel();
 		createCreditsPanel();
+		controlPanel.init(model, controller);
 		setCallbacks();
 	}
 
+
 	function size(width, height) {
-		this.w = w = width;
-		this.h = h = height;
-		renderList.size(w, h);
-		canvasPanel.setWidth(w + 12);
-		outputPanel.setWidth(w + 12);
-		panel.setPosition(w + 50, 20);
-		infoPanel.setPosition(w + 50, 350);
-		outputPanel.setPosition(w + 220, 20);
+		this.w = model.w = width;
+		this.h = model.h = height;
+		renderList.size(model.w, model.h);
+		canvasPanel.setWidth(model.w + 12);
+		outputPanel.setWidth(model.w + 12);
+		controlPanel.setPosition(model.w + 50, 20);
+		infoPanel.setPosition(model.w + 50, 350);
+		outputPanel.setPosition(model.w + 220, 20);
 	}
 
 	function loadCSS() {
@@ -58,26 +91,6 @@ function(
 		link.rel = 'stylesheet';
 		link.href = require.toUrl("libs/quicksettings_minimal.css");
 		head.appendChild(link);
-	}
-
-	function playOnce() {
-		panel.setInfo("status", "playing");
-		scheduler.playOnce();
-		canvasPanel.disableControl("Scrub");
-		panel.disableControl("Play Once");
-		panel.disableControl("Loop");
-		panel.disableControl("Make a gif");
-		panel.disableControl("Capture still");
-	}
-
-	function loop() {
-		panel.setInfo("status", "playing");
-		scheduler.loop();
-		canvasPanel.disableControl("Scrub");
-		panel.disableControl("Play Once");
-		panel.disableControl("Loop");
-		panel.disableControl("Make a gif");
-		panel.disableControl("Capture still");
 	}
 
 	function createInfoPanel() {
@@ -113,9 +126,7 @@ function(
 		outputPanel.setWidth(renderList.getCanvas().width + 12);
 		outputPanel.addImage("Capture", "");
 		outputPanel.addInfo("size", "");
-		outputPanel.addButton("Clear Image", clear);
-
-		downloadLink = document.createElement("div");
+		outputPanel.addButton("Clear Image", controller.clearOutput);
 	}
 
 	function onScrub(value) {
@@ -124,81 +135,17 @@ function(
 		}
 	}
 
-	function createControlPanel() {
-		panel = QuickSettings.create(renderList.getCanvas().width + 50, 20, "Control Panel");
-		panel.addRange("duration", 0.5, 10, scheduler.getDuration(), 0.5, scheduler.setDuration);
-		panel.addRange("fps", 1, 60, scheduler.getFPS(), 1, scheduler.setFPS);
-		panel.addRange("Max Colors", 2, 256, maxColors, 1, function(value) {
-			maxColors = value;
-		});
-		panel.bindDropDown("mode", ["bounce", "single"], interpolation);
-		panel.bindBoolean("easing", interpolation.easing, interpolation);
-		panel.addButton("Play Once", playOnce);
-		panel.addButton("Loop", loop);
-		panel.addButton("Stop", stop);
-		panel.addButton("Make a gif", makeGif);
-		panel.addButton("Capture still", captureStill);
-		panel.addInfo("status", "stopped");
-	}
-
 	function setCallbacks() {
 		scheduler.renderCallback = onRender;
 		scheduler.completeCallback = onComplete;
 	}
 
-	function makeGif() {
-		if(!scheduler.running) {
-			outputPanel.removeControl("Save");
-			outputPanel.setImageURL("Capture", "");
-			outputPanel.setInfo("size", "");
-			outputPanel.setWidth(w + 12);
-			capture = true;
-			GIFEncoder.setMaxColors(maxColors);
-			GIFEncoder.setRepeat(0);
-			GIFEncoder.setDelay(1000 / scheduler.getFPS());
-			GIFEncoder.start();
-			playOnce();
-		}
-		else {
-			panel.setInfo("status", "Animation already running");
-		}
-	}
-
-	function captureStill() {
-		var canvas = renderList.getCanvas(),
-			dataURL = canvas.toDataURL();
-		outputPanel.setWidth(w + 12);
-		outputPanel.setImageURL("Capture", dataURL);
-		var header = 'data:image/png;base64,';
-		var imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
-		outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
-
-		// disabled save link for consistency. see note in onComplete().
-		// outputPanel.removeControl("Save");
-		// downloadLink.innerHTML = "<a href='" + dataURL + "' download='" + getFileName(".png") + "'>Save PNG</a>";
-		// outputPanel.addElement("Save", downloadLink);
-	}
-
-	function stop() {
-		panel.setInfo("status", "stopped");
-		scheduler.stop();
-		canvasPanel.enableControl("Scrub");
-		panel.enableControl("Play Once");
-		panel.enableControl("Loop");
-		panel.enableControl("Make a gif");
-		panel.enableControl("Capture still");
-	}
-
-	function clear() {
-		outputPanel.setImageURL("Capture", "");
-		outputPanel.removeControl("Save");
-	}
 
 	function onRender(t) {
 		canvasPanel.setRangeValue("Scrub", t);
 		renderList.render(t);
-		if(capture) {
-			panel.setInfo("status", "capturing...");
+		if(model.capture) {
+			controlPanel.setStatus("capturing...");
 			GIFEncoder.addFrame(renderList.getContext());
 		}
 		canvasPanel.setRangeValue("Scrub", t);
@@ -206,8 +153,8 @@ function(
 	}
 
 	function onComplete() {
-		if(capture) {
-			capture = false;
+		if(model.capture) {
+			model.capture = false;
 			GIFEncoder.finish();
 			var binaryGIF = GIFEncoder.stream().getData();
 			var dataURL = "data:image/gif;base64," + encode64(binaryGIF);
@@ -216,36 +163,9 @@ function(
 			var header = 'data:image/gif;base64,';
 			var imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
 			outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
-
-			// the save link is disabled as it was failing far too often.
-			// more predictable to right click and save or drag and drop image to file system.
-			// enable this if you'd like, it generally works for images with fewer total frames.
-			// downloadLink.innerHTML = "<a href='" + dataURL + "' download='" + getFileName(".gif") + "'>Save GIF</a>";
-			// outputPanel.addElement("Save", downloadLink);
 		}
-		panel.setInfo("status", "stopped");
-		canvasPanel.enableControl("Scrub");
-		panel.enableControl("Play Once");
-		panel.enableControl("Loop");
-		panel.enableControl("Make a gif");
-		panel.enableControl("Capture still");
-	}
-
-	function getFileName(type) {
-		var date = new Date();
-			year = date.getFullYear().toString().substring(2),
-			month = date.getMonth() + 1,
-			day = date.getDate(),
-			hour = date.getHours(),
-			minute = date.getMinutes(),
-			second = date.getSeconds();
-		if(month < 10) month = "0" + month;
-		if(day < 10) day = "0" + day;
-		if(hour < 10) hour = "0" + hour;
-		if(minute < 10) minute = "0" + minute;
-		if(second < 10) second = "0" + second;
-
-		return "" + year + month + day + "-" + hour + minute + second + type;
+		controlPanel.setStatus("stopped");
+		controller.enableControls();
 	}
 
 	function encode64(input) {
@@ -271,43 +191,56 @@ function(
 		return output;
 	}
 
-	function setFPS(value) {
-		panel.setRangeValue("fps", value);
+
+	function enableControls() {
+		controlPanel.enableControls();
+		canvasPanel.enableControl("Scrub");
 	}
 
-	function setDuration(value) {
-		panel.setRangeValue("duration", value);
+	function disableControls() {
+		controlPanel.disableControls();
+		canvasPanel.disableControl("Scrub");
 	}
 
-	function setMode(mode) {
-		panel.setDropDownIndex("mode", mode === "bounce" ? 0 : 1);
+	function clearOutput() {
+		outputPanel.setImageURL("Capture", "");
+		outputPanel.setInfo("size", "");
+		outputPanel.setWidth(model.w + 12);
 	}
 
-	function setEasing(value) {
-		panel.setBoolean("easing", value);
+	function captureStill() {
+		var canvas = renderList.getCanvas(),
+			dataURL = canvas.toDataURL();
+		outputPanel.setWidth(model.w + 12);
+		outputPanel.setImageURL("Capture", dataURL);
+		var header = 'data:image/png;base64,';
+		var imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
+		outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
 	}
 
-	function setMaxColors(value) {
-		value = Math.max(2, value);
-		value = Math.min(256, value);
-		panel.setRangeValue("Max Colors", value);
+	function startEncoder() {
+		GIFEncoder.setMaxColors(model.maxColors);
+		GIFEncoder.setRepeat(0);
+		GIFEncoder.setDelay(1000 / scheduler.getFPS());
+		GIFEncoder.start();
 	}
+
 
 
 
 	var glc =  {
-		w: w,
-		h: h,
+		w: model.w,
+		h: model.h,
 		renderList: renderList,
 		styles: styles,
 		size: size,
-		playOnce: playOnce,
-		loop: loop,
-		setFPS: setFPS,
-		setDuration: setDuration,
-		setMode: setMode,
-		setEasing: setEasing,
-		setMaxColors: setMaxColors,
+		playOnce: controlPanel.playOnce,
+		loop: controlPanel.loop,
+		setFPS: controlPanel.setFPS,
+		setDuration: controlPanel.setDuration,
+		setMode: controlPanel.setMode,
+		setEasing: controlPanel.setEasing,
+		setMaxColors: controlPanel.setMaxColors,
 		color: color
 	};
 
