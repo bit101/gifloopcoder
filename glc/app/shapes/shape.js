@@ -65,6 +65,9 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 			context.globalAlpha = this.getNumber("globalAlpha", t, this.styles.globalAlpha);
 			context.translate(this.getNumber("translationX", t, this.styles.translationX), this.getNumber("translationY", t, this.styles.translationY));
 
+			var shake = this.getNumber("shake", t, this.styles.shake);
+			context.translate(Math.random() * shake - shake / 2, Math.random() * shake - shake / 2);
+
 			var lineDash = this.getArray("lineDash", t, this.styles.lineDash);
 			if(lineDash) {
 				context.setLineDash(lineDash);

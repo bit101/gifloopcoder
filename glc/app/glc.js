@@ -40,14 +40,14 @@ function(
 		setCallbacks();
 	}
 
-	function size(w, h) {
-		this.w = w;
-		this.h = h;
+	function size(width, height) {
+		this.w = w = width;
+		this.h = h = height;
 		renderList.size(w, h);
-		canvasPanel.setWidth(w + 10);
-		outputPanel.setWidth(w + 10);
+		canvasPanel.setWidth(w + 12);
+		outputPanel.setWidth(w + 12);
 		panel.setPosition(w + 50, 20);
-		infoPanel.setPosition(w + 50, 320);
+		infoPanel.setPosition(w + 50, 350);
 		outputPanel.setPosition(w + 220, 20);
 	}
 
@@ -103,14 +103,14 @@ function(
 
 	function createCanvasPanel() {	
 		canvasPanel = QuickSettings.create(20, 20, "Canvas Panel");
-		canvasPanel.setWidth(renderList.getCanvas().width + 10);
+		canvasPanel.setWidth(renderList.getCanvas().width + 12);
 		canvasPanel.addElement("Canvas", renderList.getCanvas());
 		canvasPanel.addRange("Scrub", 0, 1, 0, 0.01, onScrub);
 	}
 
 	function createOutputPanel() {
 		outputPanel = QuickSettings.create(renderList.getCanvas().width + 220, 20, "Output");
-		outputPanel.setWidth(renderList.getCanvas().width + 10);
+		outputPanel.setWidth(renderList.getCanvas().width + 12);
 		outputPanel.addImage("Capture", "");
 		outputPanel.addInfo("size", "");
 		outputPanel.addButton("Clear Image", clear);
@@ -151,6 +151,7 @@ function(
 			outputPanel.removeControl("Save");
 			outputPanel.setImageURL("Capture", "");
 			outputPanel.setInfo("size", "");
+			outputPanel.setWidth(w + 12);
 			capture = true;
 			GIFEncoder.setMaxColors(maxColors);
 			GIFEncoder.setRepeat(0);
@@ -166,6 +167,7 @@ function(
 	function captureStill() {
 		var canvas = renderList.getCanvas(),
 			dataURL = canvas.toDataURL();
+		outputPanel.setWidth(w + 12);
 		outputPanel.setImageURL("Capture", dataURL);
 		var header = 'data:image/png;base64,';
 		var imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
