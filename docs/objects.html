@@ -24,6 +24,7 @@
                         <li><a href="#grid">Grid</a></li>
                         <li><a href="#heart">Heart</a></li>
                         <li><a href="#line">Line</a></li>
+                        <li><a href="#oval">Oval</a></li>
                         <li><a href="#path">Path</a></li>
                         <li><a href="#poly">Poly</a></li>
                         <li><a href="#ray">Ray</a></li>
@@ -328,6 +329,40 @@ y1 (100)    The y value of the second point.
     </code></pre></div>
 
     </div>
+
+    <!-- ================================================================================== -->
+        <h3><a name="oval"></a>Oval</a></h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>A oval object is created with:</p>
+
+    <div class="code"><pre><code>
+glc.renderList.addOval(properties);
+    </code></pre></div>
+
+    <p>This draws an oval using values <code>rx</code> and <code>ry</code> for the x and y radius. Because this is done using the arc command in HTML5, this object also draws oval-based arcs by setting the start and end angles.</p>
+
+    <img src="images/2.22.gif">
+
+    <p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+
+    <div class="code"><pre><code>
+x (100)                 The x position of the oval.
+y (100)                 The y position of the oval.
+rx (50)                 The x radius of the oval.
+ry (50)                 The y radius of the oval.
+startAngle (0)          The start angle of the arc. (degrees)
+endAngle (360)          The end angle of the arc. (degrees)
+rotation (0)            The rotation of the oval. (degrees).
+stroke (false)          Whether the object will be stroked.
+fill (true)             Whether the object will be filled.
+drawFromCenter (false)  If true, starts and ends the drawing at the center of the oval rather than points on the radius.
+    </code></pre></div>
+
+    </div>
+
+
 
     <!-- ================================================================================== -->
         <h3><a name="path"></a>Path</a></h3>

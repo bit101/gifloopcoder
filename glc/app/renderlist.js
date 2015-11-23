@@ -12,6 +12,7 @@ define([
 	"app/shapes/grid",
 	"app/shapes/heart",
 	"app/shapes/line",
+	"app/shapes/oval",
 	"app/shapes/path",
 	"app/shapes/poly",
 	"app/shapes/ray",
@@ -36,6 +37,7 @@ define([
 		Grid,
 		Heart,
 		Line,
+		Oval,
 		Path,
 		Poly,
 		Ray,
@@ -127,6 +129,10 @@ define([
 		add(Shape.create(Line, props));
 	}
 	
+	function addOval(props) {
+		add(Shape.create(Oval, props));
+	}
+	
 	function addPath(props) {
 		add(Shape.create(Path, props));
 	}
@@ -198,6 +204,7 @@ define([
 		addGrid: addGrid,
 		addHeart: addHeart,
 		addLine: addLine,
+		addOval: addOval,
 		addPath: addPath,
 		addPoly: addPoly,
 		addRay: addRay,
