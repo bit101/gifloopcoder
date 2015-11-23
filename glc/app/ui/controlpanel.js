@@ -65,7 +65,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	}
 
 	function stop() {
-		panel.setInfo(statusInfo, "stopped");
+		setStatus("stopped");
 		controller.stop();
 		controller.enableControls();
 	}
