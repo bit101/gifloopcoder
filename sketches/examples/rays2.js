@@ -1,14 +1,14 @@
 function onGLC(glc) {
-	var list = glc.renderList;
+    var list = glc.renderList;
 
-	glc.loop();
-	glc.size(540, 540);
-	glc.setDuration(3);
-	glc.setFPS(30);
+    glc.loop();
+    glc.size(540, 540);
+    glc.setDuration(3);
+    glc.setFPS(30);
     glc.styles.backgroundColor = "#000000";
 
     
-	// your code goes here:
+    // your code goes here:
     
     var num=100;
     
@@ -25,4 +25,4 @@ function onGLC(glc) {
     }
 
 
-}		
+}       

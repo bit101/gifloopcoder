@@ -6,15 +6,15 @@ function onGLC(glc) {
     glc.styles.backgroundColor = "#74677A" // "black";
     glc.loop();
     
-	var list = glc.renderList,
-		width = glc.w,
-		height = glc.h;
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
 
-	// your code goes here:
+    // your code goes here:
 
 
     
-	var list = glc.renderList;
+    var list = glc.renderList;
     var num = 50;
 
     for (var i=0; i<num; i++) {
@@ -33,4 +33,4 @@ function onGLC(glc) {
         });
     }
 
-}		
+}       

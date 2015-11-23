@@ -1,16 +1,16 @@
 function onGLC(glc) {
-	glc.loop();
+    glc.loop();
     glc.size(540, 540);
     glc.setFPS(45);
     glc.setDuration(3);
     glc.styles.lineWidth = 5;
     glc.styles.backgroundColor = "black";
     
-	var list = glc.renderList,
-		width = glc.w,
-		height = glc.h;
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
 
-	// your code goes here:
+    // your code goes here:
 
     var num = 50;
 
@@ -24,4 +24,4 @@ function onGLC(glc) {
             phase: 1.0/num*i/2
         });
     }
-}		
+}       
