@@ -26,7 +26,10 @@ function(
 	canvasPanel,
 	outputPanel) {
 
+	// this could be a module too. 
+	// ideally it wouldn't know about scheduler directly
 	var model = {
+			// interpolation could just be absorbed into model
 			interpolation: interpolation,
 			maxColors: 256,
 			w: 400,
@@ -47,8 +50,10 @@ function(
 			getIsRunning: function() {
 				return scheduler.isRunning();
 			}
-		},
-		controller = {
+		};
+
+	// this could be a module that knows about all panels + schedule
+	var controller = {
 			playOnce: scheduler.playOnce,
 			loop: scheduler.loop,
 			stop: scheduler.stop,
@@ -61,10 +66,6 @@ function(
 			startEncoder: startEncoder
 		};
 
-
-
-
-
 	function init() {
 		loadCSS();
 		renderList.init(model.w, model.h, styles, interpolation);
@@ -76,7 +77,6 @@ function(
 		controlPanel.init(model, controller);
 		setCallbacks();
 	}
-
 
 	function size(width, height) {
 		this.w = model.w = width;
@@ -98,8 +98,9 @@ function(
 		head.appendChild(link);
 	}
 
-
-
+	/////////////////////
+	// callback methods
+	/////////////////////
 
 	function setCallbacks() {
 		scheduler.renderCallback = onRender;
@@ -126,8 +127,9 @@ function(
 		controller.enableControls();
 	}
 
-
-
+	/////////////////////
+	// controller methods
+	/////////////////////
 
 	function enableControls() {
 		controlPanel.enableControls();
@@ -138,7 +140,6 @@ function(
 		controlPanel.disableControls();
 		canvasPanel.disableControls();
 	}
-
 
 	function captureStill() {
 		var canvas = renderList.getCanvas(),
@@ -153,9 +154,6 @@ function(
 		GIFEncoder.setDelay(1000 / scheduler.getFPS());
 		GIFEncoder.start();
 	}
-
-
-
 
 	var glc =  {
 		w: model.w,

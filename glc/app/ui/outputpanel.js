@@ -3,30 +3,36 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		model = null,
 		controller = null;
 
+
+	// controls
+	var captureImage = "Capture",
+		sizeInfo = "size",
+		clearImageButton = "Clear Image";
+
 	function init(pModel, pController) {
 		model = pModel;
 		controller = pController;
 		outputPanel = QuickSettings.create(model.w + 220, 20, "Output");
 		outputPanel.setWidth(model.w + 12);
-		outputPanel.addImage("Capture", "");
-		outputPanel.addInfo("size", "");
-		outputPanel.addButton("Clear Image", controller.clearOutput);
+		outputPanel.addImage(captureImage, "");
+		outputPanel.addInfo(sizeInfo, "");
+		outputPanel.addButton(clearImageButton, controller.clearOutput);
 	}
 
 
 	function setGIF(binaryGIF) {
 		var dataURL = "data:image/gif;base64," + encode64(binaryGIF);
-		outputPanel.setImageURL("Capture", dataURL);
+		outputPanel.setImageURL(captureImage, dataURL);
 		var header = 'data:image/gif;base64,',
 			imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
-		outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
+		outputPanel.setInfo(sizeInfo, "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
 	}
 
 	function setPNG(dataURL) {
-		outputPanel.setImageURL("Capture", dataURL);
+		outputPanel.setImageURL(captureImage, dataURL);
 		var header = 'data:image/png;base64,',
 			imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
-		outputPanel.setInfo("size", "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
+		outputPanel.setInfo(sizeInfo, "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
 	}
 
 	function setWidth(width) {
@@ -38,8 +44,8 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	}
 
 	function clearOutput() {
-		outputPanel.setImageURL("Capture", "");
-		outputPanel.setInfo("size", "");
+		outputPanel.setImageURL(captureImage, "");
+		outputPanel.setInfo(sizeInfo, "");
 		outputPanel.setWidth(model.w + 12);
 	}
 
