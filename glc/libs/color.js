@@ -85,6 +85,51 @@ define(function() {
 		return animHSVA(startH, endH, startS, endS, startV, endV, 1, 1);
 	}
 
+
+
+	
+
+	/////////////////////
+	// gradients
+	/////////////////////
+    function createLinearGradient(x0, y0, x1, y1) {
+        var g = {
+            type: "linearGradient",
+            x0: x0,
+            y0: y0,
+            x1: x1,
+            y1: y1,
+            colorStops: [],
+            addColorStop: function(position, color) {
+                this.colorStops.push({
+                    position: position,
+                    color: color
+                });
+            }
+        }
+        return g;
+    }
+
+    function createRadialGradient(x0, y0, r0, x1, y1, r1) {
+        var g = {
+            type: "radialGradient",
+            x0: x0,
+            y0: y0,
+            r0: r0,
+            x1: x1,
+            y1: y1,
+            r1: r1,
+            colorStops: [],
+            addColorStop: function(position, color) {
+                this.colorStops.push({
+                    position: position,
+                    color: color
+                });
+            }
+        }
+        return g;
+    }
+
 	color = {
 		r: 255,
 		g: 255,
@@ -115,6 +160,8 @@ define(function() {
 		hsva: hsva,
 		animHSV: animHSV,
 		animHSVA: animHSVA,
-		randomHSV: randomHSV
+		randomHSV: randomHSV,
+		createLinearGradient: createLinearGradient,
+		createRadialGradient: createRadialGradient
 	};
 });

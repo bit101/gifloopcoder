@@ -19,13 +19,14 @@ define(function() {
 		    context.save();
 		    context.translate(x, y);
 		    context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+		    context.save();
 		    context.scale(w, h);
 		    context.moveTo(x0, y0);
 		    context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
 		    context.bezierCurveTo(-x2, y2, -x1, y1, -x0, y0);
 		    context.restore();
-
 			this.drawFillAndStroke(context, t, true, false);
+		    context.restore();
 		}
 	}
 });

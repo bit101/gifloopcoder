@@ -155,6 +155,7 @@ function(
 		GIFEncoder.start();
 	}
 
+
 	var glc =  {
 		w: model.w,
 		h: model.h,
@@ -168,8 +169,7 @@ function(
 		setMode: controlPanel.setMode,
 		setEasing: controlPanel.setEasing,
 		setMaxColors: controlPanel.setMaxColors,
-		color: color,
-		getContext: renderList.getContext
+		color: color
 	};
 
 	init();

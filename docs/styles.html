@@ -16,6 +16,7 @@
             <ul>
                 <li><a href="#styles">Styles</a></li>
                 <li><a href="#color">The Color Module</a></li>
+                <li><a href="#gradients">Gradients</a></li>
             </ul>
         </li>
         <li><a href="properties.html">4. Property Types</a></li>
@@ -103,7 +104,9 @@ backgroundColor "#ffffff"
 - color.randomGray(min, max)
 - color.num(number)
 - color.hsv(h, s, v)
+- color.hsva(h, s, v, a)
 - color.animHSV(h, s, v)
+- color.animHSVA(h, s, v, a)
 - color.randomHSV(minH, maxH, minS, maxS, minV, maxV)
     </code></pre></div>
 
@@ -170,6 +173,12 @@ fillStyle: color.randomGray(0, 128)
 fillStyle: color.hsv(30, 1, 1)
     </code></pre></div>
 
+    <p>There's also a version with alpha:</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.hsva(30, 1, 1, 0.5)
+    </code></pre></div>
+
     <p>And, of course, there's a random method for hsv: <code>color.randomHue(min, max, s, v)</code>. With this one, the <code>min</code> and <code>max</code> parameters, as well as <code>s</code> and <code>v</code>, are all required. The following will generate colors with a orange to yellow hue:</p>
 
     <div class="code"><pre><code>
@@ -200,12 +209,166 @@ fillStyle: [color.hsv(0, 1, 1), color.hsv(360, 1, 1)]
     <p>That's what the <code>color.animHSV</code> method is for. This takes six values - start and end parameters for each of h, s and v, and will animate between them as you would expect.</p>
 
     <div class="code"><pre><code>
-fillStyle: color.animHSV(0, 360, 1, 1, 1, 1)
+fillStyle: color.animHSV(startH, endH, startS, endS, startV, endV)
     </code></pre></div>
 
     <p>This will recalculate a new hsv value on each frame, so it is actually animating through various hues. If you try this one, I suggest you try it in single mode, no easing, with a duration of at least 5. Otherwise, the entire spectrum will be moving by so quickly, it will just look like random flashing colors. Animating hues often works better for smaller ranges, such as a min and max of 30 and 60, which will move between an orange and a yellow color.</p>
 
+    <p>And, for the sake of completeness, the alpha version:</p>
+
+    <div class="code"><pre><code>
+fillStyle: color.animHSVA(startH, endH, startS, endS, startV, endV, startA, endA)
+    </code></pre></div>
+
+
+
     <p>For a bit more in depth discussion of the color module, <a href="http://www.gifloopcoder.com/blog/2015/11/22/new-the-color-module/">check out this post</a>.</p>
+
+    </div>
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="gradients"></a>Gradients</a></h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>Gradients, even in native canvas, are complex. Creating a single gradient is complicated enough, so it was a challenge to allow for a method of animating gradients without making it any more complicated. One of the main design decisions, good or bad, in GLC was to match the native canvas drawing API as much as possible. In canvas, you create gradients by calling <code>context.createLinearGradient()</code> or <code>context.createRadialGradient()</code> and then adding colors at specific spots in the gradient by calling <code>gradient.addColorStop()</code>. This is well documented elsewhere on the web, so I'm not going to go into that much here.</p>
+
+    <p>But basically, you'll be using the same API to make gradients in GLC. The big difference is that the gradients you create in GLC will be animatable, just like everything else.</p>
+
+    <p>The methods for creating gradients have been added to the color module (which again is at <code>glc.color</code>, and aliased to simply <code>color</code> in the <code>template.js</code> file).
+
+    <p>So, to create a linear gradient, you would say:</p>
+
+    <div class="code"><pre><code>
+var gradient = color.createLinearGradient(x0, y0, x1, y1);
+    </code></pre></div>
+
+    <p>This creates a linear gradient that starts at point <code>x0, y0</code> and goes to <code>x1, y1</code>. Now we need to add color stops. Say we want the color to be red at point <code>x0, y0</code> and gradiently change to blue when it reaches <code>x1, y1</code>. We say:</p>
+
+    <div class="code"><pre><code>
+var gradient = color.createLinearGradient(x0, y0, x1, y1);
+<span class="bold">gradient.addColorStop(0, "red");
+gradient.addColorStop(1, "blue");</span>
+    </code></pre></div>
+
+    <p>You can add as many stops as you want. Just ensure that you keep the positions in the range of 0 - 1.</p>
+
+    <div class="code"><pre><code>
+var gradient = color.createLinearGradient(x0, y0, x1, y1);
+gradient.addColorStop(0, "red");
+<span class="bold">gradient.addColorStop(0.5, "green");</span>
+gradient.addColorStop(1, "blue");
+    </code></pre></div>
+
+    <p>Now, the gradient will start at red, move through green at the midway point, and end at blue. We can then simply assign this to the <code>fillStyle</code> or <code>strokeStyle</code> property of any object we are drawing. So here's what we have:</p>
+
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
+
+    var gradient = color.createLinearGradient(0, -100, 0, 100);
+    gradient.addColorStop(0, "red");
+    gradient.addColorStop(0.5, "green");
+    gradient.addColorStop(1, "blue");
+
+    list.addCircle({
+        x: 100,
+        y: 100,
+        radius: 100,
+        fillStyle: gradient
+    });
+}
+    </code></pre></div>
+
+    <p>Here, the gradient goes from point 0, -100 to point 0, 100. This is relative to the center of the circle we are drawing. Since the circle has a radius of 100, the gradient will go from the top of the circle to the bottom. And here's what this gives us:</p>
+
+
+    <img src="images/3.2.png">
+
+    <p>The center of the object distinction is unique to GLC. In native canvas, the gradient is always centered at the top left of the canvas itself. This makes calculating your gradient sizes and positions to match what you're drawing a bit tricky.</p>
+
+    <p>But for many of the objects in GLC the gradient is centered on the object, so things generally become a whole lot simpler.</p>
+
+    <p>The gradient is centered on the object for the following shapes: circle, gear, heart, oval, poly, rect, star and text. These objects all have a size and position that is known beforehand. Also, these are the objects most likely to be filled, and gradients are generally more commonly used on fills than on strokes. So this makes filling these objects with a gradient very easy.</p>
+
+    <p>When using gradients on other objects, such as curves, lines and paths, the gradient will most likely start at the default top left of the canvas and you'll have to work out where you want it from there, just like in native canvas. In some objects, such as the ray, the gradient will be centered on the first point of the ray. So you might need to experiment a bit to see where the gradient is actually starting and adjust it from there.</p>
+
+    <p>For radial gradients, the process is the same, but you'd call <code>color.createRadialGradient(x0, y0, r0, x1, y1, r1)</code>. Again, you're specifying two points, but also two radii. Basically the gradient goes between two circles. Usually these are somewhat concentric circles, with one very small, and the other the size of your object. So we have this:</p>
+
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
+
+    <span class="bold">var gradient = color.createRadialGradient(0, 0, 0, 0, 0, 100);</span>
+    gradient.addColorStop(0, "red");
+    gradient.addColorStop(0.5, "green");
+    gradient.addColorStop(1, "blue");
+
+    list.addCircle({
+        x: 100,
+        y: 100,
+        radius: 100,
+        fillStyle: gradient
+    });
+}
+    </code></pre></div>
+
+    <p>The only difference here is that we created a radial gradient. The first point is 0, 0 with a radius of 0. The second point is also 0, 0, with a radius of 100. Color stops are the same. So we get:</p>
+
+    <img src="images/3.3.png">
+
+    <p>Now, on to animating! A lot of work went into making this as easy as possible while still following the canvas API. In the end, all we have to do is create two gradients, and assign them as an array to <code>fillStyle</code>. GCL will animate between them. It will animate the points and radii of the gradients, and the positions and colors of all the color stops!</p>
+
+    <p>Here you go:</p>
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
+
+    var gradient1 = color.createRadialGradient(0, 0, 0, 0, 0, 100);
+    gradient1.addColorStop(0, "red");
+    gradient1.addColorStop(0.5, "green");
+    gradient1.addColorStop(1, "blue");
+
+    var gradient2 = color.createRadialGradient(0, 0, 0, 0, 0, 100);
+    gradient2.addColorStop(0, "green");
+    gradient2.addColorStop(0.5, "blue");
+    gradient2.addColorStop(1, "red");
+
+    list.addCircle({
+        x: 100,
+        y: 100,
+        radius: 100,
+        fillStyle: [gradient1, gradient2]
+    });
+}
+    </code></pre></div>
+
+    <p>Here, all I did was change the colors, but you could change just about anything. The result:</p>
+
+    <img src="images/3.4.gif">
+
+    <p>Now before you ask, NO, it's not possible to animate between different kinds of gradients. For example, you can't animate between a solid fill and a gradient, or between a linear and radial gradient. You could, of course, create two gradients, and have the colors all the same in one. This would, in effect, create a solid fill. But since it's really a gradient, it would animate to a different gradient.</p>
+
+    <p>Also, the number of color stops in the two gradients should be equal. If they aren't, some color stops might be dropped, or your computer might blow up.</p>
 
     </div>
 

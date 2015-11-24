@@ -12,16 +12,16 @@ define(function() {
 			context.translate(x, y);
 			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
 
-			context.translate(-w / 2, 0);
+			// context.translate(-w / 2, 0);
 
-			context.moveTo(0, -h * shaftPercent * 0.5);
-			context.lineTo(w - w * pointPercent, -h * shaftPercent * 0.5);
-			context.lineTo(w - w * pointPercent, -h * 0.5);
-			context.lineTo(w, 0);
-			context.lineTo(w - w * pointPercent, h * 0.5);
-			context.lineTo(w - w * pointPercent, h * shaftPercent * 0.5);
-			context.lineTo(0, h * shaftPercent * 0.5);
-			context.lineTo(0, -h * shaftPercent * 0.5);
+			context.moveTo(-w / 2, -h * shaftPercent * 0.5);
+			context.lineTo(w / 2 - w * pointPercent, -h * shaftPercent * 0.5);
+			context.lineTo(w / 2 - w * pointPercent, -h * 0.5);
+			context.lineTo(w / 2, 0);
+			context.lineTo(w / 2 - w * pointPercent, h * 0.5);
+			context.lineTo(w / 2 - w * pointPercent, h * shaftPercent * 0.5);
+			context.lineTo(-w / 2, h * shaftPercent * 0.5);
+			context.lineTo(-w / 2, -h * shaftPercent * 0.5);
 
 			this.drawFillAndStroke(context, t, true, false);
 		}
