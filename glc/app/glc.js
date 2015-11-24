@@ -168,7 +168,8 @@ function(
 		setMode: controlPanel.setMode,
 		setEasing: controlPanel.setEasing,
 		setMaxColors: controlPanel.setMaxColors,
-		color: color
+		color: color,
+		getContext: renderList.getContext
 	};
 
 	init();

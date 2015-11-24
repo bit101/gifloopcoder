@@ -44,7 +44,7 @@ define(function() {
 		return hsv(h, s, v);
 	}
 
-	function hsv(h, s, v) {
+	function hsva(h, s, v, a) {
 		var r, g, b,
 			i = Math.floor(h / 60),
 			f = h / 60 - i,
@@ -59,22 +59,31 @@ define(function() {
 			case 4: r = t, g = p, b = v; break;
 			case 5: r = v, g = p, b = q; break;
 		}
-		return rgb(
+		return rgba(
 			Math.floor(r * 255),
 			Math.floor(g * 255),
-			Math.floor(b * 255)
+			Math.floor(b * 255),
+			a
 		);
 	}
 
-	function animHSV(startH, endH, startS, endS, startV, endV) {
+	function hsv(h, s, v) {
+		return hsva(h, s, v, 1);
+	}
+
+	function animHSVA(startH, endH, startS, endS, startV, endV, startA, endA) {
 		return function(t) {
 			var h = startH + t * (endH - startH),
 				s = startS + t * (endS - startS),
-				v = startV + t * (endV - startV);
-			return hsv(h, s, v);
+				v = startV + t * (endV - startV),
+				a = startA + t * (endA - startA);
+			return hsva(h, s, v, a);
 		}
 	}
 
+	function animHSV(startH, endH, startS, endS, startV, endV) {
+		return animHSVA(startH, endH, startS, endS, startV, endV, 1, 1);
+	}
 
 	color = {
 		r: 255,
@@ -103,7 +112,9 @@ define(function() {
 		gray: gray,
 		num: num,
 		hsv: hsv,
+		hsva: hsva,
 		animHSV: animHSV,
+		animHSVA: animHSVA,
 		randomHSV: randomHSV
 	};
 });

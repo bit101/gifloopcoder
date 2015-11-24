@@ -22,6 +22,9 @@ define(function() {
 		else if(prop && prop.length) {
 			return  prop[Math.round(t * (prop.length - 1))];
 		}
+		if(typeof prop === "object") {
+			return prop;
+		}
 		return def;
 	}
 
