@@ -63,13 +63,14 @@ function(
 			captureStill: captureStill,
 			showCredits: creditsPanel.show,
 			renderFrame: renderList.render,
-			startEncoder: startEncoder
+			startEncoder: startEncoder,
+			setCurrentScene: renderList.setCurrentScene
 		};
 
 	function init() {
 		loadCSS();
 		renderList.init(model.w, model.h, styles, interpolation);
-		scheduler.init(onRender, onComplete);
+		scheduler.init(onRender, onComplete, onSceneEnded);
 		canvasPanel.init(model, controller, renderList.getCanvas());
 		outputPanel.init(model, controller);
 		infoPanel.init(model, controller);
@@ -118,13 +119,23 @@ function(
 	}
 
 	function onComplete() {
-		if(model.capture) {
-			model.capture = false;
-			GIFEncoder.finish();
-			outputPanel.setGIF(GIFEncoder.stream().getData());
+		if(renderList.hasNextScene()) {
+			renderList.nextScene();
+			scheduler.playOnce();
 		}
-		controlPanel.setStatus("stopped");
-		controller.enableControls();
+		else {
+			if(model.capture) {
+				model.capture = false;
+				GIFEncoder.finish();
+				outputPanel.setGIF(GIFEncoder.stream().getData());
+			}
+			controlPanel.setStatus("stopped");
+			controller.enableControls();
+		}
+	}
+
+	function onSceneEnded() {
+		renderList.nextScene();
 	}
 
 	/////////////////////

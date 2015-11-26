@@ -38,12 +38,14 @@ define(["libs/quicksettings"], function(QuickSettings) {
 
 	function playOnce() {
 		panel.setInfo(statusInfo, "playing");
+		controller.setCurrentScene(0);
 		controller.playOnce();
 		controller.disableControls();
 	}
 
 	function loop() {
 		panel.setInfo(statusInfo, "playing");
+		controller.setCurrentScene(0);
 		controller.loop();
 		controller.disableControls();
 	}

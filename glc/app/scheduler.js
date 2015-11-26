@@ -7,11 +7,13 @@ define(function() {
 		looping = false,
 		renderCallback = null,
 		completeCallback = null,
+		sceneEndedCallback = null;
 		renderList = null
 
-	function init(onRender, onCompete) {
+	function init(onRender, onCompete, onSceneEnded) {
 		renderCallback = onRender;
 		completeCallback = onCompete;
+		sceneEndedCallback = onSceneEnded;
 	}
 
 	function render() {
@@ -38,6 +40,9 @@ define(function() {
 	    if(Math.round(t * 10000) / 10000 >= 1) {
 	    	if(looping) {
 	    		t -= 1;
+	    		if(sceneEndedCallback) {
+	    			sceneEndedCallback();
+	    		}
 	    	}
 	    	else {
 		    	t = 0;

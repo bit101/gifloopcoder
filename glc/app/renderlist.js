@@ -54,7 +54,9 @@ define([
 		context = null,
 		width = 0,
 		height = 0,
+		scenes = [],
 		list = [],
+		currentScene = 0,
 		styles = null;
 
 	function init(w, h, stylesValue, interpolation) {
@@ -65,6 +67,7 @@ define([
 		styles = stylesValue
 		Shape.styles = styles;
 		Shape.interpolation = interpolation;
+		scenes.push(list);
 	}
 
 	function size(w, h) {
@@ -177,12 +180,34 @@ define([
 		}
 	}
 
+	function hasNextScene() {
+		return currentScene < scenes.length - 1;
+	}
+
+	function nextScene() {
+		currentScene++;
+		if(currentScene >= scenes.length) {
+			currentScene = 0;
+		}
+		list = scenes[currentScene];
+	}
+
 	function getCanvas() {
 		return canvas;
 	}
 
 	function getContext() {
 		return context;
+	}
+
+	function setCurrentScene(index) {
+		currentScene = index;
+		for(var i = 0; i <= currentScene; i++) {
+			if(!scenes[i]) {
+				scenes[i] = [];
+			}
+		}
+		list = scenes[currentScene];
 	}
 
 	return {
@@ -214,7 +239,10 @@ define([
 		addSpiral: addSpiral,
 		addStar: addStar,
 		addText: addText,
-		render: render
+		render: render,
+		setCurrentScene: setCurrentScene,
+		nextScene: nextScene,
+		hasNextScene: hasNextScene
 	};
 
 });
