@@ -170,8 +170,13 @@ define([
 	}
 
 	function render(t) {
-		context.fillStyle = styles.backgroundColor;
-  		context.fillRect(0, 0, width, height);
+		if(styles.backgroundColor === "transparent") {
+			context.clearRect(0, 0, width, height);
+		}
+		else {
+			context.fillStyle = styles.backgroundColor;
+  			context.fillRect(0, 0, width, height);
+  		}
 		for(var i = 0; i < list.length; i++) {
 			list[i].render(context, t);
 		}

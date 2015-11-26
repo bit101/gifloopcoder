@@ -64,7 +64,7 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 			context.miterLimit = this.getString("miterLimit", t, this.styles.miterLimit);
 			context.globalAlpha = this.getNumber("globalAlpha", t, this.styles.globalAlpha);
 			context.translate(this.getNumber("translationX", t, this.styles.translationX), this.getNumber("translationY", t, this.styles.translationY));
-
+			context.globalCompositeOperation = this.getString("blendMode", t, this.styles.blendMode);
 			var shake = this.getNumber("shake", t, this.styles.shake);
 			context.translate(Math.random() * shake - shake / 2, Math.random() * shake - shake / 2);
 

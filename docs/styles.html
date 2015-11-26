@@ -47,6 +47,7 @@ globalAlpha     1
 translationX    0
 translationY    0
 shake           0
+blendMode       "source-over"
     </code></pre></div>
 
     <p>All of these defaults are defined on the <code>glc.styles</code> property. So you can change any of these globally by writing, for example:</p>
@@ -76,13 +77,16 @@ backgroundColor "#ffffff"
 
     <p>This is a global style only. The <code>backgroundColor</code> is only used to draw the main background of the animation and is not used by objects. It is not animatable. If you want to animate the background color, just create a rect behind all the other objects and animate its color.</p>
 
-    <p>All of the other styles do pretty much what they do in the HTML5 Canvas drawing API. The only exceptions are:</p>
+    <p>You <em>can</em> create a background color by doing something like <code>"rgba(0, 0, 0, 0.1)"</code>. This has the result of partially covering the previous frame with black. After multiple frames, the background becomes mostly black, but you will sometimes see "trails" of moving objects. This can be used to create some great effects. Note, that the non-standard 8-digit hex string like <code>"#80000000"</code> cannot be used here because this value is not parsed by the GLC color parsing system.</p>
+
+    <p>All of the other styles do pretty much what they do in the HTML5 Canvas drawing API. The exceptions are:</p>
 
     <ul>
         <li>The <code>lineDash</code> property, which is a <code>setLineDash</code> method on the 2d rendering context.</li>
         <li><code>translationX</code> and <code>translationY</code>, which are <code>translate(x, y)</code> on the context.</li>
         <li>The fact that you can specify hex colors with an alpha channel here, which you can't do directly on the 2d renering context. e.g. <code>"#80ff0000"</code></li>
         <li>The <code>shake</code> property adds an adjustable jitter to any object it is applied to, randomly changing its position by a small amount on each frame.</li>
+        <li>The <code>blendMode</code> property maps to the Canvas <code>globalCompositeOperation</code> property. It's exactly the same. I just didn't feel the need to make you type "globalCompositeOperation" every time you need to use it.</li>
     </ul>
 
     <!-- ================================================================================== -->
