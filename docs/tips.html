@@ -18,7 +18,7 @@
             <ul>
                 <li><a href="#singlemode">Single Mode</a></li>
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
-                <li><a href="#phase">The Phase Property</a></li>
+                <li><a href="#phase">Phase and SpeedMult</a></li>
                 <li><a href="#sketches">Moving the Sketches Folder</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
             </ul>
@@ -172,13 +172,15 @@ function onGLC(glc) {
     </div>
 
     <!-- ================================================================================== -->
-    <h3><a name="phase"></a>The Phase Property</h3>
+    <h3><a name="phase"></a>Phase and SpeedMult</h3>
     <!-- ================================================================================== -->
     <div class="subsection">
 
-    <p>There's actually one, more advanced property that I've withheld from you until now. It's called <code>phase</code>.</p>
+    <p>There are actually two more advanced properties that I've withheld from you until now: <code>phase</code> and <code>speedMult</code>.</p>
 
-    <p>As described earlier, glc works by increasing an internal <code>t</code> variable from 0 to 1 and basing all its object animations from that. You've seen this <code>t</code> variable in the Canvas Panel scrubber and in the custom functions used for setting properties. Because everything is based on t, every object is perfectly in sync. This is good, as it results in perfectly loopable animations. However, it can make some more advanced effects more difficult. Judicious use of the <code>phase</code> property can provide you with an easy way of creating much more intricate animations, very simply.</p>
+    <p>As described earlier, glc works by increasing an internal <code>t</code> variable from 0 to 1 and basing all its object animations from that. You've seen this <code>t</code> variable in the Canvas Panel scrubber and in the custom functions used for setting properties. Because everything is based on <code>t</code>, every object is perfectly in sync. This is good, as it results in perfectly loopable animations. However, it can make some more advanced effects more difficult. Both of these properties affect how <code>t</code> can be altered before being apaplied to your animation.</p>
+
+    <p>First, <code>phase</code>. Judicious use of the <code>phase</code> property can provide you with an easy way of creating much more intricate animations, very simply.</p>
 
     <p>Here, I've set up 5 circles with a simple x-axis animation. They are spaced out on the y-axis via a for loop.</p>
 
@@ -247,6 +249,49 @@ function onGLC(glc) {
     <p>Now, this is WAY more interesting! And, it only took one line of code! And, it doesn't break the looping of the animation at all. This is just the tip of the iceberg as far as what you can do with the <code>phase</code> property. Explore it.</p>
 
     <p>Before you ask, no, it's NOT possible to animate the <code>phase</code> value. It can only be a single value. Animating the thing that's animating the things... I don't know. I think the universe would implode or something.</p>
+
+    <p>Then, there's the <code>speedMult</code> property. This essentially multiplies the <code>t</code> value by some amount, but just for that one object that it's being applied to. It lets you speed up the animation for a single object. In the following example, four circles are created. They all animate from the left side of the canvas to the right and back.</p>
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
+
+    list.addCircle({
+        x: [25, 175],
+        y: 25,
+        radius: 25
+    });
+    list.addCircle({
+        x: [25, 175],
+        y: 75,
+        radius: 25,
+        <span class="bold">speedMult: 2</span>
+    });
+    list.addCircle({
+        x: [25, 175],
+        y: 125,
+        radius: 25,
+        <span class="bold">speedMult: 3</span>
+    });
+    list.addCircle({
+        x: [25, 175],
+        y: 175,
+        radius: 25,
+        <span class="bold">speedMult: 4</span>
+    });
+}
+    </code></pre></div>
+
+    <p>Other than the y position of each of these circles, the main difference is the <code>speedMult</code> property. On the first one, it is not assigned at all, which defaults to one. So that circle moves back and forth at a normal speed. The second circle has a <code>speedMult</code> of 2, so it will move back and forth twice for every single trip the first circle makes. The next two circles have a <code>speedMult</code> of 3 and 4, so those move even faster. Here's what you get:</p>
+
+    <img src="images/5.6.gif">
+
+    <p>Be careful with this one. Assigning <code>speedMult</code> samll integer values, such as 2, 3, 4, like we did here, will maintain the smooth looping aspect that comes automatically in GLC. But you can assign any number you want - floating point numbers, super high numbers, negative values. Some of these values will break your animation. But, in the right combinations, may create new, interesting effects. Experiment away.</p>
 
     </div>
 

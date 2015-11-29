@@ -24,6 +24,7 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 		},
 
 		interpolate: function(t) {
+			t *= this.props.speedMult || 1;
 			t += this.props.phase || 0;
 
 		    switch(this.interpolation.mode) {
