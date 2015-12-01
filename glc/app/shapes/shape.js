@@ -12,6 +12,12 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 
 		init: function(type, props) {
 			this.props = props;
+			for(var prop in props) {
+				var p = props[prop];
+				if(typeof p === "function") {
+					props[prop] = p.bind(props);
+				}
+			}
 			this.draw = type.draw;
 		},
 
