@@ -169,6 +169,7 @@ function(
 		setMode: controlPanel.setMode,
 		setEasing: controlPanel.setEasing,
 		setMaxColors: controlPanel.setMaxColors,
+		setQuality: GIFEncoder.setQuality,
 		color: color
 	};
 

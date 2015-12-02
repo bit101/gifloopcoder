@@ -19,6 +19,7 @@
                 <li><a href="#singlemode">Single Mode</a></li>
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
                 <li><a href="#phase">Phase and SpeedMult</a></li>
+                <li><a href="#quality">Encoding Quality</a></li>
                 <li><a href="#sketches">Moving the Sketches Folder</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
             </ul>
@@ -294,6 +295,43 @@ function onGLC(glc) {
     <p>Be careful with this one. Assigning <code>speedMult</code> samll integer values, such as 2, 3, 4, like we did here, will maintain the smooth looping aspect that comes automatically in GLC. But you can assign any number you want - floating point numbers, super high numbers, negative values. Some of these values will break your animation. But, in the right combinations, may create new, interesting effects. Experiment away.</p>
 
     </div>
+
+
+
+
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="quality"></a>Moving the Sketches Folder</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>There is another method on <code>glc</code> that I've kept a bit quiet about in the rest of this documentation. That is <code>glc.setQuality(num)</code>. To explain how this works, you need to know a bit about the gif encoding process. First of all, you should know that gifs have a maximum color palette of 256 colors. This is very limited when you consider the over sixteen million colors available to jpgs and pngs (or many billions when you add in an alpha channel on a png). There's a good chance that if you're using gradients or lots of colors or shadows, that your original animation has more than 256 colors. During the encoding process, the encoder builds up a palette of the colors that it thinks will best suit your image. On each frame, for each pixel, it looks at the source color of that pixel and tries to map it to the closest color it has in its palette. Most of the time it comes pretty close, but sometimes, not so close. That's when you'll see splotchy images or areas that jump between different colors from one frame to the next. This process of reducing colors from a larger palette down to a smaller one is known as color quantization.</p>
+
+    <p>OK, this is all a very high level overview of how gifs are colored, and I'm probably leaving out a lot of details. But the key thing to take away is this idea that you are likely reducing colors and trying to map a wide range of colors to a smaller range. As you can imagine, this can be a pretty heavy process to run on every pixel of every frame in your image. So, we can do it two ways: quickly and not so accurately, or as accurate as possible, but sloooow. This is what the <code>glc.setQuality</code> method controls. Actually, it's more than just black or white like that. There is actually a range of quality values you can use. A quality of 1 is the highest quality and will give you the most accurate image colors possible. It's also very slow. The default value is 10 and will give you decent accuracy for most images at a reasonable speed. Going up to 20 will make things run about as fast as possible, with not so great quality. You can go beyond 20, but you're not going to see much improvement in speed.</p>
+
+    <p>So, how does this all play out? Well, here are a few examples. Here, I've created a waving gradient using 360 hues. That's 360 individual colors. That's well over the 256 color limit, so we know there's going to be some quantization going on. Rendered with the default quality of 10, we get this:</p>
+
+    <img src="images/quality10.gif">
+
+    <p>You can see a few spots in there where there's some flickering and color jumping going on. Maybe most noticeable where it changes from light to darker blue. OK, let's crank the quality up by saying <code>glc.setQuality(1)</code>:</p>
+
+    <img src="images/quality01.gif">
+
+    <p>Note that there's still a bit of flickering going on, but it's much better. Also note that this render took a LOT longer than the default quality 10 image. Finally, let's try setting quality to 20: <code>glc.setQuality(20)</code>.</p>
+
+    <img src="images/quality20.gif">
+
+    <p>This image rendered FAST. But notice that the flickering is even worse than in the default.</p>
+
+    <p>So, what should you do with this? For the most part, don't touch it. The default setting will work just fine for many, maybe even most animations. Don't just automatically set quality to 1 in your template. You'll be wasting a lot of time waiting for your images to render. And in most cases you're not going to see any significant improvement.</p>
+
+    <p>However, if you render something with lots of colors and it's not looking great, try cranking up the quality and see if that helps. It may. It may not. If there are a few million colors in your source image, the encoder is going to have a rough time bringing that down to 256 and have it look decent, no matter what quality you set.<p>
+
+    <p>Another trick that can be used to improve how some images look is dithering. With dithering, if there's an area of color that doesn't match closely to anything in the palette, it will mix two or more other colors amongst the different pixels in that area. So from a distance, they will blend together to more closely match the original color. Unfortunately, the encoder used in GLC does not support dithering. However, there are other gif optimizing tools that do. You can run your animation through one of those tools and tell it do apply dithering and you may see better results.</p>
+
+    </div>
+
 
     <!-- ================================================================================== -->
     <h3><a name="sketches"></a>Moving the Sketches Folder</h3>
