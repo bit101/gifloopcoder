@@ -472,6 +472,7 @@
 
 			var textInput = document.createElement("textarea");
 			textInput.id = title;
+			textInput.rows = 5;
 			textInput.value = text || "";
 			textInput.className = "msettings_textarea";
 
@@ -495,6 +496,10 @@
 				}
 			});
 		}, 
+
+		setTextAreaRows: function(title, rows) {
+			this._controls[title].control.rows = rows;
+		},
 
 		getText: function(title) {
 			return this._controls[title].control.value;
@@ -674,6 +679,12 @@
 				container: container,
 				label: label
 			};
+		},
+
+		addHTML: function(title, html) {
+			var div = document.createElement("div");
+			div.innerHTML = html;
+			this.addElement(title, div);
 		},
 
 		removeControl: function(title) {

@@ -1,10 +1,10 @@
 function onGLC(glc) {
-	var list = glc.renderList;
+    var list = glc.renderList;
 
-	glc.loop();
-	glc.size(540, 540);
-	glc.setDuration(3);
-	glc.setFPS(30);
+    glc.loop();
+    glc.size(540, 540);
+    glc.setDuration(3);
+    glc.setFPS(30);
     
     list.addSpiral({
         x: glc.w/2,
@@ -23,4 +23,4 @@ function onGLC(glc) {
 
 
 
-}		
+}       

@@ -35,7 +35,7 @@ define(function() {
 		var numFrames = duration * fps,
 			speed = 1 / numFrames; 
 		t += speed;
-	    if(t > 1) {
+	    if(Math.round(t * 10000) / 10000 >= 1) {
 	    	if(looping) {
 	    		t -= 1;
 	    	}

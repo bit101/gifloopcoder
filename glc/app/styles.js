@@ -14,6 +14,8 @@ define(function() {
 		shadowBlur: 0,
 		globalAlpha: 1,
 		translationX: 0,
-		translationY: 0
+		translationY: 0,
+		shake: 0,
+		blendMode: "source-over"
 	}
 });

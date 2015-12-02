@@ -1,4 +1,5 @@
 define(function() {
+	var context = document.createElement("canvas").getContext("2d");
 
 	function getColor(prop, t, def) {
 		if(prop === undefined) {
@@ -15,6 +16,12 @@ define(function() {
 			return prop(t);
 		}
 		else if(prop && prop.length === 2) {
+			if(isLinearGradient(prop)) {
+				return parseLinearGradient(prop, t);
+			}
+			if(isRadialGradient(prop)) {
+				return parseRadialGradient(prop, t);
+			}
 			var c0 = getColorObj(prop[0]),
 				c1 = getColorObj(prop[1]);
 			return interpolateColor([c0, c1], t);
@@ -22,7 +29,75 @@ define(function() {
 		else if(prop && prop.length) {
 			return  prop[Math.round(t * (prop.length - 1))];
 		}
+		if(prop.type === "linearGradient") {
+			var g = context.createLinearGradient(prop.x0, prop.y0, prop.x1, prop.y1);
+			for(var i = 0; i < prop.colorStops.length; i++) {
+				var stop = prop.colorStops[i];
+				g.addColorStop(stop.position, stop.color);
+			}
+			return g;
+		}
+		if(prop.type === "radialGradient") {
+			var g = context.createRadialGradient(prop.x0, prop.y0, prop.r0, prop.x1, prop.y1, prop.r1);
+			for(var i = 0; i < prop.colorStops.length; i++) {
+				var stop = prop.colorStops[i];
+				g.addColorStop(stop.position, stop.color);
+			}
+			return g;
+		}
 		return def;
+	}
+
+	function isLinearGradient(prop) {
+		return prop[0].type === "linearGradient" && prop[1].type === "linearGradient";
+	}
+
+	function parseLinearGradient(prop, t) {
+		var g0 = prop[0],
+			g1 = prop[1],
+			x0 = g0.x0 + (g1.x0 - g0.x0) * t,
+			y0 = g0.y0 + (g1.y0 - g0.y0) * t,
+			x1 = g0.x1 + (g1.x1 - g0.x1) * t,
+			y1 = g0.y1 + (g1.y1 - g0.y1) * t;
+
+		var g = context.createLinearGradient(x0, y0, x1, y1);
+		for(var i = 0; i < g0.colorStops.length; i++) {
+			var stopA = g0.colorStops[i],
+				stopB = g1.colorStops[i],
+				position = stopA.position + (stopB.position - stopA.position) * t,
+				colorA = getColorObj(stopA.color),
+				colorB = getColorObj(stopB.color),
+				color = interpolateColor([colorA, colorB], t);
+			g.addColorStop(position, color);
+		}
+		return g;
+	}
+
+	function isRadialGradient(prop) {
+		return prop[0].type === "radialGradient" && prop[1].type === "radialGradient";
+	}
+
+	function parseRadialGradient(prop, t) {
+		var g0 = prop[0],
+			g1 = prop[1],
+			x0 = g0.x0 + (g1.x0 - g0.x0) * t,
+			y0 = g0.y0 + (g1.y0 - g0.y0) * t,
+			r0 = g0.r0 + (g1.r0 - g0.r0) * t,
+			x1 = g0.x1 + (g1.x1 - g0.x1) * t,
+			y1 = g0.y1 + (g1.y1 - g0.y1) * t,
+			r1 = g0.r1 + (g1.r1 - g0.r1) * t;
+
+		var g = context.createRadialGradient(x0, y0, r0, x1, y1, r1);
+		for(var i = 0; i < g0.colorStops.length; i++) {
+			var stopA = g0.colorStops[i],
+				stopB = g1.colorStops[i],
+				position = stopA.position + (stopB.position - stopA.position) * t,
+				colorA = getColorObj(stopA.color),
+				colorB = getColorObj(stopB.color),
+				color = interpolateColor([colorA, colorB], t);
+			g.addColorStop(position, color);
+		}
+		return g;
 	}
 
 	function getColorString(obj) {

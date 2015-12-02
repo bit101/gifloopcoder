@@ -12,6 +12,12 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 
 		init: function(type, props) {
 			this.props = props;
+			for(var prop in props) {
+				var p = props[prop];
+				if(typeof p === "function") {
+					props[prop] = p.bind(props);
+				}
+			}
 			this.draw = type.draw;
 		},
 
@@ -24,6 +30,7 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 		},
 
 		interpolate: function(t) {
+			t *= this.props.speedMult || 1;
 			t += this.props.phase || 0;
 
 		    switch(this.interpolation.mode) {
@@ -64,6 +71,9 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 			context.miterLimit = this.getString("miterLimit", t, this.styles.miterLimit);
 			context.globalAlpha = this.getNumber("globalAlpha", t, this.styles.globalAlpha);
 			context.translate(this.getNumber("translationX", t, this.styles.translationX), this.getNumber("translationY", t, this.styles.translationY));
+			context.globalCompositeOperation = this.getString("blendMode", t, this.styles.blendMode);
+			var shake = this.getNumber("shake", t, this.styles.shake);
+			context.translate(Math.random() * shake - shake / 2, Math.random() * shake - shake / 2);
 
 			var lineDash = this.getArray("lineDash", t, this.styles.lineDash);
 			if(lineDash) {

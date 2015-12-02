@@ -1,17 +1,17 @@
 function onGLC(glc) {
     
-	glc.loop();
-	glc.size(540,540);
+    glc.loop();
+    glc.size(540,540);
     glc.setFPS(33);
     glc.setDuration(3);
     glc.styles.backgroundColor = "white"
 
     
     var list = glc.renderList,
-	   width = glc.w,
-	   height = glc.h;
+       width = glc.w,
+       height = glc.h;
 
-	// your code goes here:
+    // your code goes here:
 
     var n = 6;
     var rad = (width/n)/2;
@@ -30,4 +30,4 @@ function onGLC(glc) {
         }
     }
 
-}		
+}       
