@@ -67,7 +67,6 @@ function(
 		};
 
 	function init() {
-		loadCSS();
 		renderList.init(model.w, model.h, styles, interpolation);
 		scheduler.init(onRender, onComplete);
 		canvasPanel.init(model, controller, renderList.getCanvas());
@@ -87,15 +86,6 @@ function(
 		controlPanel.setPosition(model.w + 50, 20);
 		infoPanel.setPosition(model.w + 50, 350);
 		outputPanel.setPosition(model.w + 220, 20);
-	}
-
-	function loadCSS() {
-		var head = document.getElementsByTagName('head')[0],
-			link = document.createElement('link');
-		link.type = 'text/css';
-		link.rel = 'stylesheet';
-		link.href = require.toUrl("libs/quicksettings_minimal.css");
-		head.appendChild(link);
 	}
 
 	/////////////////////
