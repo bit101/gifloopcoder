@@ -45,13 +45,16 @@
     
     <img src="images/1.1.png">
 
-    <p>Get the code from <a href="https://github.com/bit101/gifloopcoder">repo address</a>. In the sketches folder, you'll see an <code>index.html</code>, a <code>glcloader.js</code> file, a <code>code</code> folder with a <code>template.js</code> file, and an <code>examples</code> folder with a number of JavaScript files. The project structure should look something like this:</p>
+    <p>You can check out the entire source repository from <a href="https://github.com/bit101/gifloopcoder">https://github.com/bit101/gifloopcoder</a>. Or, you can simply download a zip file that contains the files you need to run the app, and this documentation. That zip is at <a href="http://www.gifloopcoder.com/download/">http://www.gifloopcoder.com/download/</a>.</p>
+
+    <p>If you've checked out the whole project, the file structure should look something like this:</p>
 
     <div class="code"><pre><code>
 - project
   <span class="bold">- sketches
     - index.html
-    - glc.loader.js
+    - glc-min.js
+    - quicksettings_minimal.css
     - code
       - template.js
     - examples
@@ -59,10 +62,13 @@
   - glc
     - app
     - libs
+  - docs
+    - this documentation
     </code></pre></div>
 
+    <p>If you've downloaded the zip file, you'll only have the sketches and docs folders. In the sketches folder, you'll see an <code>index.html</code>, a <code>glc-min.js</code> file, a <code>quicksettings_minimal.css</code> file, a <code>code</code> folder with a <code>template.js</code> file, and an <code>examples</code> folder with a number of JavaScript files. 
 
-    <p>Until you get to the "hacking the mainframe" level, you only really need to worry about that <code>sketches</code> folder. The <code>index.html</code> file looks like this:</p>
+    <p>The <code>index.html</code> file looks like this:</p>
 
 
     <div class="code"><pre><code>
@@ -70,13 +76,13 @@
 &lt;html&gt;
 &lt;head&gt;
     &lt;title&gt;GIF Loop Coder&lt;/title&gt;
+    &lt;link rel="stylesheet" type="text/css" href="quicksettings_minimal.css"&gt;
 &lt;/head&gt;
 &lt;body&gt;
     &lt;!-- This should point to the sketch you want to run --&gt;
     <span class="bold">&lt;script type="text/javascript" src="examples/allshapes.js"&gt;&lt;/script&gt;</span>
 
-    &lt;!-- Don't touch this unless you move your sketches folder. If so, update the path to require.js --&gt;
-    &lt;script type="text/javascript" src="../glc/libs/require.js" data-main="glcloader"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" src="glc-min.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;
     </code></pre></div>
@@ -123,26 +129,6 @@ function onGLC(glc) {
     <div class="code"><pre><code>
 &lt;script type="text/javascript" src=<span class="bold">"code/animation_01.js"</span>&gt;&lt;/script&gt;
     </code></pre></div>
-
-    <p>There's another way to load a particular sketch dynamically. In the browser, you should see a url something like this:</p>
-
-    <div class="code"><pre><code>
-file:///path/to/glc/sketches/index.html
-    </code></pre></div>
-
-    <p>To navigate to a particular sketch file, add a <code>#</code> character plus the path to the file you want to load. e.g.:</p>
-
-    <div class="code"><pre><code>
-file:///path/to/glc/sketches/index.html<span class="bold">#code/animation_01.js</span>
-    </code></pre></div>
-
-    <p>Or, to load something from the <code>examples</code> folder:</p>
-
-    <div class="code"><pre><code>
-file:///path/to/glc/sketches/index.html<span class="bold">#examples/allshapes.js</span>
-    </code></pre></div>
-
-    <p>Using this method, you can cycle through different sketches without ever leaving the browser.</p>
 
     <p>So, your app should be running, but you need to add at least one object to have anything interesting to see.</p>
 
@@ -321,6 +307,7 @@ function onGLC(glc) {
         <li><code>glc.setMode(mode)</code> - sets the interpolation mode ("bounce" or "single").</li>
         <li><code>glc.setEasing(bool)</code> - sets easing on or off.</li>
         <li><code>glc.setMaxColors(num)</code> - sets the maximum number of colors in your animation.</li>
+        <li><code>glc.setQuality(num)</code> - sets the quality of the color quantization process. See <a href="tips.html#quality">the tips section</a> for details on this.</li>
     </ul>
 
     <p>These are all very useful when you are going back and forth between the code and the app a lot, and you want to have your animation play at a particular rate and duration, mode and easing. Just set it once in the code rather than having to tweak the UI each time you reload.</p>

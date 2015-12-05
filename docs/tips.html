@@ -338,62 +338,13 @@ function onGLC(glc) {
     <!-- ================================================================================== -->
     <div class="subsection">
 
-    <p>The <code>sketches</code> folder is set up to be the place where you keep the HTML and JavaScript files for your various animations. If you just keep all your JavaScript files in the <code>code</code> folder and reference them from the <code>index.html</code> file, things will work fine. However, for whatever reason, you may want to rearrange things. Here's how to do that.</p>
+    <p>In previous versions of GLC, code was loaded directly from the <code>glc</code> folder via <code>require.js</code>. This meant that your sketches folder needed to know the location of all those library files. and there were various paths you had to change if you moved things around.</p>
 
-    <p>First of all, you can put your JavaScript sketch files wherever you want, as long as you add the correct relative or absolute path to them in the HTML file. The JavaScript files can be in any folder on the same drive, a different drive, or even somewhere else on the network. As long as the HTML has the correct path to the file, it should load and run.</p>
+    <p>This has now all been greatly simplified</p>
 
-    <p>But say you still want to move that sketch folder, or set up multiple sketch folders. That can be done too, but takes a few more steps. The important thing to know is that in addition to the HTML file needing to know where your JavaScript file is, it needs to know where the <code>require.js</code> file is. In addition to that, the <code>glcloader.js</code> file  needs to know the location of the <code>glc</code> folder.</p>
+    <p>If you've checked out the repo, you'll see that all of the GLC code has been compiled into a single <code>glc-min.js</code> file that has been moved into the sketches folder. That sketches folder is now completely portable and has no dependencies on the rest of the GLC code. Move it wherever you want it.</p>
 
-    <p>Here again is the <code>index.html</code> file, with the important bit highlighted.</p>
-
-    <div class="code"><pre><code>
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;GIF Loop Coder&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;!-- This should point to the sketch you want to run --&gt;
-    &lt;script type="text/javascript" src="examples/allshapes.js"&gt;&lt;/script&gt;
-
-    &lt;!-- Don't touch this unless you move your sketches folder. If so, update the path to require.js --&gt;
-    &lt;script type="text/javascript" <span class="bold">src="../glc/libs/require.js"</span> data-main="glcloader"&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-    </code></pre></div>
-
-    <p>Currently, it's saying that to find <code>require.js</code> from the <code>sketches</code> folder, go up one directory, and then down the given path. So, if that no longer points to <code>require.js</code>, adjust that path so it does.</p>
-
-    <p>Next, here is <code>glcloader.js</code>:</p>
-
-    <div class="code"><pre><code>
-// if you move your sketches folder somewhere other than the default,
-// update this baseUrl property so it continues to point to the glc directory.
-require.config({
-    <span class="bold">baseUrl: "../glc"</span>
-});
-
-
-if(document.location.hash) {
-    var script = document.createElement("script");
-    script.src = document.location.hash.substring(1);
-    document.head.appendChild(script);
-}
-
-window.onhashchange = function() {
-    document.location.reload();
-}
-
-require(["app/glc"], function(glc) {
-    if(window.onGLC) {
-        window.onGLC(glc);
-    }
-});
-    </code></pre></div>
-
-    <p>Here, you see a <code>require.config</code> block that contains a <code>baseUrl</code> property. This needs to point to the <code>glc</code> folder. Again, from the <code>sketches</code> folder, that's up one level. So if you move things around, this is the other path you'll have to adjust.</p>
-
-    <p>Once those two items point to the right places, your newly located sketches folder should work just fine.</p>
+    <p>If you've downloaded the zipped GLC distribution, you won't even have that <code>glc</code> folder, just the sketches and docs folders, which you can move anywhere you'd like.</p>
 
     </div>
 
