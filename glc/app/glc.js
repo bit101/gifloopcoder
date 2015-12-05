@@ -7,7 +7,6 @@ define([
 	"libs/GIFEncoder",
 	"libs/color",
 	"app/ui/controlpanel",
-	"app/ui/creditspanel",
 	"app/ui/infopanel",
 	"app/ui/canvaspanel",
 	"app/ui/outputpanel"],
@@ -21,7 +20,6 @@ function(
 	GIFEncoder,
 	color,
 	controlPanel,
-	creditsPanel,
 	infoPanel,
 	canvasPanel,
 	outputPanel) {
@@ -62,11 +60,11 @@ function(
 			disableControls: disableControls,
 			clearOutput: outputPanel.clearOutput,
 			captureStill: captureStill,
-			showCredits: creditsPanel.show,
 			renderFrame: renderList.render,
 			startEncoder: startEncoder,
 			chooseFile: chooseFile,
-			reload: reload
+			reload: reload,
+			showInfoPanel: showInfoPanel
 		};
 
 	function init() {
@@ -75,7 +73,6 @@ function(
 		canvasPanel.init(model, controller, renderList.getCanvas());
 		outputPanel.init(model, controller);
 		infoPanel.init(model, controller);
-		creditsPanel.init();
 		controlPanel.init(model, controller);
 		setCallbacks();
 		setKeys();
@@ -89,7 +86,6 @@ function(
 		canvasPanel.setWidth(model.w + 12);
 		outputPanel.setWidth(model.w + 12);
 		controlPanel.setPosition(model.w + 50, 20);
-		infoPanel.setPosition(model.w + 50, 430);
 		outputPanel.setPosition(model.w + 220, 20);
 	}
 
@@ -210,6 +206,10 @@ function(
 			}
 		}
 		reader.readAsText(model.file);
+	}
+
+	function showInfoPanel() {
+		infoPanel.show();
 	}
 
 	function reset() {

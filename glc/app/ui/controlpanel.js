@@ -18,7 +18,8 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		stopButton = "Stop",
 		makeAGifButton = "Make a gif",
 		captureStillButton = "Capture still",
-		statusInfo = "status";
+		statusInfo = "status",
+		about = "about";
 
 
 	function init(pModel, pController) {
@@ -48,6 +49,9 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.addButton(makeAGifButton, makeGif);
 		panel.addButton(captureStillButton, captureStill);
 		panel.addInfo(statusInfo, "stopped");
+		panel.addButton(about, function() {
+			controller.showInfoPanel();
+		})
 	}
 
 	function playOnce() {
