@@ -73,8 +73,14 @@ define([
 	}
 
 	function add(item) {
-		list.push(item);
+		if(item.props.attachTo) {
+			item.props.attachTo.add(item);
+		}
+		else {
+			list.push(item);
+		}
 		render(0);
+		return item;
 	}
 
 	function clear() {
@@ -82,91 +88,91 @@ define([
 	}
 
 	function addArrow(props) {
-		add(Shape.create(Arrow, props));
+		return add(Shape.create(Arrow, props));
 	}
 
 	function addArcSegment(props) {
-		add(Shape.create(ArcSegment, props));
+		return add(Shape.create(ArcSegment, props));
 	}
 
 	function addBezierCurve(props) {
-		add(Shape.create(BezierCurve, props));
+		return add(Shape.create(BezierCurve, props));
 	}
 
 	function addBezierSegment(props) {
-		add(Shape.create(BezierSegment, props));
+		return add(Shape.create(BezierSegment, props));
 	}
 
 	function addCircle(props) {
-		add(Shape.create(Circle, props));
+		return add(Shape.create(Circle, props));
 	}
 
 	function addCube(props) {
-		add(Shape.create(Cube, props));
+		return add(Shape.create(Cube, props));
 	}
 
 	function addCurve(props) {
-		add(Shape.create(Curve, props));
+		return add(Shape.create(Curve, props));
 	}
 
 	function addCurveSegment(props) {
-		add(Shape.create(CurveSegment, props));
+		return add(Shape.create(CurveSegment, props));
 	}
 
 	function addGear(props) {
-		add(Shape.create(Gear, props));
+		return add(Shape.create(Gear, props));
 	}
 
 	function addGrid(props) {
-		add(Shape.create(Grid, props));
+		return add(Shape.create(Grid, props));
 	}
 
 	function addHeart(props) {
-		add(Shape.create(Heart, props));
+		return add(Shape.create(Heart, props));
 	}
 
 	function addLine(props) {
-		add(Shape.create(Line, props));
+		return add(Shape.create(Line, props));
 	}
 	
 	function addOval(props) {
-		add(Shape.create(Oval, props));
+		return add(Shape.create(Oval, props));
 	}
 	
 	function addPath(props) {
-		add(Shape.create(Path, props));
+		return add(Shape.create(Path, props));
 	}
 	
 	function addPoly(props) {
-		add(Shape.create(Poly, props));
+		return add(Shape.create(Poly, props));
 	}
 	
 	function addRay(props) {
-		add(Shape.create(Ray, props));
+		return add(Shape.create(Ray, props));
 	}
 
 	function addRaySegment(props) {
-		add(Shape.create(RaySegment, props));
+		return add(Shape.create(RaySegment, props));
 	}
 
 	function addRect(props) {
-		add(Shape.create(Rect, props));
+		return add(Shape.create(Rect, props));
 	}
 
 	function addSegment(props) {
-		add(Shape.create(Segment, props));
+		return add(Shape.create(Segment, props));
 	}
 
 	function addSpiral(props) {
-		add(Shape.create(Spiral, props));
+		return add(Shape.create(Spiral, props));
 	}
 
 	function addStar(props) {
-		add(Shape.create(Star, props));
+		return add(Shape.create(Star, props));
 	}
 
 	function addText(props) {
-		add(Shape.create(Text, props));
+		return add(Shape.create(Text, props));
 	}
 
 	function render(t) {
