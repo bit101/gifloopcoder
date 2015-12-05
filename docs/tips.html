@@ -20,7 +20,6 @@
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
                 <li><a href="#phase">Phase and SpeedMult</a></li>
                 <li><a href="#quality">Encoding Quality</a></li>
-                <li><a href="#sketches">Moving the Sketches Folder</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
             </ul>
 
@@ -331,23 +330,6 @@ function onGLC(glc) {
     <p>Another trick that can be used to improve how some images look is dithering. With dithering, if there's an area of color that doesn't match closely to anything in the palette, it will mix two or more other colors amongst the different pixels in that area. So from a distance, they will blend together to more closely match the original color. Unfortunately, the encoder used in GLC does not support dithering. However, there are other gif optimizing tools that do. You can run your animation through one of those tools and tell it do apply dithering and you may see better results.</p>
 
     </div>
-
-
-    <!-- ================================================================================== -->
-    <h3><a name="sketches"></a>Moving the Sketches Folder</h3>
-    <!-- ================================================================================== -->
-    <div class="subsection">
-
-    <p>In previous versions of GLC, code was loaded directly from the <code>glc</code> folder via <code>require.js</code>. This meant that your sketches folder needed to know the location of all those library files. and there were various paths you had to change if you moved things around.</p>
-
-    <p>This has now all been greatly simplified</p>
-
-    <p>If you've checked out the repo, you'll see that all of the GLC code has been compiled into a single <code>glc-min.js</code> file that has been moved into the sketches folder. That sketches folder is now completely portable and has no dependencies on the rest of the GLC code. Move it wherever you want it.</p>
-
-    <p>If you've downloaded the zipped GLC distribution, you won't even have that <code>glc</code> folder, just the sketches and docs folders, which you can move anywhere you'd like.</p>
-
-    </div>
-
 
     <!-- ================================================================================== -->
     <h3><a name="jif"></a>GIF or JIF?</h3>
