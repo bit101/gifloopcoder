@@ -19,13 +19,31 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		makeAGifButton = "Make a gif",
 		captureStillButton = "Capture still",
 		statusInfo = "status",
-		about = "about";
+		about = "about",
+		fullScreen = "Full Screen";
 
 
 	function init(pModel, pController) {
 		model = pModel;
 		controller = pController;
 		panel = QuickSettings.create(model.w + 50, 20, "Control Panel");
+
+		// electron only.
+		if(window.nodeRequire) {
+			var remote = nodeRequire("remote");
+			if(remote) {
+				panel.addButton(fullScreen, function() {
+					var win = remote.getCurrentWindow();
+					if(win.isFullScreen()) {
+						win.setFullScreen(false);
+					}
+					else {
+						win.setFullScreen(true);
+					}
+
+				})
+			}
+		}
 
 		fileInput = document.createElement("input");
 		fileInput.type = "file";
