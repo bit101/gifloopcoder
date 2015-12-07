@@ -17,6 +17,7 @@
         <li><span class="current_section">5. Tips and Advanced Use</span>
             <ul>
                 <li><a href="#singlemode">Single Mode</a></li>
+                <li><a href="#parent">Parenting</a></li>
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
                 <li><a href="#phase">Phase and SpeedMult</a></li>
                 <li><a href="#quality">Encoding Quality</a></li>
@@ -143,6 +144,103 @@ function onGLC(glc) {
 
 
     <p>Once you get the idea of this, it opens up the doors to all kinds of different animations.</p>
+    </div>
+
+
+
+        <!-- ================================================================================== -->
+    <h3><a name="parent"></a>Parenting</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>With parenting, when you create a new object using one of the add methods, you can specify another object as that new objects's parent. To do that, you need a reference to the parent object you want to add it to. This reference is now returned by all of the add methods. So, when you make a circle, for example, you can store a reference to it like so:</p>
+
+    <div class="code"><pre><code>
+<span class="bold">var circle = </span>list.addCircle({
+    x: width / 2,
+    y: height / 2,
+    radius: 100,
+    stroke: true,
+    fill: false
+});
+    </code></pre></div>
+
+    <p>Now you can make another object and set <code>circle</code> as its parent:</p>
+
+    <div class="code"><pre><code>
+var circle = list.addCircle({
+    x: width / 2,
+    y: height / 2,
+    radius: 100,
+    stroke: true,
+    fill: false
+});
+
+list.addRect({
+    x: 100,
+    y: 0,
+    w: 20,
+    h: 20,
+    fillStyle: "red",
+    <span class="bold">parent: circle</span>
+});
+    </code></pre></div>
+
+    <p>Now, because a circle's orientation point is the center of the circle, when we set x to 100 and y to 0, the rect will be placed 100 pixels to the right of the center of the circle, giving you this picture:</p>
+
+    <img src="images/5.7.png">
+
+    <p>Then, if we animate the circle, the rect will animate right along with it. Here, we'll rotate the circle. Note that we aren't changing anything on the rect. It's only animating because its parent is animating.</p>
+
+    <div class="code"><pre><code>
+var circle = list.addCircle({
+    x: width / 2,
+    y: height / 2,
+    radius: 100,
+    stroke: true,
+    fill: false,
+    <span class="bold">rotation: [0, 180]</span>
+});
+
+list.addRect({
+    x: 100,
+    y: 0,
+    w: 20,
+    h: 20,
+    fillStyle: "red",
+    parent: circle
+});
+    </code></pre></div>
+
+    <p>And this gives us:</p>
+
+    <img src="images/5.8.gif">
+
+    <p>Once you get the idea of parenting objects, you'll find all kinds of uses for it. Eventually you'll realize that there are cases when you want to animate a bunch of objects as a group, but you don't want the parent to have a visible shape. You could just make a circle with <code>stroke</code> and <code>fill</code> both set to false, but rather than making you go through that, there is a new object called a <code>Container</code>. A container is just an object with no visible appearance. You can set its x and y position and change its rotation. And you can use it as the parent of other objects. So we could get rid of the circle in the above example, and replace it with a container.</p>
+
+    <div class="code"><pre><code>
+<span class="bold">var container = list.addContainer({
+    x: width / 2,
+    y: height / 2,
+    <span class="bold">rotation: [0, 180]</span>
+});</span>
+
+list.addRect({
+    x: 100,
+    y: 0,
+    w: 20,
+    h: 20,
+    fillStyle: "red",
+    <span class="bold">parent: container</span>
+});
+    </code></pre></div>
+
+    <p>Which gives us the same animation on the rect, but no circle.</p>
+
+    <img src="images/5.9.gif">
+
+    <p>Thanks to <a href="https://github.com/Landerson352">Lincoln Anderson</a> for coming up with this idea and writing 99% of the code.</p>
+
     </div>
 
     <!-- ================================================================================== -->

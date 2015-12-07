@@ -18,6 +18,7 @@
                         <li><a href="#arrow">Arrow</a></li>
                         <li><a href="#beziercurve">BezierCurve</a></li>
                         <li><a href="#circle">Circle</a></li>
+                        <li><a href="#container">Container</a></li>
                         <li><a href="#cube">Cube</a></li>
                         <li><a href="#curve">Curve</a></li>
                         <li><a href="#gear">Gear</a></li>
@@ -64,6 +65,8 @@
     <p>Read more about style properties in the <a href="#styles">Styles</a> section. This section will cover only object-specific properties.</p>
 
     <p>All of the properties of all of the objects listed here, and all of the styles properties that can be defined on objects are animatable. It may seem unclear how you can animate a string of text or a boolean value. This is covered in detail in the <a href="properties">Property Types</a> section.</p>
+
+    <p>All of these add methods will return a reference to the object just created. This can be used to make this object the parent of other objects. More info on how to use parenting can be found in the <a href="tips.html#parent">Tips Section</a></p>
 
 
     <!-- ================================================================================== -->
@@ -122,10 +125,7 @@ y2 (100)    The y value of the third point.
 x3 (150)    The x value of the fourth point.
 y3 (10)     The y value of the fourth point.
     </code></pre></div>
-    </div>
-
-
-    <!-- ================================================================================== -->
+    </div>    <!-- ================================================================================== -->
         <h3><a name="circle"></a>Circle</a></h3>
     <!-- ================================================================================== -->
     <div class="subsection">
@@ -152,6 +152,33 @@ rotation (0)            The rotation of the circle. (degrees).
 stroke (false)          Whether the object will be stroked.
 fill (true)             Whether the object will be filled.
 drawFromCenter (false)  If true, starts and ends the drawing at the center of the circle rather than points on the radius.
+    </code></pre></div>
+
+    </div>
+
+
+
+    <!-- ================================================================================== -->
+        <h3><a name="container"></a>Container</a></h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>A container object is created with:</p>
+
+    <div class="code"><pre><code>
+glc.renderList.addContainer(properties);
+    </code></pre></div>
+
+    <p>This creates an empty shape that other shapes can be added to. The container can be positioned on the x, y axes and rotated. More info on how to use parenting can be found in the <a href="tips.html#parent">Tips Section</a></p>
+
+    <img src="images/2.3.gif">
+
+    <p>Because the container does not draw anything, any style properties will be ignored. The following properties can be used on a container. All of these properties are animatable.</p>
+
+    <div class="code"><pre><code>
+x (0)                 The x position of the container.
+y (0)                 The y position of the container.
+rotation (0)            The rotation of the container. (degrees).
     </code></pre></div>
 
     </div>
