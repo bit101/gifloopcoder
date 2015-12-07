@@ -19,13 +19,28 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 				}
 			}
 			this.draw = type.draw;
+			this.list = [];
 		},
 
-		render: function(context, t) {
-			var t = this.interpolate(t);
+		add: function(item) {
+			this.list.push(item);
+			return item;
+		},
+
+		clear: function() {
+			this.list.length = 0;
+		},
+
+		render: function(context, t, skipInterpolation) {
+			if(!skipInterpolation) {
+				var t = this.interpolate(t);
+			}
 
 			this.startDraw(context, t);
 			this.draw(context, t);
+			for(var i in this.list) {
+				this.list[i].render(context, t, true);
+			}
 			this.endDraw(context, t);
 		},
 
