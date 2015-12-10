@@ -20,6 +20,7 @@
                 <li><a href="#parent">Parenting</a></li>
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
                 <li><a href="#phase">Phase and SpeedMult</a></li>
+                <li><a href="#spritesheets">Creating Sprite Sheets</a></li>
                 <li><a href="#quality">Encoding Quality</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
             </ul>
@@ -395,6 +396,30 @@ function onGLC(glc) {
 
 
 
+    <!-- ================================================================================== -->
+    <h3><a name="spritesheets"></a>Creating Sprite Sheet</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>A sprite sheet is a large bitmap image, where each frame of an animation is drawn at a different position. Often the frames are arranged in a grid. You can then sequentially show different portions of the large bitmap over time to accomplish animation.</p>
+
+    <p>One of the great things about sprite sheets is that because they are simply a single image, they are cross platform and the same sprite sheet can be used in HTML, iOS, Android, Unity, Flash, or any other system where animation is possible.</p>
+
+    <p>In addition to creating gifs, GLC can also create sprite sheet animations. All you have to do is click the "Make a sprite sheet" button and the animation will render and be displayed as a sprite sheet in the Output Panel. Here is an example:</p>
+
+    <img src="images/spritesheet.png">
+
+    <p>This animation had a duration of two seconds and a frame rate of twenty, so there are forty frames in this animation. Each frame is 100x100 pixels. As you can see, the sprite sheet can get very large quickly. Sprite sheets are usually meant for small animations, usually 100 pixels or less. There's nothing stopping you from making larger animations, but the sprite sheet may wind up being enormous.</p>
+    
+    <p>Sprite sheets created by GLC will always be square. In some systems, sprite sheets perform better if their size is a power of two, such as 256x256, 512x512, 1024x1024, 2048x2048, etc. At this time, GLC does not create power-of-two spritesheets, but this is a possible future feature.</p>
+
+    <p>GLC will lay out the frames in a grid going from top left to bottom right. Each frame will be drawn full size, even if the graphics in it do not fill the entire frame. More complex sprite sheet generators use something called texture packing, to reduce the size of each frame and intelligently arrange them into the smallest space possible. This is beyond the scope of GLC at this point.</p>
+
+    <p>To test a sprite sheet you have saved locally, you can use the Sprite Sheet Util at <a href="http://www.gifloopcoder.com/spritesheetutil/">http://www.gifloopcoder.com/spritesheetutil/</a>. This will let you browse to your sprite sheet to load it in. Then you'll have to set the size of each frame and the total number of frames and hit play.</p>
+
+    <p>The utility will also generate some sample code that you could use as a starting point to animate your sprite sheet in HTML. The code for other systems or frameworks will be different, obviously.</p>
+
+    </div>
 
 
 

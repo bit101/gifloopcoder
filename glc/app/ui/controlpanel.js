@@ -4,7 +4,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		controller,
 		fileInput = null;
 
-	// conrols:
+	// controls:
 	var chooseFile = "Open File",
 		reload = "Reload",
 		fileName = "File name",
@@ -17,6 +17,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		loopButton = "Loop",
 		stopButton = "Stop",
 		makeAGifButton = "Make a gif",
+		makeASpriteSheetButton = "Make a sprite sheet",
 		captureStillButton = "Capture still",
 		statusInfo = "status",
 		about = "about",
@@ -65,6 +66,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.addButton(loopButton, loop);
 		panel.addButton(stopButton, stop);
 		panel.addButton(makeAGifButton, makeGif);
+		panel.addButton(makeASpriteSheetButton, makeSpriteSheet);
 		panel.addButton(captureStillButton, captureStill);
 		panel.addInfo(statusInfo, "stopped");
 		panel.addButton(about, function() {
@@ -96,6 +98,18 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		}
 	}
 
+	function makeSpriteSheet() {
+		if(!model.getIsRunning()) {
+			controller.clearOutput();
+			model.captureSpriteSheet = true;
+			controller.initSpriteSheet();
+			playOnce();
+		}
+		else {
+			panel.setInfo(statusInfo, "Animation already running");
+		}
+	}
+
 	function captureStill() {
 		controller.captureStill();
 	}
@@ -118,12 +132,14 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.enableControl(playOnceButton);
 		panel.enableControl(loopButton);
 		panel.enableControl(makeAGifButton);
+		panel.enableControl(makeASpriteSheetButton);
 	}
 
 	function disableControls() {
 		panel.disableControl(playOnceButton);
 		panel.disableControl(loopButton);
 		panel.disableControl(makeAGifButton);
+		panel.disableControl(makeASpriteSheetButton);
 	}
 
 	function setFPS(value) {

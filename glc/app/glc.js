@@ -3,6 +3,7 @@ define([
 	"app/scheduler", 
 	"app/styles",
 	"app/interpolation",
+	"app/spritesheet",
 	"libs/quicksettings",
 	"libs/GIFEncoder",
 	"libs/color",
@@ -16,6 +17,7 @@ function(
 	scheduler, 
 	styles,
 	interpolation,
+	SpriteSheet,
 	QuickSettings,
 	GIFEncoder,
 	color,
@@ -34,6 +36,7 @@ function(
 			w: 400,
 			h: 400,
 			capture: false,
+			captureSpriteSheet: false,
 			getDuration: function() {
 				return scheduler.getDuration();
 			},
@@ -64,7 +67,8 @@ function(
 			startEncoder: startEncoder,
 			chooseFile: chooseFile,
 			reload: reload,
-			showInfoPanel: showInfoPanel
+			showInfoPanel: showInfoPanel,
+			initSpriteSheet: initSpriteSheet
 		};
 
 	function init() {
@@ -82,6 +86,7 @@ function(
 		this.w = model.w = width;
 		this.h = model.h = height;
 		GIFEncoder.setSize(width, height);
+		SpriteSheet.setSize(width, height);
 		renderList.size(model.w, model.h);
 		canvasPanel.setWidth(model.w + 12);
 		outputPanel.setWidth(model.w + 12);
@@ -136,6 +141,9 @@ function(
 			controlPanel.setStatus("capturing...");
 			GIFEncoder.addFrame(renderList.getContext());
 		}
+		if(model.captureSpriteSheet) {
+			SpriteSheet.addFrame(renderList.getCanvas());
+		}
 	}
 
 	function onComplete() {
@@ -143,6 +151,11 @@ function(
 			model.capture = false;
 			GIFEncoder.finish();
 			outputPanel.setGIF(GIFEncoder.stream().getData());
+		}
+		if(model.captureSpriteSheet) {
+			model.captureSpriteSheet = false;
+	        outputPanel.setWidth(SpriteSheet.getSpriteSheetSize() + 12);
+			outputPanel.setPNG(SpriteSheet.getImage());
 		}
 		controlPanel.setStatus("stopped");
 		controller.enableControls();
@@ -238,6 +251,11 @@ function(
 		glc.styles.shake = 0;
 		glc.styles.blendMode = "source-over";
 	}
+
+	function initSpriteSheet() {
+		SpriteSheet.init(scheduler.getFPS(), scheduler.getDuration());
+	}
+
 
 
 	var glc =  {
