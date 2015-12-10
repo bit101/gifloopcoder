@@ -41,32 +41,35 @@
     
     <p>You create a JavaScript file and write code to add animated objects to a render list.</p>
 
-    <p>Your script is loaded by an HTML document that gets run in the browser. The library creates a user interface that shows you the animated ojects you created, gives you a control panel to control how the animation is rendered and lets you save the result as an animated gif.</p>
+    <p>Your script is loaded by the web application. The app displays and animates the ojects you created, gives you a control panel to control how the animation is rendered and lets you save the result as an animated gif.</p>
     
     <img src="images/1.1.png">
 
     <p>You can check out the entire source repository from <a href="https://github.com/bit101/gifloopcoder">https://github.com/bit101/gifloopcoder</a>. Or, you can simply download a zip file that contains the files you need to run the app, and this documentation. That zip is at <a href="http://www.gifloopcoder.com/download/">http://www.gifloopcoder.com/download/</a>.</p>
 
-    <p>If you've checked out the whole project, the file structure should look something like this:</p>
+    <p>If you've downloaded the zip file, the file structure should look something like this:</p>
 
     <div class="code"><pre><code>
-- project
-  <span class="bold">- sketches
+- gifloopcoder
+  - sketches
     - index.html
     - glc-min.js
     - quicksettings_minimal.css
     - code
       - template.js
     - examples
-      - various example js files</span>
-  - glc
-    - app
-    - libs
+      - various example js files
   - docs
     - this documentation
     </code></pre></div>
 
-    <p>If you've downloaded the zip file, you'll only have the sketches and docs folders. In the sketches folder, you'll see an <code>index.html</code>, a <code>glc-min.js</code> file, a <code>quicksettings_minimal.css</code> file, a <code>code</code> folder with a <code>template.js</code> file, and an <code>examples</code> folder with a number of JavaScript files. 
+    <p>If you've checked out the full code repo, you'll also have a <code>glc</code> folder containing the source code that is used to build the app. You'll only need that if you plan on hacking around or extending the system. If you just want to make animations, all you need is the sketches folder.</p>
+
+    <p>In the sketches folder, you'll see an <code>index.html</code>, a <code>glc-min.js</code> file, a <code>quicksettings_minimal.css</code> file, a <code>code</code> folder with a <code>template.js</code> file, and an <code>examples</code> folder with a number of JavaScript files.</p>
+
+    <p>With the current release of GLC, all you need to do is open that <code>index.html</code> file in a browser. There is a button in the UI that allows you to browse to any sketch file you want. This will then be loaded in and displayed. And there is a reload button that will reload the current sketch if you've made any changes to it.</p>
+
+    <p>However, many developers like to set up a shortcut in their editor that will launch a web page with their latest changes. To do that, you can specify which sketch should be loaded right in the html.</p>
 
     <p>The <code>index.html</code> file looks like this:</p>
 
@@ -87,11 +90,11 @@
 &lt;/html&gt;
     </code></pre></div>
 
-    <p>You see there are two script files there. The first one points to the sketch that you will create. Here, it's set to load the sketch defined in <code>examples/allshapes.js</code>. To load a different sketch, just change the JavaScript file this points to.</p>
+    <p>You see there are two script tags there. The first one points to the sketch that you will create. Here, it's set to load the sketch defined in <code>examples/allshapes.js</code>. To load a different sketch, just change the JavaScript file this points to. Now when you launch the app, it will load that sketch.</p>
 
     <p>The second script is to load the glc library. Generally speaking, you shouldn't need to touch that at all.</p>
 
-    <p>In the <code>code</code> folder there is a <code>template.js</code> file that gives you an empty starting point for a project. It looks like this:</p>
+    <p>Now let's look at what makes up a sketch. In the <code>code</code> folder there is a <code>template.js</code> file that gives you an empty starting point for a project. It looks like this:</p>
 
     <div class="code"><pre><code>
 function onGLC(glc) {
@@ -129,6 +132,8 @@ function onGLC(glc) {
     <div class="code"><pre><code>
 &lt;script type="text/javascript" src=<span class="bold">"code/animation_01.js"</span>&gt;&lt;/script&gt;
     </code></pre></div>
+
+    <p>Or, just open the app and use the open file option to browse to <code>animation_01.js</code> and open that.</p>
 
     <p>So, your app should be running, but you need to add at least one object to have anything interesting to see.</p>
 
@@ -281,6 +286,9 @@ function onGLC(glc) {
     <p>The Control Panel is what you'll interact with mostly though. From top to bottom, here's what it does:</p>
 
     <ul>
+        <li>The open file button lets you choose any sketch on your system. It will load and display that sketch.</li>
+        <li>Beneath that is the name of the currently loaded sketch, if one is loaded.</li>
+        <li>The reload button reloads the current sketch. If you've made some changes to the sketch in your code editor and saved those edits, press this button to reload the updated sketch.</li>
         <li>The duration slider changes how long the overall animation lasts. It can go from 0.5 seconds up to 10 seconds, in 0.5 second increments.</li>
         <li>The fps slider sets the approximate frame rate in frames per second of the animation. This is accomplished by adding a small delay on each frame. It goes from 1 fps up to 60 fps.</li>
         <li>The max colors slider sets how many colors will be used in the final animation. GIFs have a maximum of 256 colors. But often you can set the max colors much lower and still have your animation look good. This can make a dramatic difference in file size.</li>
@@ -296,7 +304,9 @@ function onGLC(glc) {
 
     <p>If you ever have a hard time getting one of the sliders to land on a specific value, you can also use the left and right cursor keys on your keyboard. Pressing these will move the slider in single increments one way or the other.</p>
 
-    <p>You can interact with several of the controls here via the code you write. You've already seen that you can call <code>glc.loop()</code> to have your animation start looping as soon as the page loads. Alternately, you could <code>glc.playOnce()</code>. Here are all the available commands:</p>
+    <p>Several of the controls have keyboard shortcuts. These are listed in the info panel below the control panel.</p>
+
+    <p>You can also interact with several of the controls here via the code you write. You've already seen that you can call <code>glc.loop()</code> to have your animation start looping as soon as the page loads. Alternately, you could <code>glc.playOnce()</code>. Here are all the available commands:</p>
 
     <ul>
         <li><code>glc.loop()</code> - loops the animation continuously when the page loads.</li>

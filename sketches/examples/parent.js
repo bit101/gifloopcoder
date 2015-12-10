@@ -16,7 +16,7 @@ function onGLC(glc) {
         rotation:[0,360]
     });
     list.addCircle({
-        attachTo:centerSquare,
+        parent:centerSquare,
         x:130,
         y:0,
         radius:10,
@@ -28,7 +28,7 @@ function onGLC(glc) {
     for(var i=0;i<18;i++) {
         parentStick = list.addRect({
             fillStyle:"red",
-            attachTo:parentStick,
+            parent:parentStick,
             w:10,
             h:50,
             x:parentStick? 0 : 127,

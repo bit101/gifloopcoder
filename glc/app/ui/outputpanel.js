@@ -7,7 +7,8 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	// controls
 	var captureImage = "Capture",
 		sizeInfo = "size",
-		clearImageButton = "Clear Image";
+		clearImageButton = "Clear Image",
+		closePanel = "Close";
 
 	function init(pModel, pController) {
 		model = pModel;
@@ -17,10 +18,15 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		outputPanel.addImage(captureImage, "");
 		outputPanel.addInfo(sizeInfo, "");
 		outputPanel.addButton(clearImageButton, controller.clearOutput);
+		outputPanel.addButton(closePanel, function() {
+			clearOutput();
+			outputPanel.hide();
+		});
 	}
 
 
 	function setGIF(binaryGIF) {
+		outputPanel.show();
 		var dataURL = "data:image/gif;base64," + encode64(binaryGIF);
 		outputPanel.setImageURL(captureImage, dataURL);
 		var header = 'data:image/gif;base64,',
@@ -29,6 +35,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	}
 
 	function setPNG(dataURL) {
+		outputPanel.show();
 		outputPanel.setImageURL(captureImage, dataURL);
 		var header = 'data:image/png;base64,',
 			imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);

@@ -5,6 +5,7 @@ define([
 	"app/shapes/beziercurve",
 	"app/shapes/beziersegment",
 	"app/shapes/circle",
+	"app/shapes/container",
 	"app/shapes/cube",
 	"app/shapes/curve",
 	"app/shapes/curvesegment",
@@ -30,6 +31,7 @@ define([
 		BezierCurve,
 		BezierSegment, 
 		Circle,
+		Container,
 		Cube,
 		Curve,
 		CurveSegment,
@@ -73,8 +75,8 @@ define([
 	}
 
 	function add(item) {
-		if(item.props.attachTo) {
-			item.props.attachTo.add(item);
+		if(item.props.parent) {
+			item.props.parent.add(item);
 		}
 		else {
 			list.push(item);
@@ -105,6 +107,10 @@ define([
 
 	function addCircle(props) {
 		return add(Shape.create(Circle, props));
+	}
+
+	function addContainer(props) {
+		return add(Shape.create(Container, props));
 	}
 
 	function addCube(props) {
@@ -208,6 +214,7 @@ define([
 		addBezierCurve: addBezierCurve,
 		addBezierSegment: addBezierSegment,
 		addCircle: addCircle,
+		addContainer: addContainer,
 		addCube: addCube,
 		addCurve: addCurve,
 		addCurveSegment: addCurveSegment,

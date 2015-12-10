@@ -1,10 +1,14 @@
 define(["libs/quicksettings"], function(QuickSettings) {
 	var panel = null,
 		model,
-		controller;
+		controller,
+		fileInput = null;
 
 	// conrols:
-	var modeDropDown = "mode",
+	var chooseFile = "Open File",
+		reload = "Reload",
+		fileName = "File name",
+		modeDropDown = "mode",
 		durationSlider = "duration",
 		fpsSlider = "fps",
 		maxColorsSlider = "Max Colors",
@@ -14,13 +18,42 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		stopButton = "Stop",
 		makeAGifButton = "Make a gif",
 		captureStillButton = "Capture still",
-		statusInfo = "status";
+		statusInfo = "status",
+		about = "about",
+		fullScreen = "Full Screen";
 
 
 	function init(pModel, pController) {
 		model = pModel;
 		controller = pController;
 		panel = QuickSettings.create(model.w + 50, 20, "Control Panel");
+
+		// electron only.
+		if(window.nodeRequire) {
+			var remote = nodeRequire("remote");
+			if(remote) {
+				panel.addButton(fullScreen, function() {
+					var win = remote.getCurrentWindow();
+					if(win.isFullScreen()) {
+						win.setFullScreen(false);
+					}
+					else {
+						win.setFullScreen(true);
+					}
+
+				})
+			}
+		}
+
+		fileInput = document.createElement("input");
+		fileInput.type = "file";
+		fileInput.addEventListener("change", controller.chooseFile);
+		panel.addButton(chooseFile, function() {
+			fileInput.click();
+		});
+		panel.addInfo(fileName, "");
+		panel.addButton(reload, controller.reload);
+		panel.disableControl(reload);
 		panel.addRange(durationSlider, 0.5, 10, model.getDuration(), 0.5, model.setDuration);
 		panel.addRange(fpsSlider, 1, 60, model.getFPS(), 1, model.setFPS);
 		panel.addRange(maxColorsSlider, 2, 256, model.maxColors, 1, function(value) {
@@ -34,6 +67,9 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.addButton(makeAGifButton, makeGif);
 		panel.addButton(captureStillButton, captureStill);
 		panel.addInfo(statusInfo, "stopped");
+		panel.addButton(about, function() {
+			controller.showInfoPanel();
+		})
 	}
 
 	function playOnce() {
@@ -82,14 +118,12 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.enableControl(playOnceButton);
 		panel.enableControl(loopButton);
 		panel.enableControl(makeAGifButton);
-		panel.enableControl(captureStillButton);
 	}
 
 	function disableControls() {
 		panel.disableControl(playOnceButton);
 		panel.disableControl(loopButton);
 		panel.disableControl(makeAGifButton);
-		panel.disableControl(captureStillButton);
 	}
 
 	function setFPS(value) {
@@ -114,6 +148,15 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.setRangeValue(maxColorsSlider, value);
 	}
 
+	function setFileName(name) {
+		panel.setInfo(fileName, name);
+		panel.enableControl(reload);
+	}
+
+	function chooseFileDialog() {
+		fileInput.click();
+	}
+
 	return {
 		init: init,
 		setPosition: setPosition,
@@ -126,7 +169,10 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		setDuration: setDuration,
 		setMode: setMode,
 		setEasing: setEasing,
-		setMaxColors: setMaxColors
+		setMaxColors: setMaxColors,
+		setFileName: setFileName,
+		makeGif: makeGif,
+		chooseFileDialog: chooseFileDialog
 	};
 
 });
