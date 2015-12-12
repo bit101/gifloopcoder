@@ -33,7 +33,9 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 
 		render: function(context, t, skipInterpolation) {
 			if(!skipInterpolation) {
-				var t = this.interpolate(t);
+				t *= this.props.speedMult || 1;
+				t += this.props.phase || 0;
+				var t = this.interpolation.interpolate(t);
 			}
 
 			this.startDraw(context, t);
@@ -43,38 +45,6 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 			}
 			this.endDraw(context, t);
 		},
-
-		interpolate: function(t) {
-			t *= this.props.speedMult || 1;
-			t += this.props.phase || 0;
-
-		    switch(this.interpolation.mode) {
-		    	case "bounce":
-			    	if(this.interpolation.easing) {
-				    	var a = t * Math.PI * 2;
-					    return 0.5 - Math.cos(a) * 0.5;
-			    	}
-			    	else {
-			    		t = t % 1;
-			    		return t < 0.5 ? t * 2 : t = (1 - t) * 2;
-			   		}
-			   		break;
-
-			   	case "single":
-			   			if(t > 1) {
-			   				t %= 1;
-			   			}
-			   		if(this.interpolation.easing) {
-				    	var a = t * Math.PI;
-					    return 0.5 - Math.cos(a) * 0.5;
-			   		}
-			   		else{
-				    	return t;
-			   		}
-		    }
-
-		},
-
 
 		startDraw: function(context, t) {
 			context.save();

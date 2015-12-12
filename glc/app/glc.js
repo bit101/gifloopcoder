@@ -72,7 +72,7 @@ function(
 		};
 
 	function init() {
-		renderList.init(model.w, model.h, styles, interpolation);
+		renderList.init(glc, model.w, model.h, styles, interpolation);
 		scheduler.init(onRender, onComplete);
 		canvasPanel.init(model, controller, renderList.getCanvas());
 		outputPanel.init(model, controller);
@@ -80,6 +80,8 @@ function(
 		controlPanel.init(model, controller);
 		setCallbacks();
 		setKeys();
+		glc.context = renderList.getContext();
+		glc.canvas = renderList.getCanvas();
 	}
 
 	function size(width, height) {
@@ -96,7 +98,7 @@ function(
 
 	function setKeys() {
 		document.body.addEventListener("keyup", function(event) {
-			console.log(event.keyCode);
+			// console.log(event.keyCode);
 			switch(event.keyCode) {
 				case 82: // R
 					reload();
@@ -272,7 +274,11 @@ function(
 		setEasing: controlPanel.setEasing,
 		setMaxColors: controlPanel.setMaxColors,
 		setQuality: GIFEncoder.setQuality,
-		color: color
+		color: color,
+		onEnterFrame: null,
+		onExitFrame: null,
+		context: null,
+		canvas: null
 	};
 
 	init();

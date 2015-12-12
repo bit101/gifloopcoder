@@ -57,16 +57,19 @@ define([
 		width = 0,
 		height = 0,
 		list = [],
-		styles = null;
+		styles = null,
+		interpolation = null,
+		glc = null;
 
-	function init(w, h, stylesValue, interpolation) {
+	function init(pGlc, w, h, pStyles, pInterpolation) {
+		glc = pGlc
 		canvas = document.createElement("canvas");
 		width = canvas.width = w;
 		height = canvas.height = h;
 		context = canvas.getContext("2d");
-		styles = stylesValue
+		styles = pStyles
 		Shape.styles = styles;
-		Shape.interpolation = interpolation;
+		Shape.interpolation = interpolation = pInterpolation;
 	}
 
 	function size(w, h) {
@@ -189,8 +192,19 @@ define([
 			context.fillStyle = styles.backgroundColor;
   			context.fillRect(0, 0, width, height);
   		}
+  		var interpolatedT = interpolation.interpolate(t);
+		if(glc.onEnterFrame) {
+			context.save();
+			glc.onEnterFrame(interpolatedT);
+			context.restore();
+		}
 		for(var i = 0; i < list.length; i++) {
 			list[i].render(context, t);
+		}
+		if(glc.onExitFrame) {
+			context.save();
+			glc.onExitFrame(interpolatedT);
+			context.restore();
 		}
 	}
 

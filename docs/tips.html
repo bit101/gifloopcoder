@@ -20,6 +20,7 @@
                 <li><a href="#parent">Parenting</a></li>
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
                 <li><a href="#phase">Phase and SpeedMult</a></li>
+                <li><a href="#enterframe">Direct Canvas Access</a></li>
                 <li><a href="#spritesheets">Creating Sprite Sheets</a></li>
                 <li><a href="#quality">Encoding Quality</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
@@ -393,6 +394,104 @@ function onGLC(glc) {
     <p>Be careful with this one. Assigning <code>speedMult</code> samll integer values, such as 2, 3, 4, like we did here, will maintain the smooth looping aspect that comes automatically in GLC. But you can assign any number you want - floating point numbers, super high numbers, negative values. Some of these values will break your animation. But, in the right combinations, may create new, interesting effects. Experiment away.</p>
 
     </div>
+
+
+
+
+
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="enterframe"></a>Direct Canvas Access</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>GLC was designed to be as easy as possible to use. Thus, it has tons of high level drawing objects, all with default parameters. You can just say "add a circle" and you get a circle without worrying about numbers, math, or any of the details of how a circle is drawn on HTML5 canvas.</p>
+
+    <p>However, sometimes you need some extra control. For power users or those who are already comfortable with the canvas drawing API, you also have direct access to the canvas and 2d rendering context. With this, you can draw anything you want, or make use of any third party canvas graphics libraries that you might want to use. Here's how it works.</p>
+
+    <p>At the start of each rendering frame, GLC will clear the canvas, using the default background color or one you specified. Then it will call a method named <code>glc.onEnterFrame</code>, passing in the current <code>t</code> value from the scheduler. After that, it will draw all the shapes in the render list. Then it will call a method called <code>onExitFrame</code>, again, passing <code>t</code>.</p>
+
+    <p>So, where are these two new methods? You create them yourself. And do anything you want inside them. Let me just dump a big example in your lap.</p>
+
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
+    glc.styles.backgroundColor = "#666666";
+
+    list.addCube({
+        x: width / 2,
+        y: height / 2,
+        size: 100,
+        rotationX: 30,
+        rotationY: [-30, 30],
+        strokeStyle: "white"
+    });
+
+    list.addText({
+        x: [width / 2 - 20, width /2 + 20],
+        y: height / 2 + 20,
+        fontSize: 12,
+        text: "glc",
+        fillStyle: "white",
+    });
+    
+    <span class="bold">var context = glc.context;
+
+    // gets executed prior to rendering shapes in renderList
+    glc.onEnterFrame = function(t) {
+        var res = 720;
+        context.beginPath();
+        for(var i = 0; i < res; i++) {
+            // just some crazy trig to make a circular path with a varying radius.
+            var angle = Math.PI * 2 / res * i,
+                radius = width / 2 - 50 + Math.sin(angle * 10) * 30 * (t - 0.5) * 2 + Math.cos(angle * 33) * 10 + Math.sin(angle * 97+t*30) * 5* (t - 0.5) * 2;
+            context.lineTo(width / 2 + Math.cos(angle) * radius, height / 2 + Math.sin(angle) * radius);
+        }
+        context.closePath();
+        context.fillStyle = "black";
+        context.fill();
+    }
+
+    // gets executed after rendering renderList
+    glc.onExitFrame = function(t) {
+        var res = 10;
+        context.strokeStyle = "red";
+        context.lineWidth = t * 25 + 0.5;
+        context.beginPath();
+        context.moveTo(0, height / 2);
+        // just a crooked line.
+        for(var i = res; i < width + res; i += res) {
+            context.lineTo(i, height / 2 + Math.random() * 100 - 50);
+        }
+        context.stroke();
+    }</span>
+}
+    </code></pre></div>
+
+    <p>The first half of that should be nothing new to you. Standard set up, draws a cube and some text, both animated. The highlighted part is all new stuff. First, we get a direct reference to the 2d rendering context with <code>glc.context</code>. If you need to get at the canvas itself, you have <code>glc.canvas</code>.</p>
+
+    <p>Then we define a <code>glc.onEnterFrame</code> and <code>glc.onExitFrame</code> function. Both get a parameter of <code>t</code>. In these functions, you can do whatever you want. Draw your own shapes, as simple or complex as you want. You can factor in the <code>t</code> value if you want it to animate along with the rest of the objects, or just ignore it. You have full access to the canvas and context and all that implies.</p>
+
+    <p>Just remember the order of operations: 1. Clear canvas, 2. <code>onEnterFrame</code>, 3. render objects in list, 4. <code>onExitFrame</code>. So shapes from the render list will get drawn over anything drawn in <code>onEnterFrame</code>. And whatever is drawn in <code>onExitFrame</code> will be on top of everything else.</p>
+
+    <p>In this example, I just go a little wild with the trig to create an animated ... blob or something in the <code>onEnterFrame</code> method. I just wanted to do something crazy that would be difficult to try to do with objects in the render list. In the <code>onExitFrame</code> method, I'm drawing a jagged line. Note that in both of these, I'm implementing the <code>t</code> value for animation, so things stay in sync. Here's what that gives us:</p>
+
+    <img src="images/oef.gif">
+
+    <p>With this, GLC moves towards being a general purpose animation tool. You can ignore the render list and shapes altogether, and just write your own rendering code in either <code>onEnterFrame</code> or <code>onExitFrame</code>. You still get the scheduler, interpolation, the whole GLC UI and various output formats. Plug in your own 3rd party drawing libs and they now become animation libs.</p>
+
+    <p>And of course, all of this is optional. Don't need the canvas, context, or the new frame methods. Just don't write them. This doesn't change anything else in GLC and the way it works with the render list.</p>
+
+    </div>
+
+
+
 
 
 
