@@ -64,6 +64,14 @@ define(["app/valueparser", "app/colorparser"], function(valueParser, colorParser
 			if(lineDash) {
 				context.setLineDash(lineDash);
 			}
+
+			var clipinfo = this.getArray("clip", t, this.styles.clip);
+			if (clipinfo) {
+				context.beginPath();
+				context.rect(clipinfo[0], clipinfo[1], clipinfo[2], clipinfo[3])
+				context.clip();
+			}
+
 			context.beginPath();
 		},
 
