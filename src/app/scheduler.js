@@ -4,6 +4,7 @@ define(function() {
 		duration = 2,
 		fps = 30,
 		running = false,
+		stopping = false,
 		looping = false,
 		renderCallback = null,
 		completeCallback = null,
@@ -15,7 +16,7 @@ define(function() {
 	}
 
 	function render() {
-		if(running) {
+		if(running && !stopping) {
 			if(renderCallback) {
 				renderCallback(t);
 			}
@@ -23,6 +24,9 @@ define(function() {
 			setTimeout(onTimeout, 1000 / fps);
 		}
 		else if(completeCallback) {
+			running = false;
+			looping = false;
+			stopping = false;
 	    	completeCallback();
 	   	}
 	}
@@ -49,6 +53,7 @@ define(function() {
 	function loop() {
 		if(!running) {
 			t = 0;
+			stopping = false;
 			looping = true;
 			running = true;
 			render();
@@ -56,8 +61,7 @@ define(function() {
 	}
 
 	function stop() {
-		running = false;
-		looping = false;
+		stopping = true;
 		t = 0;
 	}
 

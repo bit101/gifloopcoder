@@ -17,7 +17,7 @@ define(function() {
 					r = i % 2 ? innerRadius : outerRadius;
 				context.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
 			}
-			context.lineTo(outerRadius, 0);
+			context.closePath();
 
 
 			this.drawFillAndStroke(context, t, true, false);	

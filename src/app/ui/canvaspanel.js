@@ -7,7 +7,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	function init(pModel, pController, canvas) {
 		model = pModel;
 		controller = pController;
-		canvasPanel = QuickSettings.create(20, 20, "Canvas Panel");
+		canvasPanel = QuickSettings.create(400, 60, "Canvas Panel");
 		canvasPanel.setWidth(model.w + 12);
 		canvasPanel.addElement("Canvas", canvas);
 		canvasPanel.addRange("Scrub", 0, 1, 0, 0.01, onScrub);

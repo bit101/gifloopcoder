@@ -41,6 +41,7 @@
 		_createPanel: function(x, y) {
 			this._panel = document.createElement("div");
 			this._panel.className = "msettings_main";
+			this._panel.style.zIndex = ++QuickSettings._topZ;
 			this.setPosition(x || 0, y || 0);
 			this._controls = {};
 		},
@@ -163,6 +164,7 @@
 
 		show: function() {
 			this._panel.style.visibility = "visible";
+			this._panel.style.zIndex = ++QuickSettings._topZ;
 			this._hidden = false;
 		},
 

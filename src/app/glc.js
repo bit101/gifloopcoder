@@ -10,7 +10,9 @@ define([
 	"app/ui/controlpanel",
 	"app/ui/infopanel",
 	"app/ui/canvaspanel",
-	"app/ui/outputpanel"],
+	"app/ui/outputpanel",
+	"app/ui/codePanel",
+	"app/ui/toolbar"],
 	
 function(
 	renderList, 
@@ -24,60 +26,85 @@ function(
 	controlPanel,
 	infoPanel,
 	canvasPanel,
-	outputPanel) {
+	outputPanel,
+	codePanel,
+	toolbar) {
 
 	// this could be a module too. 
 	// ideally it wouldn't know about scheduler directly
 	var model = {
-			// interpolation could just be absorbed into model
-			interpolation: interpolation,
-			file: null,
-			maxColors: 256,
-			w: 400,
-			h: 400,
-			capture: false,
-			captureSpriteSheet: false,
-			getDuration: function() {
-				return scheduler.getDuration();
-			},
-			setDuration: function(value) {
-				scheduler.setDuration(value);
-			},
-			getFPS: function() {
-				return scheduler.getFPS();
-			},
-			setFPS: function(value) {
-				scheduler.setFPS(value);
-			},
-			getIsRunning: function() {
-				return scheduler.isRunning();
-			}
-		};
+		interpolation: interpolation,
+		file: null,
+		maxColors: 256,
+		w: 400,
+		h: 400,
+		capture: false,
+		captureSpriteSheet: false,
+		getDuration: function() {
+			return scheduler.getDuration();
+		},
+		setDuration: function(value) {
+			scheduler.setDuration(value);
+		},
+		getFPS: function() {
+			return scheduler.getFPS();
+		},
+		setFPS: function(value) {
+			scheduler.setFPS(value);
+		},
+		getIsRunning: function() {
+			return scheduler.isRunning();
+		}
+	};
 
 	// this could be a module that knows about all panels + schedule
 	var controller = {
-			playOnce: scheduler.playOnce,
-			loop: scheduler.loop,
-			stop: scheduler.stop,
-			enableControls: enableControls,
-			disableControls: disableControls,
-			clearOutput: outputPanel.clearOutput,
-			captureStill: captureStill,
-			renderFrame: renderList.render,
-			startEncoder: startEncoder,
-			chooseFile: chooseFile,
-			reload: reload,
-			showInfoPanel: showInfoPanel,
-			initSpriteSheet: initSpriteSheet
-		};
+		playOnce: function() {
+			scheduler.playOnce();
+			disableControls();
+			controlPanel.setStatus("playing");
+		},
+		loop: function() {
+			scheduler.loop();
+			disableControls();
+			controlPanel.setStatus("playing");
+		},
+		stop: function() {
+			scheduler.stop();
+			enableControls();
+			controlPanel.setStatus("stopped");
+		},
+		enableControls: enableControls,
+		disableControls: disableControls,
+		clearOutput: outputPanel.clearOutput,
+		captureStill: captureStill,
+		renderFrame: renderList.render,
+		startEncoder: startEncoder,
+		chooseFile: chooseFile,
+		reload: reload,
+		showInfoPanel: showInfoPanel,
+		initSpriteSheet: initSpriteSheet,
+		updateCode: updateCode,
+		makeGif: makeGif,
+		makeSpriteSheet: makeSpriteSheet,
+		saveCode: codePanel.saveCode
+	};
 
 	function init() {
+		window.addEventListener("error", function (event) {//msg, url, lineNumber, column, error) {
+			window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
+		});
+		window.addEventListener("beforeunload", function(event) {
+			event.returnValue = "Any unsaved changes will be lost.";
+		});
+		toolbar.init(controller);
+		codePanel.init(controller);
 		renderList.init(glc, model.w, model.h, styles, interpolation);
 		scheduler.init(onRender, onComplete);
 		canvasPanel.init(model, controller, renderList.getCanvas());
 		outputPanel.init(model, controller);
-		infoPanel.init(model, controller);
 		controlPanel.init(model, controller);
+		infoPanel.init(model, controller);
 		setCallbacks();
 		setKeys();
 		glc.context = renderList.getContext();
@@ -92,36 +119,55 @@ function(
 		renderList.size(model.w, model.h);
 		canvasPanel.setWidth(model.w + 12);
 		outputPanel.setWidth(model.w + 12);
-		controlPanel.setPosition(model.w + 50, 20);
-		outputPanel.setPosition(model.w + 220, 20);
 	}
 
 	function setKeys() {
 		document.body.addEventListener("keyup", function(event) {
 			// console.log(event.keyCode);
-			switch(event.keyCode) {
-				case 82: // R
-					reload();
-					break;
-				case 80: // P
-					if(scheduler.isRunning()) {
-						controller.stop();
-					}
-					else {
-						controller.loop();
-					}
-					break;
-				case 71: // G
-					controlPanel.makeGif();
-					break;
-				case 83: // S
-					controller.captureStill();
-					break;
-				case 70: // F
-					controlPanel.chooseFileDialog();
-					break;
-				default:
-					break;
+			if(event.ctrlKey) {
+				switch(event.keyCode) {
+					case 82: // R
+						reload();
+						break;
+					case 32: // space
+						if(scheduler.isRunning()) {
+							controller.stop();
+						}
+						else {
+							controller.loop();
+						}
+						break;
+					case 71: // G
+						controlPanel.makeGif();
+						break;
+					case 83: // S
+						controller.captureStill();
+						break;
+					case 70: // F
+						toolbar.chooseFileDialog();
+						break;
+					case 13: // enter
+						updateCode();
+						break;
+					default:
+						break;
+				}
+			}
+		});
+		document.body.addEventListener("keydown", function(event) {
+			if(event.ctrlKey) {
+				switch(event.keyCode) {
+					case 82: // R
+					case 32: // space
+					case 71: // G
+					case 83: // S
+					case 70: // F
+					case 13: // enter
+						event.preventDefault();
+						break;
+					default:
+						break;
+				}
 			}
 		});
 	}
@@ -160,7 +206,7 @@ function(
 			outputPanel.setPNG(SpriteSheet.getImage());
 		}
 		controlPanel.setStatus("stopped");
-		controller.enableControls();
+		enableControls();
 	}
 
 	/////////////////////
@@ -168,12 +214,12 @@ function(
 	/////////////////////
 
 	function enableControls() {
-		controlPanel.enableControls();
+		toolbar.enableControls();
 		canvasPanel.enableControls();
 	}
 
 	function disableControls() {
-		controlPanel.disableControls();
+		toolbar.disableControls();
 		canvasPanel.disableControls();
 	}
 
@@ -193,7 +239,6 @@ function(
 
 	function chooseFile(event) {
 		model.file = event.target.files[0];
-		controlPanel.setFileName(model.file.name);
 		reload();
 	}
 
@@ -203,31 +248,72 @@ function(
 
 		var reader = new FileReader();
 		reader.onload = function() {
-			renderList.clear();
-			reset();
-			var script = document.getElementById("loaded_script");
-			if(script) {
-				document.head.removeChild(script);
-			}
-
-			script = document.createElement("script");
-			script.id = "loaded_script";
-			document.head.appendChild(script);
-
-			script.textContent = reader.result;
-
-			if(window.onGLC) {
-				window.onGLC(glc);
-			}
+			setCode(reader.result, true);
 		}
 		reader.readAsText(model.file);
+	}
+
+	function updateCode() {
+		setCode(codePanel.getCode(), false);
+	}
+
+	function setCode(code, updateCodePanel) {
+		renderList.clear();
+		reset();
+		var script = document.getElementById("loaded_script");
+		if(script) {
+			document.head.removeChild(script);
+		}
+
+		script = document.createElement("script");
+		script.id = "loaded_script";
+		document.head.appendChild(script);
+
+		script.textContent = code;
+		if(updateCodePanel) {
+			codePanel.setCode(code);
+		}
+
+		if(window.onGLC) {
+			setTimeout(function() {
+				window.onGLC(glc);
+			}, 100);
+		}
 	}
 
 	function showInfoPanel() {
 		infoPanel.show();
 	}
 
+	function makeGif() {
+		if(!model.getIsRunning()) {
+			controller.clearOutput();
+			model.capture = true;
+			controller.startEncoder();
+			controller.playOnce();
+		}
+		else {
+			controlPanel.setStatus("Animation already running");
+		}
+	}
+
+	function makeSpriteSheet() {
+		if(!model.getIsRunning()) {
+			controller.clearOutput();
+			model.captureSpriteSheet = true;
+			controller.initSpriteSheet();
+			controller.playOnce();
+		}
+		else {
+			controlPanel.setStatus("Animation already running");
+		}
+	}
+
+
 	function reset() {
+		scheduler.stop();
+		glc.onEnterFrame = null;
+		glc.onExitFrame = null;
 		glc.size(400, 400);
 		glc.setFPS(30);
 		glc.setDuration(2);
@@ -266,8 +352,8 @@ function(
 		renderList: renderList,
 		styles: styles,
 		size: size,
-		playOnce: controlPanel.playOnce,
-		loop: controlPanel.loop,
+		playOnce: controller.playOnce,
+		loop: controller.loop,
 		setFPS: controlPanel.setFPS,
 		setDuration: controlPanel.setDuration,
 		setMode: controlPanel.setMode,

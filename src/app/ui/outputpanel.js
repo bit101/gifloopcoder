@@ -22,11 +22,12 @@ define(["libs/quicksettings"], function(QuickSettings) {
 			clearOutput();
 			outputPanel.hide();
 		});
+		outputPanel.hide();
 	}
 
 
 	function setGIF(binaryGIF) {
-		outputPanel.show();
+		showPanel();
 		var dataURL = "data:image/gif;base64," + encode64(binaryGIF);
 		outputPanel.setImageURL(captureImage, dataURL);
 		var header = 'data:image/gif;base64,',
@@ -35,7 +36,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	}
 
 	function setPNG(dataURL) {
-		outputPanel.show();
+		showPanel();
 		outputPanel.setImageURL(captureImage, dataURL);
 		var header = 'data:image/png;base64,',
 			imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
@@ -44,16 +45,18 @@ define(["libs/quicksettings"], function(QuickSettings) {
 
 	function setWidth(width) {
 		outputPanel.setWidth(width);
+		outputPanel.setPosition((window.innerWidth - width) / 2, 40);
 	}
 
-	function setPosition(x, y) {
-		outputPanel.setPosition(x, y);
+	function showPanel() {
+		outputPanel.setPosition((window.innerWidth - model.w + 12) / 2, 40);
+		outputPanel.show();
 	}
 
 	function clearOutput() {
 		outputPanel.setImageURL(captureImage, "");
 		outputPanel.setInfo(sizeInfo, "");
-		outputPanel.setWidth(model.w + 12);
+		setWidth(model.w + 12);
 	}
 
 	function encode64(input) {
@@ -85,7 +88,6 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		setGIF: setGIF,
 		setPNG: setPNG,
 		setWidth: setWidth,
-		setPosition: setPosition,
 		clearOutput: clearOutput
 	}
 });

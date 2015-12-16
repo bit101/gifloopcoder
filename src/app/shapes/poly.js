@@ -15,7 +15,7 @@ define(function() {
 				var angle = Math.PI * 2 / sides * i;
 				context.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
 			}
-			context.lineTo(radius, 0);
+			context.closePath();
 
 			this.drawFillAndStroke(context, t, true, false);
 		}
