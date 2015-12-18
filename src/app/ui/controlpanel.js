@@ -2,6 +2,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	var panel = null,
 		model,
 		controller,
+		scheduler,
 		fileInput = null;
 
 	// controls:
@@ -15,9 +16,10 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		// fullScreen = "Full Screen";
 
 
-	function init(pModel, pController) {
+	function init(pModel, pController, pScheduler) {
 		model = pModel;
 		controller = pController;
+		scheduler = pScheduler;
 		panel = QuickSettings.create(window.innerWidth - 200, 60, "Control Panel");
 
 		// electron only.
@@ -37,13 +39,13 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		// 	}
 		// }
 
-		panel.addRange(durationSlider, 0.5, 10, model.getDuration(), 0.5, model.setDuration);
-		panel.addRange(fpsSlider, 1, 60, model.getFPS(), 1, model.setFPS);
+		panel.addRange(durationSlider, 0.5, 10, scheduler.getDuration(), 0.5, scheduler.setDuration);
+		panel.addRange(fpsSlider, 1, 60, scheduler.getFPS(), 1, scheduler.setFPS);
 		panel.addRange(maxColorsSlider, 2, 256, model.maxColors, 1, function(value) {
 			model.maxColors = value;
 		});
-		panel.bindDropDown(modeDropDown, ["bounce", "single"], model.interpolation);
-		panel.bindBoolean(easingCheckbox, model.interpolation.easing, model.interpolation);
+		panel.bindDropDown(modeDropDown, ["bounce", "single"], model);
+		panel.bindBoolean(easingCheckbox, model.easing, model);
 		panel.addInfo(statusInfo, "stopped");
 	}
 

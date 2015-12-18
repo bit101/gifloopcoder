@@ -1,5 +1,5 @@
 define(function() {
-	return {
+	var defaultStyles = {
 		backgroundColor: "#ffffff",
 		lineWidth: 5,
 		strokeStyle: "#000000",
@@ -16,6 +16,22 @@ define(function() {
 		translationX: 0,
 		translationY: 0,
 		shake: 0,
-		blendMode: "source-over"
+		blendMode: "source-over",
+		reset: reset
+	},
+
+	styles = {};
+
+	reset();
+
+	function reset() {
+		for(var prop in defaultStyles) {
+			styles[prop] = defaultStyles[prop];
+		}
 	}
+
+
+
+	return styles;
+
 });

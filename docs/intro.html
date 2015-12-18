@@ -37,64 +37,34 @@
 
     <p>GIF Loop Coder (glc) is a JavaScript-based tool for creating looping animated gifs.</p>
 
-    <p>The program is a combination of a JavaScript library that you code against, and a local web application that you run in a browser.</p>
+    <p>The program is a local web application that you run in a browser.</p>
     
-    <p>You create a JavaScript file and write code to add animated objects to a render list.</p>
+    <p>It provides a text editor where you can write JavaScript code to add animated objects to a render list.</p>
 
-    <p>Your script is loaded by the web application. The app displays and animates the ojects you created, gives you a control panel to control how the animation is rendered and lets you save the result as an animated gif.</p>
+    <p>Your code is loaded by the web application, which then animates the ojects you created, gives you a control panel to control how the animation is rendered and lets you save the result as an animated gif.</p>
     
     <img src="images/1.1.png">
 
-    <p>You can check out the entire source repository from <a href="https://github.com/bit101/gifloopcoder">https://github.com/bit101/gifloopcoder</a>. Or, you can simply download a zip file that contains the files you need to run the app, and this documentation. That zip is at <a href="http://www.gifloopcoder.com/download/">http://www.gifloopcoder.com/download/</a>.</p>
+    <p>You can check out the entire source repository from <a href="https://github.com/bit101/gifloopcoder">https://github.com/bit101/gifloopcoder</a>. Or, you can simply download a zip file that contains the files you need to run the app, and this documentation. That zip is at <a href="https://github.com/bit101/gifloopcoder/releases">https://github.com/bit101/gifloopcoder/releases</a>.</p>
+
+
 
     <p>If you've downloaded the zip file, the file structure should look something like this:</p>
 
     <div class="code"><pre><code>
 - gifloopcoder
-  - sketches
-    - index.html
-    - glc-min.js
-    - quicksettings_minimal.css
-    - code
-      - template.js
-    - examples
-      - various example js files
+  - app
   - docs
-    - this documentation
+  - examples
     </code></pre></div>
 
-    <p>If you've checked out the full code repo, you'll also have a <code>glc</code> folder containing the source code that is used to build the app. You'll only need that if you plan on hacking around or extending the system. If you just want to make animations, all you need is the sketches folder.</p>
+    <p>If you've checked out the full code repo, you'll also have a <code>src</code> folder containing the source code that is used to build the app. You'll only need that if you plan on hacking around or extending the system. If you just want to make animations, all you need is the app and examples folders.</p>
 
-    <p>In the sketches folder, you'll see an <code>index.html</code>, a <code>glc-min.js</code> file, a <code>quicksettings_minimal.css</code> file, a <code>code</code> folder with a <code>template.js</code> file, and an <code>examples</code> folder with a number of JavaScript files.</p>
+    <p>In previous versions of GLC, you needed to edit the <code>index.html</code> file to tell it which sketch file you wanted to run, and then create that sketch file, based on a template. Things are much simpler now. All you have to do is load that <code>index.html</code> file in a browser. GLC now has a built-in code editor which will be pre-loaded with a basic sketch template. Just start coding away.</p>
 
-    <p>With the current release of GLC, all you need to do is open that <code>index.html</code> file in a browser. There is a button in the UI that allows you to browse to any sketch file you want. This will then be loaded in and displayed. And there is a reload button that will reload the current sketch if you've made any changes to it.</p>
+    <p>However, if you want to use and external editor and have that launch GLC with your sketch already loaded, that is still possible. This is covered in the <a href="tips.html">Tips</a> section.
 
-    <p>However, many developers like to set up a shortcut in their editor that will launch a web page with their latest changes. To do that, you can specify which sketch should be loaded right in the html.</p>
-
-    <p>The <code>index.html</code> file looks like this:</p>
-
-
-    <div class="code"><pre><code>
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;GIF Loop Coder&lt;/title&gt;
-    &lt;link rel="stylesheet" type="text/css" href="quicksettings_minimal.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;!-- This should point to the sketch you want to run --&gt;
-    <span class="bold">&lt;script type="text/javascript" src="examples/allshapes.js"&gt;&lt;/script&gt;</span>
-
-    &lt;script type="text/javascript" src="glc-min.js"&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-    </code></pre></div>
-
-    <p>You see there are two script tags there. The first one points to the sketch that you will create. Here, it's set to load the sketch defined in <code>examples/allshapes.js</code>. To load a different sketch, just change the JavaScript file this points to. Now when you launch the app, it will load that sketch.</p>
-
-    <p>The second script is to load the glc library. Generally speaking, you shouldn't need to touch that at all.</p>
-
-    <p>Now let's look at what makes up a sketch. In the <code>code</code> folder there is a <code>template.js</code> file that gives you an empty starting point for a project. It looks like this:</p>
+    <p>Now let's look at what makes up a sketch. The template looks like this:</p>
 
     <div class="code"><pre><code>
 function onGLC(glc) {
@@ -104,10 +74,10 @@ function onGLC(glc) {
     // glc.setFPS(20);
     // glc.setMode("single");
     // glc.setEasing(false);
-    // glc.setMaxColors(256);
     var list = glc.renderList,
         width = glc.w,
-        height = glc.h;
+        height = glc.h,
+        color = glc.color;
 
     // your code goes here:
 
@@ -124,18 +94,7 @@ function onGLC(glc) {
 
     <p>You'll also see that <code>glc.w</code> and <code>glc.h</code>, which represent the width and the height of the current sketch, are aliased to <code>width</code> and <code>height</code>, again for ease of typing.
 
-    <p>You probably want to keep that <code>template.js</code> file around for starting new projects. So it's best to save it with a different name and then adjust the HTML to point to wherever that new file is. The <code>code</code> folder is a good place to store your own sketch scripts.</p>
-
-    <p>For example, save a copy of that <code>template.js</code> file as <code>animaton_01.js</code> in the <code>code</code> folder, and then in the HTML, say: </p>
-
-
-    <div class="code"><pre><code>
-&lt;script type="text/javascript" src=<span class="bold">"code/animation_01.js"</span>&gt;&lt;/script&gt;
-    </code></pre></div>
-
-    <p>Or, just open the app and use the open file option to browse to <code>animation_01.js</code> and open that.</p>
-
-    <p>So, your app should be running, but you need to add at least one object to have anything interesting to see.</p>
+    <p>Now you are ready to add some objects and animate them.</p>
 
     </div>
 
@@ -144,8 +103,6 @@ function onGLC(glc) {
     <h3><a name="addingobjects"></a>Adding Objects</h3>
     <!-- ================================================================================== -->
     <div class="subsection">
-
-
 
 
     <p>The <code>glc.renderList</code>, which we have aliased to <code>list</code>, has a number of "add" methods for adding objects. Let's start by adding a circle.</p>
@@ -173,7 +130,7 @@ function onGLC(glc) {
 
     <p>Now, there are many properties that go into defining a rendered circle: position, radius, stroked or filled or both? Stroke color and width, solid or dashed, fill color, drop shadow parameters. Circles are drawn in HTML5 using the <code>arc</code> method, so we also need to know the start and end angle of that arc. But we don't have to specify anything at all here because glc has defaults for everything. You only need define what you want to be different from the default.</p>
 
-    <p>When you run this, you should see your circle right away.</p>
+    <p>You can run this sketch by clicking the "Compile" button on the tool bar, or pressing <code>Control-Enter</code> on the keyboard. When you do, you should see your circle right away.</p>
 
     <img src="images/1.2.png">
 
@@ -277,35 +234,41 @@ function onGLC(glc) {
     <!-- ================================================================================== -->
     <div class="subsection">
 
-    <p>The key parts of the glc user interface are the Canvas Panel and the Control Panel. The ui is created using the <a href="https://github.com/bit101/quicksettings">QuickSettings library</a>, which you may want to check out for your own projects.</p>
+    <p>The key parts of the glc user interface are the tool bar, the code editing area, Canvas Panel and the Control Panel. The UI for the panels is created using the <a href="https://github.com/bit101/quicksettings">QuickSettings library</a>, which you may want to check out for your own projects.</p>
 
-    <p>The Canvas Panel displays the animation in progress. It will be sized to 400x400 pixels, or differently if you called <code>glc.size</code> in your JavaScript file. Note that at the bottom of the panel, there is a scrubber for moving through the animation manually.</p>
+    <p>The Canvas Panel displays the animation in progress. It will be sized to 400x400 pixels, or differently if you called <code>glc.size</code> in your sketch. Note that at the bottom of the panel, there is a scrubber for moving through the animation manually.</p>
 
     <img src="images/1.1.png">
 
-    <p>The Control Panel is what you'll interact with mostly though. From top to bottom, here's what it does:</p>
+    <p>The Control Panel and toolbar are what you'll interact with mostly though. First the toolbar. From left to right:</p>
 
     <ul>
-        <li>The open file button lets you choose any sketch on your system. It will load and display that sketch.</li>
-        <li>Beneath that is the name of the currently loaded sketch, if one is loaded.</li>
-        <li>The reload button reloads the current sketch. If you've made some changes to the sketch in your code editor and saved those edits, press this button to reload the updated sketch.</li>
+        <li>The Open button lets you browse to and load a sketch file from your file system. This file will be loaded into the code editor and will be executed immediately. So if you set the sketch size, the canvas panel will resize and if you told the sketch to loop, it will start looping. Shortcut: Control-O</li>
+        <li>The Compile button re-executes the code in the code editing area. You'll want to do this when you add or change some code and want to see what it does. The shortcut is Control-Enter. That's a good one to learn because you'll be using it a lot.</li>
+        <li>The Save button saves the current sketch to your file system. Due to the limitations of GLC being a browser based application, however, you cannot choose where to save the file. It will be saved in the browser's default download location, and will not overwrite the file you loaded in or previously saved versions. Shortcut: Control-S</li>
+        <li>The Loop button simply starts the animation playing continuously. Shortcut Control-Space will toggle between playing and paused.</li>
+        <li>The Once button will play the animation through from start to finish one time.</li>
+        <li>The Pause button pauses the animation.</li>
+        <li>The Make GIF button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into an animated gif, which it displays in the Output panel. Shortcut: Control-G</li>
+        <li>The Still button will capture the single frame showing in the Canvas panel and display it in the Output panel.</li>
+        <li>The Sprite Sheet button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into a sprite sheet, which it displays in the Output panel</li>
+        <li>The About button displays some information about the app.</li>
+    </ul>
+
+
+    <p>Then there's the Control Panel. From top to bottom, here's what it does:</p>
+
+    <ul>
         <li>The duration slider changes how long the overall animation lasts. It can go from 0.5 seconds up to 10 seconds, in 0.5 second increments.</li>
         <li>The fps slider sets the approximate frame rate in frames per second of the animation. This is accomplished by adding a small delay on each frame. It goes from 1 fps up to 60 fps.</li>
         <li>The max colors slider sets how many colors will be used in the final animation. GIFs have a maximum of 256 colors. But often you can set the max colors much lower and still have your animation look good. This can make a dramatic difference in file size.</li>
         <li>The mode select allows you to choose "bounce" or "single". Modes will be explained a bit more below.</li>
         <li>The easing checkbox gives the animation an ease-in and ease-out to the animation if checked. Otherwise, it performs a straight linear interpolation.</li>
-        <li>The Play once button plays the animation through one full cycle and stops.</li>
-        <li>The Loop button causes the animation to loop continuously.</li>
-        <li>The Stop button causes any animation or rendering to stop.</li>
-        <li>The "Make a gif" button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into an animated gif, which it displays in the Output panel.</li>
-        <li>The "Make a sprite sheet button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into a sprite sheet, which it displays in the Output panel</li>
-        <li>The "Capture still" button will capture the single frame showing in the Canvas panel and display it in the Output panel.</li>
         <li>The status indicator lets you know what's happening</li>
     </ul>
 
     <p>If you ever have a hard time getting one of the sliders to land on a specific value, you can also use the left and right cursor keys on your keyboard. Pressing these will move the slider in single increments one way or the other.</p>
 
-    <p>Several of the controls have keyboard shortcuts. These are listed in the info panel below the control panel.</p>
 
     <p>You can also interact with several of the controls here via the code you write. You've already seen that you can call <code>glc.loop()</code> to have your animation start looping as soon as the page loads. Alternately, you could <code>glc.playOnce()</code>. Here are all the available commands:</p>
 
@@ -324,6 +287,8 @@ function onGLC(glc) {
     <p>These are all very useful when you are going back and forth between the code and the app a lot, and you want to have your animation play at a particular rate and duration, mode and easing. Just set it once in the code rather than having to tweak the UI each time you reload.</p>
 
     <p>Finally, the Output panel displays the generated gif or captured image as well as the approximate size that the file will be when you save it. Once it's in there, you can right click it to save it in a specific location with a specific name, or open it in a new tab. You can also choose to clear the image from the panel. Sometimes the right-click to save action will fail on larger animations. If this happens, try dragging and dropping the image into a file system window.</p>
+
+    <p>The Output panel is not displayed until there is something to display in it. It also has a close button so you can hide it out of the way when you are coding.</p>
 
     </div>
 

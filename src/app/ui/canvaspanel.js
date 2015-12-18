@@ -1,12 +1,14 @@
 define(["libs/quicksettings"], function(QuickSettings) {
 	var canvasPanel = null,
 		model = null,
-		controller = null;
+		controller = null,
+		scheduler;
 
 
-	function init(pModel, pController, canvas) {
+	function init(pModel, pController, pScheduler, canvas) {
 		model = pModel;
 		controller = pController;
+		scheduler = pScheduler;
 		canvasPanel = QuickSettings.create(400, 60, "Canvas Panel");
 		canvasPanel.setWidth(model.w + 12);
 		canvasPanel.addElement("Canvas", canvas);
@@ -14,7 +16,7 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	}
 
 	function onScrub(value) {
-		if(!model.getIsRunning()) {
+		if(!scheduler.isRunning()) {
 			controller.renderFrame(value);
 		}
 	}
@@ -35,11 +37,21 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		canvasPanel.enableControl("Scrub");
 	}
 
+	function hide() {
+		canvasPanel.hide();
+	}
+
+	function show() {
+		canvasPanel.show();
+	}
+
 	return {
 		init: init,
 		setWidth: setWidth,
 		setTime: setTime,
 		disableControls: disableControls,
-		enableControls: enableControls
+		enableControls: enableControls,
+		hide: hide,
+		show: show
 	}
 });

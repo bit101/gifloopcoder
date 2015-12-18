@@ -1,9 +1,13 @@
 define(function() {
 
+    function init(pModel) {
+        model = pModel;
+    }
+
     function interpolate(t) {
-        switch(this.mode) {
+        switch(model.mode) {
             case "bounce":
-                if(this.easing) {
+                if(model.easing) {
                     var a = t * Math.PI * 2;
                     return 0.5 - Math.cos(a) * 0.5;
                 }
@@ -18,7 +22,7 @@ define(function() {
                 if(t > 1) {
                     t %= 1;
                 }
-                if(this.easing) {
+                if(model.easing) {
                     var a = t * Math.PI;
                     return 0.5 - Math.cos(a) * 0.5;
                 }
@@ -30,8 +34,7 @@ define(function() {
 
 
 	return {
+        init: init,
         interpolate: interpolate,
-		mode: "bounce",
-		easing: true
 	}
 });

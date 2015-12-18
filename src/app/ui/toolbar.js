@@ -87,7 +87,6 @@ define(function() {
         gifBtn.className = "";
         spriteBtn.className = "";
         pauseBtn.className = "disabled";
-        console.log(gifBtn.className);
     }
 
     function disableControls() {

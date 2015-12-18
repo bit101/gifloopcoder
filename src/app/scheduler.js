@@ -6,28 +6,24 @@ define(function() {
 		running = false,
 		stopping = false,
 		looping = false,
-		renderCallback = null,
-		completeCallback = null,
+		controller = null,
 		renderList = null
 
-	function init(onRender, onCompete) {
-		renderCallback = onRender;
-		completeCallback = onCompete;
+	function init(pController) {
+		controller = pController;
 	}
 
 	function render() {
 		if(running && !stopping) {
-			if(renderCallback) {
-				renderCallback(t);
-			}
+			controller.onRender(t);
 		    advance();
 			setTimeout(onTimeout, 1000 / fps);
 		}
-		else if(completeCallback) {
+		else {
 			running = false;
 			looping = false;
 			stopping = false;
-	    	completeCallback();
+	    	controller.onComplete();
 	   	}
 	}
 

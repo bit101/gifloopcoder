@@ -10,7 +10,8 @@ define([
     "libs/quicksettings", 
     "libs/codemirror/lib/codemirror", 
     "libs/codemirror/mode/javascript/javascript",
-    "libs/codemirror/addon/edit/closebrackets"
+    "libs/codemirror/addon/edit/closebrackets",
+    "libs/codemirror/addon/comment/comment"
     ], function(QuickSettings, CodeMirror) {
     var codePanel = null,
         cm = null,
@@ -30,8 +31,8 @@ define([
             lineNumbers: true,
             autoCloseBrackets: true
         });
-        // cm.setSize(window.innerWidth, window.innerHeight - 56);
-        cm.setValue("function onGLC(glc) {\n    glc.loop();\n    // glc.size(400, 400);\n    // glc.setDuration(5);\n    // glc.setFPS(20);\n    // glc.setMode('single');\n    // glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+        cm.setSize(window.innerWidth, window.innerHeight - 56);
+        cm.setValue("function onGLC(glc) {\n    glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
     }
 
     function saveCode() {
@@ -60,10 +61,15 @@ define([
         return cm.getValue();
     }
 
+    function toggleComment() {
+        cm.toggleComment();
+    }
+
     return {
         saveCode: saveCode,
         setCode: setCode,
         getCode: getCode,
-        init: init
+        init: init,
+        toggleComment: toggleComment
     };
 });

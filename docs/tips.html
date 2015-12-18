@@ -23,6 +23,7 @@
                 <li><a href="#enterframe">Direct Canvas Access</a></li>
                 <li><a href="#spritesheets">Creating Sprite Sheets</a></li>
                 <li><a href="#quality">Encoding Quality</a></li>
+                <li><a href="#external">Using an External Editor</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
             </ul>
 
@@ -552,6 +553,26 @@ function onGLC(glc) {
     <p>Another trick that can be used to improve how some images look is dithering. With dithering, if there's an area of color that doesn't match closely to anything in the palette, it will mix two or more other colors amongst the different pixels in that area. So from a distance, they will blend together to more closely match the original color. Unfortunately, the encoder used in GLC does not support dithering. However, there are other gif optimizing tools that do. You can run your animation through one of those tools and tell it do apply dithering and you may see better results.</p>
 
     </div>
+
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="external"></a>Using an External Editor</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>Although most will find the integrated editor in GLC useful, you may want to use another editing program that you are more comfortable with. This is the way GLC worked originally, and it's still possible to use it this way.</p>
+
+    <p>If you open up the <code>index.html</code> file in the main app folder, you can add a script tag somewhere in the HTML document that points to the script you want to load. This script tag can be in the head or body section of the document, but must be before the final script tag which looks like this:</p>
+
+    <code><pre><div>
+<script type="text/javascript" src="glc-min.js"></script>
+    </div></pre></code>
+    </div>
+
+    <p>Now when you load the file in the browser, that script will be loaded and executed in GLC. Note that a script loaded this way will NOT appear in the integrated text editor. And if you hit the Compile button or the shortcut, Control-Enter, the script that is in the code editor (the empty template) will be executed instead. So you can use an external editor, or the built-in editor, but not both at the same time.</p>
+
+
 
     <!-- ================================================================================== -->
     <h3><a name="jif"></a>GIF or JIF?</h3>
