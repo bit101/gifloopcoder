@@ -14,6 +14,7 @@
 		_draggable: true,
 		_collapsible: true,
 		_globalChangeHandler: null,
+		_moveListener: null,
 
 		create: function(x, y, title) {
 			var obj = Object.create(this);
@@ -125,6 +126,9 @@
 		_endDrag: function(event) {
 			document.removeEventListener("mousemove", this._drag);
 			document.removeEventListener("mouseup", this._endDrag);
+			if(this._moveListener) {
+				this._moveListener(this._panel.offsetLeft, this._panel.offsetTop);
+			}
 			event.preventDefault();
 		},
 
@@ -136,6 +140,10 @@
 
 		setGlobalChangeHandler: function(handler) {
 			this._globalChangeHandler = handler;
+		},
+
+		setMoveListener: function(listener) {
+			this._moveListener = listener;
 		},
 
 		toggleCollapsed: function() {

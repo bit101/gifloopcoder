@@ -22,6 +22,11 @@ define(function() {
 
 
     function init(pController) {
+        if(!window.glcSettings.useIntegratedEditor) {
+            openBtn.style.display = "none";
+            compileBtn.style.display = "none";
+            saveBtn.style.display = "none";
+        }
         controller = pController;
         setupFile();
         addListeners();

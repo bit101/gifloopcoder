@@ -17,10 +17,15 @@ define(["libs/quicksettings"], function(QuickSettings) {
 
 
 	function init(pModel, pController, pScheduler) {
+		var controlPanelX = localStorage.getItem("controlPanelX"),
+			controlPanelY = localStorage.getItem("controlPanelY");
+		if(controlPanelX == null) controlPanelX = window.innerWidth - 200;
+		if(controlPanelY == null) controlPanelY = 60;
+
 		model = pModel;
 		controller = pController;
 		scheduler = pScheduler;
-		panel = QuickSettings.create(window.innerWidth - 200, 60, "Control Panel");
+		panel = QuickSettings.create(controlPanelX, controlPanelY, "Control Panel");
 
 		// electron only.
 		// if(window.nodeRequire) {
@@ -47,6 +52,10 @@ define(["libs/quicksettings"], function(QuickSettings) {
 		panel.bindDropDown(modeDropDown, ["bounce", "single"], model);
 		panel.bindBoolean(easingCheckbox, model.easing, model);
 		panel.addInfo(statusInfo, "stopped");
+		panel.setMoveListener(function(x, y) {
+			localStorage.setItem("controlPanelX", x);
+			localStorage.setItem("controlPanelY", y);
+		});
 	}
 
 	function setStatus(status) {

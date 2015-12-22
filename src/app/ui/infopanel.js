@@ -2,7 +2,12 @@ define(["libs/quicksettings"], function(QuickSettings) {
 	var panel = null;
 
 	function init(model, controller) {
-		infoPanel = QuickSettings.create((window.innerWidth - 150) / 2, 100, "GIF Loop Coder v" + model.version);
+		var infoPanelX = localStorage.getItem("infoPanelX"),
+			infoPanelY = localStorage.getItem("infoPanelY");
+		if(infoPanelX == null) infoPanelX = (window.innerWidth - 150) / 2;
+		if(infoPanelY == null) infoPanelY = 100;
+
+		infoPanel = QuickSettings.create(infoPanelX, infoPanelY, "GIF Loop Coder v" + model.version);
 		infoPanel.addInfo("site", "<a href='http://www.gifloopcoder.com'>http://www.gifloopcoder.com</a>");
 		infoPanel.addInfo("Info", "Howdy! Welcome to GIF Loop Coder (GLC). This program is offered free and is open source. Lots of hours went into it, so if you find it useful, pay it back or pay it forward.");
 		infoPanel.addInfo("tips", "<a href='https://www.paypal.me/bit101'>Buy me a beer (or two)</a>");
@@ -18,6 +23,10 @@ define(["libs/quicksettings"], function(QuickSettings) {
 			infoPanel.hide();
 		});
 		infoPanel.hide();
+		infoPanel.setMoveListener(function(x, y) {
+			localStorage.setItem("infoPanelX", x);
+			localStorage.setItem("infoPanelY", y);
+		});
 	}
 
 	function show() {

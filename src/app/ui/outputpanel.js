@@ -12,8 +12,14 @@ define(["libs/quicksettings"], function(QuickSettings) {
 
 	function init(pModel, pController) {
 		model = pModel;
+
+		var outputPanelX = localStorage.getItem("outputPanelX"),
+			outputPanelY = localStorage.getItem("outputPanelY");
+		if(outputPanelX == null) outputPanelX = model.w + 220;
+		if(outputPanelY == null) outputPanelY = 20;
+
 		controller = pController;
-		outputPanel = QuickSettings.create(model.w + 220, 20, "Output");
+		outputPanel = QuickSettings.create(outputPanelX, outputPanelY, "Output");
 		outputPanel.setWidth(model.w + 12);
 		outputPanel.addImage(captureImage, "");
 		outputPanel.addInfo(sizeInfo, "");
@@ -23,6 +29,10 @@ define(["libs/quicksettings"], function(QuickSettings) {
 			outputPanel.hide();
 		});
 		outputPanel.hide();
+		outputPanel.setMoveListener(function(x, y) {
+			localStorage.setItem("outputPanelX", x);
+			localStorage.setItem("outputPanelY", y);
+		});
 	}
 
 
@@ -45,11 +55,9 @@ define(["libs/quicksettings"], function(QuickSettings) {
 
 	function setWidth(width) {
 		outputPanel.setWidth(width);
-		outputPanel.setPosition((window.innerWidth - width) / 2, 40);
 	}
 
 	function showPanel() {
-		outputPanel.setPosition((window.innerWidth - model.w + 12) / 2, 40);
 		outputPanel.show();
 	}
 

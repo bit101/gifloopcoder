@@ -66,14 +66,18 @@ function(
 		window.addEventListener("error", function (event) {//msg, url, lineNumber, column, error) {
 			window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
 		});
-		window.addEventListener("beforeunload", function(event) {
-			event.returnValue = "Any unsaved changes will be lost.";
-		});
+		if(window.glcSettings.useIntegratedEditor) {
+			window.addEventListener("beforeunload", function(event) {
+				event.returnValue = "Any unsaved changes will be lost.";
+			});
+		}
 		internalInterface.glc = glc;
 		controller.init(internalInterface);
 		interpolation.init(model);
 		toolbar.init(controller);
-		codePanel.init(controller);
+		if(window.glcSettings.useIntegratedEditor) {
+			codePanel.init(controller);
+		}
 		renderList.init(glc, model.w, model.h, styles, interpolation);
 		scheduler.init(controller);
 		canvasPanel.init(model, controller, scheduler, renderList.getCanvas());
@@ -92,6 +96,7 @@ function(
 	}
 
 	function setKeys() {
+		var useEditor = window.glcSettings.useIntegratedEditor;
 		document.body.addEventListener("keyup", function(event) {
 			// console.log(event.keyCode);
 			if(event.ctrlKey) {
@@ -108,16 +113,24 @@ function(
 						controller.makeGif();
 						break;
 					case 83: // S
-						controller.saveCode();
+						if(useEditor) {
+							controller.saveCode();
+						}
 						break;
 					case 79: // O
-						controller.openFile();
+						if(useEditor) {
+							controller.openFile();
+						}
 						break;
 					case 13: // enter
-						controller.updateCode();
+						if(useEditor) {
+							controller.updateCode();
+						}
 						break;
 					case 191: // forward slash
-						codePanel.toggleComment();
+						if(useEditor) {
+							codePanel.toggleComment();
+						}
 						break;
 					default:
 						break;

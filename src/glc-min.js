@@ -2127,6 +2127,7 @@ define('app/spritesheet',[],function() {
 		_draggable: true,
 		_collapsible: true,
 		_globalChangeHandler: null,
+		_moveListener: null,
 
 		create: function(x, y, title) {
 			var obj = Object.create(this);
@@ -2238,6 +2239,9 @@ define('app/spritesheet',[],function() {
 		_endDrag: function(event) {
 			document.removeEventListener("mousemove", this._drag);
 			document.removeEventListener("mouseup", this._endDrag);
+			if(this._moveListener) {
+				this._moveListener(this._panel.offsetLeft, this._panel.offsetTop);
+			}
 			event.preventDefault();
 		},
 
@@ -2249,6 +2253,10 @@ define('app/spritesheet',[],function() {
 
 		setGlobalChangeHandler: function(handler) {
 			this._globalChangeHandler = handler;
+		},
+
+		setMoveListener: function(listener) {
+			this._moveListener = listener;
 		},
 
 		toggleCollapsed: function() {
@@ -4301,10 +4309,15 @@ define('app/ui/controlpanel',["libs/quicksettings"], function(QuickSettings) {
 
 
 	function init(pModel, pController, pScheduler) {
+		var controlPanelX = localStorage.getItem("controlPanelX"),
+			controlPanelY = localStorage.getItem("controlPanelY");
+		if(controlPanelX == null) controlPanelX = window.innerWidth - 200;
+		if(controlPanelY == null) controlPanelY = 60;
+
 		model = pModel;
 		controller = pController;
 		scheduler = pScheduler;
-		panel = QuickSettings.create(window.innerWidth - 200, 60, "Control Panel");
+		panel = QuickSettings.create(controlPanelX, controlPanelY, "Control Panel");
 
 		// electron only.
 		// if(window.nodeRequire) {
@@ -4331,6 +4344,10 @@ define('app/ui/controlpanel',["libs/quicksettings"], function(QuickSettings) {
 		panel.bindDropDown(modeDropDown, ["bounce", "single"], model);
 		panel.bindBoolean(easingCheckbox, model.easing, model);
 		panel.addInfo(statusInfo, "stopped");
+		panel.setMoveListener(function(x, y) {
+			localStorage.setItem("controlPanelX", x);
+			localStorage.setItem("controlPanelY", y);
+		});
 	}
 
 	function setStatus(status) {
@@ -4375,7 +4392,12 @@ define('app/ui/infopanel',["libs/quicksettings"], function(QuickSettings) {
 	var panel = null;
 
 	function init(model, controller) {
-		infoPanel = QuickSettings.create((window.innerWidth - 150) / 2, 100, "GIF Loop Coder v" + model.version);
+		var infoPanelX = localStorage.getItem("infoPanelX"),
+			infoPanelY = localStorage.getItem("infoPanelY");
+		if(infoPanelX == null) infoPanelX = (window.innerWidth - 150) / 2;
+		if(infoPanelY == null) infoPanelY = 100;
+
+		infoPanel = QuickSettings.create(infoPanelX, infoPanelY, "GIF Loop Coder v" + model.version);
 		infoPanel.addInfo("site", "<a href='http://www.gifloopcoder.com'>http://www.gifloopcoder.com</a>");
 		infoPanel.addInfo("Info", "Howdy! Welcome to GIF Loop Coder (GLC). This program is offered free and is open source. Lots of hours went into it, so if you find it useful, pay it back or pay it forward.");
 		infoPanel.addInfo("tips", "<a href='https://www.paypal.me/bit101'>Buy me a beer (or two)</a>");
@@ -4391,6 +4413,10 @@ define('app/ui/infopanel',["libs/quicksettings"], function(QuickSettings) {
 			infoPanel.hide();
 		});
 		infoPanel.hide();
+		infoPanel.setMoveListener(function(x, y) {
+			localStorage.setItem("infoPanelX", x);
+			localStorage.setItem("infoPanelY", y);
+		});
 	}
 
 	function show() {
@@ -4415,13 +4441,22 @@ define('app/ui/canvaspanel',["libs/quicksettings"], function(QuickSettings) {
 
 
 	function init(pModel, pController, pScheduler, canvas) {
+		var canvasPanelX = localStorage.getItem("canvasPanelX"),
+			canvasPanelY = localStorage.getItem("canvasPanelY");
+		if(canvasPanelX == null) canvasPanelX = 400;
+		if(canvasPanelY == null) canvasPanelY = 60;
+
 		model = pModel;
 		controller = pController;
 		scheduler = pScheduler;
-		canvasPanel = QuickSettings.create(400, 60, "Canvas Panel");
+		canvasPanel = QuickSettings.create(canvasPanelX, canvasPanelY, "Canvas Panel");
 		canvasPanel.setWidth(model.w + 12);
 		canvasPanel.addElement("Canvas", canvas);
 		canvasPanel.addRange("Scrub", 0, 1, 0, 0.01, onScrub);
+		canvasPanel.setMoveListener(function(x, y) {
+			localStorage.setItem("canvasPanelX", x);
+			localStorage.setItem("canvasPanelY", y);
+		});
 	}
 
 	function onScrub(value) {
@@ -4478,8 +4513,14 @@ define('app/ui/outputpanel',["libs/quicksettings"], function(QuickSettings) {
 
 	function init(pModel, pController) {
 		model = pModel;
+
+		var outputPanelX = localStorage.getItem("outputPanelX"),
+			outputPanelY = localStorage.getItem("outputPanelY");
+		if(outputPanelX == null) outputPanelX = model.w + 220;
+		if(outputPanelY == null) outputPanelY = 20;
+
 		controller = pController;
-		outputPanel = QuickSettings.create(model.w + 220, 20, "Output");
+		outputPanel = QuickSettings.create(outputPanelX, outputPanelY, "Output");
 		outputPanel.setWidth(model.w + 12);
 		outputPanel.addImage(captureImage, "");
 		outputPanel.addInfo(sizeInfo, "");
@@ -4489,6 +4530,10 @@ define('app/ui/outputpanel',["libs/quicksettings"], function(QuickSettings) {
 			outputPanel.hide();
 		});
 		outputPanel.hide();
+		outputPanel.setMoveListener(function(x, y) {
+			localStorage.setItem("outputPanelX", x);
+			localStorage.setItem("outputPanelY", y);
+		});
 	}
 
 
@@ -4511,11 +4556,9 @@ define('app/ui/outputpanel',["libs/quicksettings"], function(QuickSettings) {
 
 	function setWidth(width) {
 		outputPanel.setWidth(width);
-		outputPanel.setPosition((window.innerWidth - width) / 2, 40);
 	}
 
 	function showPanel() {
-		outputPanel.setPosition((window.innerWidth - model.w + 12) / 2, 40);
 		outputPanel.show();
 	}
 
@@ -14646,6 +14689,11 @@ define('app/ui/toolbar',[],function() {
 
 
     function init(pController) {
+        if(!window.glcSettings.useIntegratedEditor) {
+            openBtn.style.display = "none";
+            compileBtn.style.display = "none";
+            saveBtn.style.display = "none";
+        }
         controller = pController;
         setupFile();
         addListeners();
@@ -14803,14 +14851,18 @@ function(
 		window.addEventListener("error", function (event) {//msg, url, lineNumber, column, error) {
 			window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
 		});
-		window.addEventListener("beforeunload", function(event) {
-			event.returnValue = "Any unsaved changes will be lost.";
-		});
+		if(window.glcSettings.useIntegratedEditor) {
+			window.addEventListener("beforeunload", function(event) {
+				event.returnValue = "Any unsaved changes will be lost.";
+			});
+		}
 		internalInterface.glc = glc;
 		controller.init(internalInterface);
 		interpolation.init(model);
 		toolbar.init(controller);
-		codePanel.init(controller);
+		if(window.glcSettings.useIntegratedEditor) {
+			codePanel.init(controller);
+		}
 		renderList.init(glc, model.w, model.h, styles, interpolation);
 		scheduler.init(controller);
 		canvasPanel.init(model, controller, scheduler, renderList.getCanvas());
@@ -14829,6 +14881,7 @@ function(
 	}
 
 	function setKeys() {
+		var useEditor = window.glcSettings.useIntegratedEditor;
 		document.body.addEventListener("keyup", function(event) {
 			// console.log(event.keyCode);
 			if(event.ctrlKey) {
@@ -14845,16 +14898,24 @@ function(
 						controller.makeGif();
 						break;
 					case 83: // S
-						controller.saveCode();
+						if(useEditor) {
+							controller.saveCode();
+						}
 						break;
 					case 79: // O
-						controller.openFile();
+						if(useEditor) {
+							controller.openFile();
+						}
 						break;
 					case 13: // enter
-						controller.updateCode();
+						if(useEditor) {
+							controller.updateCode();
+						}
 						break;
 					case 191: // forward slash
-						codePanel.toggleComment();
+						if(useEditor) {
+							codePanel.toggleComment();
+						}
 						break;
 					default:
 						break;

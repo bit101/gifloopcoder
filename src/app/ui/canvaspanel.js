@@ -6,13 +6,22 @@ define(["libs/quicksettings"], function(QuickSettings) {
 
 
 	function init(pModel, pController, pScheduler, canvas) {
+		var canvasPanelX = localStorage.getItem("canvasPanelX"),
+			canvasPanelY = localStorage.getItem("canvasPanelY");
+		if(canvasPanelX == null) canvasPanelX = 400;
+		if(canvasPanelY == null) canvasPanelY = 60;
+
 		model = pModel;
 		controller = pController;
 		scheduler = pScheduler;
-		canvasPanel = QuickSettings.create(400, 60, "Canvas Panel");
+		canvasPanel = QuickSettings.create(canvasPanelX, canvasPanelY, "Canvas Panel");
 		canvasPanel.setWidth(model.w + 12);
 		canvasPanel.addElement("Canvas", canvas);
 		canvasPanel.addRange("Scrub", 0, 1, 0, 0.01, onScrub);
+		canvasPanel.setMoveListener(function(x, y) {
+			localStorage.setItem("canvasPanelX", x);
+			localStorage.setItem("canvasPanelY", y);
+		});
 	}
 
 	function onScrub(value) {

@@ -561,16 +561,33 @@ function onGLC(glc) {
     <!-- ================================================================================== -->
     <div class="subsection">
 
-    <p>Although most will find the integrated editor in GLC useful, you may want to use another editing program that you are more comfortable with. This is the way GLC worked originally, and it's still possible to use it this way.</p>
+    <p>Although many will find the integrated editor in GLC useful, you may want to use another editing program that you are more comfortable with. This is the way GLC worked originally, and it's still possible to use it this way.</p>
 
-    <p>If you open up the <code>index.html</code> file in the main app folder, you can add a script tag somewhere in the HTML document that points to the script you want to load. This script tag can be in the head or body section of the document, but must be before the final script tag which looks like this:</p>
+    <p>If you open up the <code>index.html</code> file in the main app folder, you will see a commented out script tag. </p>
 
-    <code><pre><div>
-<script type="text/javascript" src="glc-min.js"></script>
-    </div></pre></code>
+    <div class="code"><pre><code>
+    &lt;!-- to autoload a script on launch, uncomment next line and insert path to script. --&gt;
+    &lt;!-- &lt;script type="text/javascript" src="../examples/allshapes.js"&gt;&lt;/script&gt; --&gt;
+
+    &lt;script type="text/javascript" src="glc-min.js"&gt;&lt;/script&gt;
+    </code></pre></div>
+
+    <p>If you uncomment that script tag and insert the path to your own script, that script will be loaded and executed in GLC.</p>
+
+    <p>Note that a script loaded this way will NOT appear in the integrated text editor. And if you hit the Compile button or the shortcut, Control-Enter, the script that is in the code editor (the empty template) will be executed instead. To mitigage this confusion, there is another setting at the top of the <code>index.html</code> file:</p>
+
+    <div class="code"><pre><code>
+&lt;script type="text/javascript"&gt;
+window.glcSettings = {
+    useIntegratedEditor: true
+};
+&lt;/script&gt;
+    </code></pre></div>
+
+    <p>If you plan on using an external editor to edit your code, set <code>useIntegratedEditor</code> to false. This will hide the editor in the UI and remove the toolbar icons and keyboard shortcuts for loading, saving and compiling the code in the editor. It will also remove the warning you get about unsaved changes in the editor when you reload or close the page.</p>
+
+
     </div>
-
-    <p>Now when you load the file in the browser, that script will be loaded and executed in GLC. Note that a script loaded this way will NOT appear in the integrated text editor. And if you hit the Compile button or the shortcut, Control-Enter, the script that is in the code editor (the empty template) will be executed instead. So you can use an external editor, or the built-in editor, but not both at the same time.</p>
 
 
 
