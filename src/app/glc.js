@@ -66,11 +66,6 @@ function(
 		window.addEventListener("error", function (event) {//msg, url, lineNumber, column, error) {
 			window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
 		});
-		if(window.glcSettings.useIntegratedEditor) {
-			window.addEventListener("beforeunload", function(event) {
-				event.returnValue = "Any unsaved changes will be lost.";
-			});
-		}
 		internalInterface.glc = glc;
 		controller.init(internalInterface);
 		interpolation.init(model);
@@ -143,7 +138,7 @@ function(
 					case 32: // space
 					case 71: // G
 					case 83: // S
-					case 79: // F
+					case 79: // O
 					case 13: // enter
 					case 191: // forward slash
 						event.preventDefault();

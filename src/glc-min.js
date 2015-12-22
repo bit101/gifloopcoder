@@ -1837,6 +1837,14 @@ define('app/controller',[],function() {
         setCode(codePanel.getCode(), false);
     }
 
+    function newFile() {
+        if(window.confirm("You will lose any unsaved changes.")) {
+            stop();
+            codePanel.newFile();
+            setCode(codePanel.getCode(), false);
+        }
+    }
+
     function setCode(code, updateCodePanel) {
         renderList.clear();
         var script = document.getElementById("loaded_script");
@@ -1960,6 +1968,7 @@ define('app/controller',[],function() {
         renderFrame: renderFrame,
         startEncoder: startEncoder,
         chooseFile: chooseFile,
+        newFile: newFile,
         reload: reload,
         showInfoPanel: showInfoPanel,
         initSpriteSheet: initSpriteSheet,
@@ -14624,7 +14633,14 @@ define('app/ui/codePanel',[
             autoCloseBrackets: true
         });
         cm.setSize(window.innerWidth, window.innerHeight - 56);
-        cm.setValue("function onGLC(glc) {\n    glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+        cm.on("change", cacheCode);
+        var cachedCode = localStorage.getItem("glcCode");
+        if(cachedCode == null) {
+            newFile();
+        }
+        else {
+            cm.setValue(cachedCode);
+        }
     }
 
     function saveCode() {
@@ -14657,12 +14673,21 @@ define('app/ui/codePanel',[
         cm.toggleComment();
     }
 
+    function cacheCode() {
+        localStorage.setItem("glcCode", cm.getValue());
+    }
+
+    function newFile() {
+        cm.setValue("function onGLC(glc) {\n//     glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+    }
+
     return {
         saveCode: saveCode,
         setCode: setCode,
         getCode: getCode,
         init: init,
-        toggleComment: toggleComment
+        toggleComment: toggleComment,
+        newFile: newFile
     };
 });
 define('app/ui/toolbar',[],function() {
@@ -14674,6 +14699,7 @@ define('app/ui/toolbar',[],function() {
         toolbar = document.getElementById("header"),
         
         openBtn = document.getElementById("open_btn"),
+        newBtn = document.getElementById("new_btn"),
         compileBtn = document.getElementById("compile_btn"),
         saveBtn = document.getElementById("save_btn"),
         
@@ -14691,6 +14717,7 @@ define('app/ui/toolbar',[],function() {
     function init(pController) {
         if(!window.glcSettings.useIntegratedEditor) {
             openBtn.style.display = "none";
+            newBtn.style.display = "none";
             compileBtn.style.display = "none";
             saveBtn.style.display = "none";
         }
@@ -14709,6 +14736,10 @@ define('app/ui/toolbar',[],function() {
     function addListeners() {
         openBtn.addEventListener("click", function() {
             fileInput.click();
+        });
+
+        newBtn.addEventListener("click", function() {
+            controller.newFile();
         });
 
         compileBtn.addEventListener("click", function() {
@@ -14851,11 +14882,6 @@ function(
 		window.addEventListener("error", function (event) {//msg, url, lineNumber, column, error) {
 			window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
 		});
-		if(window.glcSettings.useIntegratedEditor) {
-			window.addEventListener("beforeunload", function(event) {
-				event.returnValue = "Any unsaved changes will be lost.";
-			});
-		}
 		internalInterface.glc = glc;
 		controller.init(internalInterface);
 		interpolation.init(model);
@@ -14928,7 +14954,7 @@ function(
 					case 32: // space
 					case 71: // G
 					case 83: // S
-					case 79: // F
+					case 79: // O
 					case 13: // enter
 					case 191: // forward slash
 						event.preventDefault();

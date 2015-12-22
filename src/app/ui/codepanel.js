@@ -32,7 +32,14 @@ define([
             autoCloseBrackets: true
         });
         cm.setSize(window.innerWidth, window.innerHeight - 56);
-        cm.setValue("function onGLC(glc) {\n    glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+        cm.on("change", cacheCode);
+        var cachedCode = localStorage.getItem("glcCode");
+        if(cachedCode == null) {
+            newFile();
+        }
+        else {
+            cm.setValue(cachedCode);
+        }
     }
 
     function saveCode() {
@@ -65,11 +72,20 @@ define([
         cm.toggleComment();
     }
 
+    function cacheCode() {
+        localStorage.setItem("glcCode", cm.getValue());
+    }
+
+    function newFile() {
+        cm.setValue("function onGLC(glc) {\n//     glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+    }
+
     return {
         saveCode: saveCode,
         setCode: setCode,
         getCode: getCode,
         init: init,
-        toggleComment: toggleComment
+        toggleComment: toggleComment,
+        newFile: newFile
     };
 });

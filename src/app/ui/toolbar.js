@@ -7,6 +7,7 @@ define(function() {
         toolbar = document.getElementById("header"),
         
         openBtn = document.getElementById("open_btn"),
+        newBtn = document.getElementById("new_btn"),
         compileBtn = document.getElementById("compile_btn"),
         saveBtn = document.getElementById("save_btn"),
         
@@ -24,6 +25,7 @@ define(function() {
     function init(pController) {
         if(!window.glcSettings.useIntegratedEditor) {
             openBtn.style.display = "none";
+            newBtn.style.display = "none";
             compileBtn.style.display = "none";
             saveBtn.style.display = "none";
         }
@@ -42,6 +44,10 @@ define(function() {
     function addListeners() {
         openBtn.addEventListener("click", function() {
             fileInput.click();
+        });
+
+        newBtn.addEventListener("click", function() {
+            controller.newFile();
         });
 
         compileBtn.addEventListener("click", function() {

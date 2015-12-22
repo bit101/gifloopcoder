@@ -92,6 +92,14 @@ define(function() {
         setCode(codePanel.getCode(), false);
     }
 
+    function newFile() {
+        if(window.confirm("You will lose any unsaved changes.")) {
+            stop();
+            codePanel.newFile();
+            setCode(codePanel.getCode(), false);
+        }
+    }
+
     function setCode(code, updateCodePanel) {
         renderList.clear();
         var script = document.getElementById("loaded_script");
@@ -215,6 +223,7 @@ define(function() {
         renderFrame: renderFrame,
         startEncoder: startEncoder,
         chooseFile: chooseFile,
+        newFile: newFile,
         reload: reload,
         showInfoPanel: showInfoPanel,
         initSpriteSheet: initSpriteSheet,
