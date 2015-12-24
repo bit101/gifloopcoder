@@ -12,6 +12,7 @@ define([
 	"app/shapes/gear",
 	"app/shapes/grid",
 	"app/shapes/heart",
+	"app/shapes/isobox",
 	"app/shapes/line",
 	"app/shapes/oval",
 	"app/shapes/path",
@@ -38,6 +39,7 @@ define([
 		Gear,
 		Grid,
 		Heart,
+		Isobox,
 		Line,
 		Oval,
 		Path,
@@ -140,6 +142,10 @@ define([
 		return add(Shape.create(Heart, props));
 	}
 
+	function addIsobox(props) {
+		return add(Shape.create(Isobox, props));
+	}
+
 	function addLine(props) {
 		return add(Shape.create(Line, props));
 	}
@@ -235,6 +241,7 @@ define([
 		addGear: addGear,
 		addGrid: addGrid,
 		addHeart: addHeart,
+		addIsobox: addIsobox,
 		addLine: addLine,
 		addOval: addOval,
 		addPath: addPath,

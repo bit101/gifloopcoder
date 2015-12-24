@@ -1085,6 +1085,92 @@ define('app/shapes/heart',[],function() {
 	}
 });
 
+define('app/shapes/isobox',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				size = this.getNumber("size", t, 60),
+				h = this.getNumber("h", t, 40),
+				colorLeft = this.getColor("colorLeft", t, "#999999"),
+				colorRight = this.getColor("colorRight", t, "#cccccc"),
+				colorTop = this.getColor("colorTop", t, "#eeeeee");
+				
+			context.translate(x, y);
+
+			if(h >= 0) {
+				context.fillStyle = colorLeft;
+				context.beginPath();
+				context.moveTo(-size / 2, 0);
+				context.lineTo(0, size / 4);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(-size / 2, -h);
+				context.lineTo(-size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorRight;
+				context.beginPath();
+				context.moveTo(size / 2, 0);
+				context.lineTo(0, size / 4);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorTop;
+				context.beginPath();
+				context.moveTo(-size / 2, -h + 0.25);
+				context.lineTo(0, -size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(-size / 2, -h);
+				this.drawFillAndStroke(context, t, true, false);
+			}
+			else {
+				// clip path
+				context.beginPath();
+				context.moveTo(-size / 2, 0);
+				context.lineTo(0, -size / 4);
+				context.lineTo(size / 2, 0);
+				context.lineTo(0, size / 4);
+				context.lineTo(-size / 2, 0);
+				context.clip();
+
+
+				context.fillStyle = colorRight;
+				context.beginPath();
+				context.moveTo(-size / 2, 0);
+				context.lineTo(0, -size / 4);
+				context.lineTo(0, -size / 4 -h);
+				context.lineTo(-size / 2, -h);
+				context.lineTo(-size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorLeft;
+				context.beginPath();
+				context.moveTo(size / 2, 0);
+				context.lineTo(0, -size / 4);
+				context.lineTo(0, -size / 4 -h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorTop;
+				context.beginPath();
+				context.moveTo(-size / 2, -h);
+				context.lineTo(0, -size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(-size / 2, -h);
+				this.drawFillAndStroke(context, t, true, false);
+			}
+
+
+		}
+	}
+});
+
 define('app/shapes/line',[],function() {
 	
 	return {
@@ -1397,6 +1483,7 @@ define('app/renderlist',[
 	"app/shapes/gear",
 	"app/shapes/grid",
 	"app/shapes/heart",
+	"app/shapes/isobox",
 	"app/shapes/line",
 	"app/shapes/oval",
 	"app/shapes/path",
@@ -1423,6 +1510,7 @@ define('app/renderlist',[
 		Gear,
 		Grid,
 		Heart,
+		Isobox,
 		Line,
 		Oval,
 		Path,
@@ -1525,6 +1613,10 @@ define('app/renderlist',[
 		return add(Shape.create(Heart, props));
 	}
 
+	function addIsobox(props) {
+		return add(Shape.create(Isobox, props));
+	}
+
 	function addLine(props) {
 		return add(Shape.create(Line, props));
 	}
@@ -1620,6 +1712,7 @@ define('app/renderlist',[
 		addGear: addGear,
 		addGrid: addGrid,
 		addHeart: addHeart,
+		addIsobox: addIsobox,
 		addLine: addLine,
 		addOval: addOval,
 		addPath: addPath,
@@ -1982,6 +2075,7 @@ define('app/controller',[],function() {
         size: size
     };
 });
+
 define('app/styles',[],function() {
 	var defaultStyles = {
 		backgroundColor: "#ffffff",
@@ -14731,6 +14825,9 @@ define('app/ui/toolbar',[],function() {
         fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.addEventListener("change", controller.chooseFile);
+        fileInput.addEventListener("click", function() {
+            this.value = null;
+        })
     }
 
     function addListeners() {

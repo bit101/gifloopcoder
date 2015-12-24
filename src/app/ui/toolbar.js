@@ -39,6 +39,9 @@ define(function() {
         fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.addEventListener("change", controller.chooseFile);
+        fileInput.addEventListener("click", function() {
+            this.value = null;
+        })
     }
 
     function addListeners() {
