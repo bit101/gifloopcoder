@@ -20,7 +20,10 @@
                 <li><a href="#parent">Parenting</a></li>
                 <li><a href="#optimization">GIF Size and Optimization</a></li>
                 <li><a href="#phase">Phase and SpeedMult</a></li>
+                <li><a href="#enterframe">Direct Canvas Access</a></li>
+                <li><a href="#spritesheets">Creating Sprite Sheets</a></li>
                 <li><a href="#quality">Encoding Quality</a></li>
+                <li><a href="#external">Using an External Editor</a></li>
                 <li><a href="#jif">GIF or JIF?</a></li>
             </ul>
 
@@ -398,6 +401,128 @@ function onGLC(glc) {
 
 
 
+
+    <!-- ================================================================================== -->
+    <h3><a name="enterframe"></a>Direct Canvas Access</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>GLC was designed to be as easy as possible to use. Thus, it has tons of high level drawing objects, all with default parameters. You can just say "add a circle" and you get a circle without worrying about numbers, math, or any of the details of how a circle is drawn on HTML5 canvas.</p>
+
+    <p>However, sometimes you need some extra control. For power users or those who are already comfortable with the canvas drawing API, you also have direct access to the canvas and 2d rendering context. With this, you can draw anything you want, or make use of any third party canvas graphics libraries that you might want to use. Here's how it works.</p>
+
+    <p>At the start of each rendering frame, GLC will clear the canvas, using the default background color or one you specified. Then it will call a method named <code>glc.onEnterFrame</code>, passing in the current <code>t</code> value from the scheduler. After that, it will draw all the shapes in the render list. Then it will call a method called <code>onExitFrame</code>, again, passing <code>t</code>.</p>
+
+    <p>So, where are these two new methods? You create them yourself. And do anything you want inside them. Let me just dump a big example in your lap.</p>
+
+
+    <div class="code"><pre><code>
+function onGLC(glc) {
+    glc.loop();
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
+    glc.styles.backgroundColor = "#666666";
+
+    list.addCube({
+        x: width / 2,
+        y: height / 2,
+        size: 100,
+        rotationX: 30,
+        rotationY: [-30, 30],
+        strokeStyle: "white"
+    });
+
+    list.addText({
+        x: [width / 2 - 20, width /2 + 20],
+        y: height / 2 + 20,
+        fontSize: 12,
+        text: "glc",
+        fillStyle: "white",
+    });
+    
+    <span class="bold">var context = glc.context;
+
+    // gets executed prior to rendering shapes in renderList
+    glc.onEnterFrame = function(t) {
+        var res = 720;
+        context.beginPath();
+        for(var i = 0; i < res; i++) {
+            // just some crazy trig to make a circular path with a varying radius.
+            var angle = Math.PI * 2 / res * i,
+                radius = width / 2 - 50 + Math.sin(angle * 10) * 30 * (t - 0.5) * 2 + Math.cos(angle * 33) * 10 + Math.sin(angle * 97+t*30) * 5* (t - 0.5) * 2;
+            context.lineTo(width / 2 + Math.cos(angle) * radius, height / 2 + Math.sin(angle) * radius);
+        }
+        context.closePath();
+        context.fillStyle = "black";
+        context.fill();
+    }
+
+    // gets executed after rendering renderList
+    glc.onExitFrame = function(t) {
+        var res = 10;
+        context.strokeStyle = "red";
+        context.lineWidth = t * 25 + 0.5;
+        context.beginPath();
+        context.moveTo(0, height / 2);
+        // just a crooked line.
+        for(var i = res; i < width + res; i += res) {
+            context.lineTo(i, height / 2 + Math.random() * 100 - 50);
+        }
+        context.stroke();
+    }</span>
+}
+    </code></pre></div>
+
+    <p>The first half of that should be nothing new to you. Standard set up, draws a cube and some text, both animated. The highlighted part is all new stuff. First, we get a direct reference to the 2d rendering context with <code>glc.context</code>. If you need to get at the canvas itself, you have <code>glc.canvas</code>.</p>
+
+    <p>Then we define a <code>glc.onEnterFrame</code> and <code>glc.onExitFrame</code> function. Both get a parameter of <code>t</code>. In these functions, you can do whatever you want. Draw your own shapes, as simple or complex as you want. You can factor in the <code>t</code> value if you want it to animate along with the rest of the objects, or just ignore it. You have full access to the canvas and context and all that implies.</p>
+
+    <p>Just remember the order of operations: 1. Clear canvas, 2. <code>onEnterFrame</code>, 3. render objects in list, 4. <code>onExitFrame</code>. So shapes from the render list will get drawn over anything drawn in <code>onEnterFrame</code>. And whatever is drawn in <code>onExitFrame</code> will be on top of everything else.</p>
+
+    <p>In this example, I just go a little wild with the trig to create an animated ... blob or something in the <code>onEnterFrame</code> method. I just wanted to do something crazy that would be difficult to try to do with objects in the render list. In the <code>onExitFrame</code> method, I'm drawing a jagged line. Note that in both of these, I'm implementing the <code>t</code> value for animation, so things stay in sync. Here's what that gives us:</p>
+
+    <img src="images/oef.gif">
+
+    <p>With this, GLC moves towards being a general purpose animation tool. You can ignore the render list and shapes altogether, and just write your own rendering code in either <code>onEnterFrame</code> or <code>onExitFrame</code>. You still get the scheduler, interpolation, the whole GLC UI and various output formats. Plug in your own 3rd party drawing libs and they now become animation libs.</p>
+
+    <p>And of course, all of this is optional. Don't need the canvas, context, or the new frame methods. Just don't write them. This doesn't change anything else in GLC and the way it works with the render list.</p>
+
+    </div>
+
+
+
+
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="spritesheets"></a>Creating Sprite Sheet</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>A sprite sheet is a large bitmap image, where each frame of an animation is drawn at a different position. Often the frames are arranged in a grid. You can then sequentially show different portions of the large bitmap over time to accomplish animation.</p>
+
+    <p>One of the great things about sprite sheets is that because they are simply a single image, they are cross platform and the same sprite sheet can be used in HTML, iOS, Android, Unity, Flash, or any other system where animation is possible.</p>
+
+    <p>In addition to creating gifs, GLC can also create sprite sheet animations. All you have to do is click the "Make a sprite sheet" button and the animation will render and be displayed as a sprite sheet in the Output Panel. Here is an example:</p>
+
+    <img src="images/spritesheet.png">
+
+    <p>This animation had a duration of two seconds and a frame rate of twenty, so there are forty frames in this animation. Each frame is 100x100 pixels. As you can see, the sprite sheet can get very large quickly. Sprite sheets are usually meant for small animations, usually 100 pixels or less. There's nothing stopping you from making larger animations, but the sprite sheet may wind up being enormous.</p>
+    
+    <p>Sprite sheets created by GLC will always be square. In some systems, sprite sheets perform better if their size is a power of two, such as 256x256, 512x512, 1024x1024, 2048x2048, etc. At this time, GLC does not create power-of-two spritesheets, but this is a possible future feature.</p>
+
+    <p>GLC will lay out the frames in a grid going from top left to bottom right. Each frame will be drawn full size, even if the graphics in it do not fill the entire frame. More complex sprite sheet generators use something called texture packing, to reduce the size of each frame and intelligently arrange them into the smallest space possible. This is beyond the scope of GLC at this point.</p>
+
+    <p>To test a sprite sheet you have saved locally, you can use the Sprite Sheet Util at <a href="http://www.gifloopcoder.com/spritesheetutil/">http://www.gifloopcoder.com/spritesheetutil/</a>. This will let you browse to your sprite sheet to load it in. Then you'll have to set the size of each frame and the total number of frames and hit play.</p>
+
+    <p>The utility will also generate some sample code that you could use as a starting point to animate your sprite sheet in HTML. The code for other systems or frameworks will be different, obviously.</p>
+
+    </div>
+
+
+
     <!-- ================================================================================== -->
     <h3><a name="quality"></a>Encoding Quality</h3>
     <!-- ================================================================================== -->
@@ -428,6 +553,43 @@ function onGLC(glc) {
     <p>Another trick that can be used to improve how some images look is dithering. With dithering, if there's an area of color that doesn't match closely to anything in the palette, it will mix two or more other colors amongst the different pixels in that area. So from a distance, they will blend together to more closely match the original color. Unfortunately, the encoder used in GLC does not support dithering. However, there are other gif optimizing tools that do. You can run your animation through one of those tools and tell it do apply dithering and you may see better results.</p>
 
     </div>
+
+
+
+    <!-- ================================================================================== -->
+    <h3><a name="external"></a>Using an External Editor</h3>
+    <!-- ================================================================================== -->
+    <div class="subsection">
+
+    <p>Although many will find the integrated editor in GLC useful, you may want to use another editing program that you are more comfortable with. This is the way GLC worked originally, and it's still possible to use it this way.</p>
+
+    <p>If you open up the <code>index.html</code> file in the main app folder, you will see a commented out script tag. </p>
+
+    <div class="code"><pre><code>
+    &lt;!-- to autoload a script on launch, uncomment next line and insert path to script. --&gt;
+    &lt;!-- &lt;script type="text/javascript" src="../examples/allshapes.js"&gt;&lt;/script&gt; --&gt;
+
+    &lt;script type="text/javascript" src="glc-min.js"&gt;&lt;/script&gt;
+    </code></pre></div>
+
+    <p>If you uncomment that script tag and insert the path to your own script, that script will be loaded and executed in GLC.</p>
+
+    <p>Note that a script loaded this way will NOT appear in the integrated text editor. And if you hit the Compile button or the shortcut, Control-Enter, the script that is in the code editor (the empty template) will be executed instead. To mitigage this confusion, there is another setting at the top of the <code>index.html</code> file:</p>
+
+    <div class="code"><pre><code>
+&lt;script type="text/javascript"&gt;
+window.glcSettings = {
+    useIntegratedEditor: true
+};
+&lt;/script&gt;
+    </code></pre></div>
+
+    <p>If you plan on using an external editor to edit your code, set <code>useIntegratedEditor</code> to false. This will hide the editor in the UI and remove the toolbar icons and keyboard shortcuts for loading, saving and compiling the code in the editor. It will also remove the warning you get about unsaved changes in the editor when you reload or close the page.</p>
+
+
+    </div>
+
+
 
     <!-- ================================================================================== -->
     <h3><a name="jif"></a>GIF or JIF?</h3>
