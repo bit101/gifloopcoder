@@ -13,6 +13,17 @@ define(function() {
 			context.translate(x, y);
 
 			if(h >= 0) {
+				context.fillStyle = colorTop;
+				context.beginPath();
+				context.moveTo(-size / 2, -h);
+				context.lineTo(0, -size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(size / 2, -1);
+				context.lineTo(0, size / 4 - 1);
+				context.lineTo(-size / 2, -1);				
+				context.lineTo(-size / 2, -h);
+				this.drawFillAndStroke(context, t, true, false);
+
 				context.fillStyle = colorLeft;
 				context.beginPath();
 				context.moveTo(-size / 2, 0);
@@ -29,15 +40,6 @@ define(function() {
 				context.lineTo(0, size / 4 - h);
 				context.lineTo(size / 2, -h);
 				context.lineTo(size / 2, 0);
-				this.drawFillAndStroke(context, t, true, false);
-
-				context.fillStyle = colorTop;
-				context.beginPath();
-				context.moveTo(-size / 2, -h + 0.25);
-				context.lineTo(0, -size / 4 - h);
-				context.lineTo(size / 2, -h);
-				context.lineTo(0, size / 4 - h);
-				context.lineTo(-size / 2, -h);
 				this.drawFillAndStroke(context, t, true, false);
 			}
 			else {
