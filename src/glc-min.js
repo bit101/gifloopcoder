@@ -2321,7 +2321,9 @@ define('app/MainController',['require','app/encode/Encoder','app/encode/SpriteSh
         var cachedCode = localStorage.getItem("glcCode");
         if(glcConfig.externalEditor) {
             reset();
-            window.onGLC(GLCInterface);
+            if(window.onGLC) {
+                window.onGLC(GLCInterface);
+            }
         }
         else if(cachedCode == null) {
             newFile(true);

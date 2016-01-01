@@ -30,7 +30,9 @@ define(function(require) {
         var cachedCode = localStorage.getItem("glcCode");
         if(glcConfig.externalEditor) {
             reset();
-            window.onGLC(GLCInterface);
+            if(window.onGLC) {
+                window.onGLC(GLCInterface);
+            }
         }
         else if(cachedCode == null) {
             newFile(true);
