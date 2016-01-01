@@ -31,17 +31,16 @@ define(["app/render/ValueParser", "app/render/ColorParser"], function(ValueParse
 			this.list.length = 0;
 		},
 
-		render: function(context, t, skipInterpolation) {
-			if(!skipInterpolation) {
-				t *= this.props.speedMult || 1;
-				t += this.props.phase || 0;
-				var t = this.interpolation.interpolate(t);
-			}
+		render: function(context, t) {
+			var globalTime = t;
+			t *= this.props.speedMult || 1;
+			t += this.props.phase || 0;
+			var t = this.interpolation.interpolate(t);
 
 			this.startDraw(context, t);
 			this.draw(context, t);
 			for(var i in this.list) {
-				this.list[i].render(context, t, true);
+				this.list[i].render(context, globalTime);
 			}
 			this.endDraw(context, t);
 		},
