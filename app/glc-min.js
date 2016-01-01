@@ -13545,7 +13545,7 @@ define('app/GLCInterface',['require','app/render/Color'],function(require) {
   else // Plain browser env
     mod(CodeMirror);
 })(function(CodeMirror) {
-
+"use strict";
 
 CodeMirror.defineMode("javascript", function(config, parserConfig) {
   var indentUnit = config.indentUnit;
