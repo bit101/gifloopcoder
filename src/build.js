@@ -1,9 +1,9 @@
 ({
-    baseUrl: ".",
+    baseUrl: "src",
     paths: {
         requireLib: "libs/require"
     },
     include: "requireLib",
-    name: "glcloader",
+    name: "glclauncher",
     out: "glc-min.js"
 })

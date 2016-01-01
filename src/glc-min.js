@@ -37,2913 +37,472 @@ function(b,d){c.push(d)}),c=(1===d.length?["require"]:["require","exports","modu
 
 define("requireLib", function(){});
 
-define('app/valueparser',[],function() {
-
-	return {
-
-		getNumber: function(prop, t, def) {
-			if(typeof(prop) === "number") {
-				return prop;
-			}
-			else if(typeof(prop) === "function") {
-				return prop(t);
-			}
-			else if(prop && prop.length === 2) {
-				var start = prop[0],
-				end = prop[1];
-				return start + (end - start) * t;
-			}
-			else if(prop && prop.length) {
-				return prop[Math.round(t * (prop.length - 1))];
-			}
-			return def;
-		},
-
-
-		getString: function(prop, t, def) {
-			if(prop === undefined) {
-				return def;
-			}
-			else if(typeof(prop) === "string") {
-				return prop;
-			}
-			else if(typeof(prop) === "function") {
-				return prop(t);
-			}
-			else if(prop && prop.length) {
-				return prop[Math.round(t * (prop.length - 1))];
-			}
-			return prop;
-		},
-
-		getBool: function(prop, t, def) {
-			if(prop === undefined) {
-				return def;
-			}
-			else if(typeof(prop) === "function") {
-				return prop(t);
-			}
-			else if(prop && prop.length) {
-				return prop[Math.round(t * (prop.length - 1))];
-			}
-			return prop;
-		},
-
-		getArray: function(prop, t, def) {
-			// string will have length, but is useless
-			if(typeof(prop) === "string") {
-				return def;
-			}
-			else if(typeof(prop) === "function") {
-				return prop(t);
-			}
-			else if(prop && (prop.length == 2) && prop[0].length && prop[1].length) {
-				// we seem to have an array of arrays
-				var arr0 = prop[0],
-					arr1 = prop[1],
-					len = Math.min(arr0.length, arr1.length),
-					result = [];
-
-				for(var i = 0; i < len; i++) {
-					var v0 = arr0[i],
-						v1 = arr1[i];
-					result.push(v0 + (v1 - v0) * t);
-				}
-				return result;
-
-			}
-			else if(prop && prop.length > 1) {
-				return prop;
-			}
-			return def;
-		},
-
-		getObject: function(prop, t, def) {
-			if(prop === undefined) {
-				return def;
-			}
-			else if(typeof(prop) === "function") {
-				return prop(t);
-			}
-			else if(prop && prop.length) {
-				return prop[Math.round(t * (prop.length - 1))];
-			}
-			return prop;
-		}
-
-	
-	}
-
-
-	
-});
-
-define('app/colorparser',[],function() {
-	var context = document.createElement("canvas").getContext("2d");
-
-	function getColor(prop, t, def) {
-		if(prop === undefined) {
-			return def;
-		}
-		if(typeof(prop) === "string") {
-			if(prop.charAt(0) === "#" && prop.length > 7) {
-				var obj = getColorObj(prop);
-				return getColorString(obj);
-			}
-			return prop;
-		}
-		else if(typeof(prop) === "function") {
-			return prop(t);
-		}
-		else if(prop && prop.length === 2) {
-			if(isLinearGradient(prop)) {
-				return parseLinearGradient(prop, t);
-			}
-			if(isRadialGradient(prop)) {
-				return parseRadialGradient(prop, t);
-			}
-			var c0 = getColorObj(prop[0]),
-				c1 = getColorObj(prop[1]);
-			return interpolateColor([c0, c1], t);
-		}
-		else if(prop && prop.length) {
-			return  prop[Math.round(t * (prop.length - 1))];
-		}
-		if(prop.type === "linearGradient") {
-			var g = context.createLinearGradient(prop.x0, prop.y0, prop.x1, prop.y1);
-			for(var i = 0; i < prop.colorStops.length; i++) {
-				var stop = prop.colorStops[i];
-				g.addColorStop(stop.position, stop.color);
-			}
-			return g;
-		}
-		if(prop.type === "radialGradient") {
-			var g = context.createRadialGradient(prop.x0, prop.y0, prop.r0, prop.x1, prop.y1, prop.r1);
-			for(var i = 0; i < prop.colorStops.length; i++) {
-				var stop = prop.colorStops[i];
-				g.addColorStop(stop.position, stop.color);
-			}
-			return g;
-		}
-		return def;
-	}
-
-	function isLinearGradient(prop) {
-		return prop[0].type === "linearGradient" && prop[1].type === "linearGradient";
-	}
-
-	function parseLinearGradient(prop, t) {
-		var g0 = prop[0],
-			g1 = prop[1],
-			x0 = g0.x0 + (g1.x0 - g0.x0) * t,
-			y0 = g0.y0 + (g1.y0 - g0.y0) * t,
-			x1 = g0.x1 + (g1.x1 - g0.x1) * t,
-			y1 = g0.y1 + (g1.y1 - g0.y1) * t;
-
-		var g = context.createLinearGradient(x0, y0, x1, y1);
-		for(var i = 0; i < g0.colorStops.length; i++) {
-			var stopA = g0.colorStops[i],
-				stopB = g1.colorStops[i],
-				position = stopA.position + (stopB.position - stopA.position) * t,
-				colorA = getColorObj(stopA.color),
-				colorB = getColorObj(stopB.color),
-				color = interpolateColor([colorA, colorB], t);
-			g.addColorStop(position, color);
-		}
-		return g;
-	}
-
-	function isRadialGradient(prop) {
-		return prop[0].type === "radialGradient" && prop[1].type === "radialGradient";
-	}
-
-	function parseRadialGradient(prop, t) {
-		var g0 = prop[0],
-			g1 = prop[1],
-			x0 = g0.x0 + (g1.x0 - g0.x0) * t,
-			y0 = g0.y0 + (g1.y0 - g0.y0) * t,
-			r0 = g0.r0 + (g1.r0 - g0.r0) * t,
-			x1 = g0.x1 + (g1.x1 - g0.x1) * t,
-			y1 = g0.y1 + (g1.y1 - g0.y1) * t,
-			r1 = g0.r1 + (g1.r1 - g0.r1) * t;
-
-		var g = context.createRadialGradient(x0, y0, r0, x1, y1, r1);
-		for(var i = 0; i < g0.colorStops.length; i++) {
-			var stopA = g0.colorStops[i],
-				stopB = g1.colorStops[i],
-				position = stopA.position + (stopB.position - stopA.position) * t,
-				colorA = getColorObj(stopA.color),
-				colorB = getColorObj(stopB.color),
-				color = interpolateColor([colorA, colorB], t);
-			g.addColorStop(position, color);
-		}
-		return g;
-	}
-
-	function getColorString(obj) {
-		return "rgba(" + obj.r + "," + obj.g + "," + obj.b + "," + (obj.a / 255) + ")";
-	}
-
-
-
-	function getColorObj(color) {
-		if(color.charAt(0) === "#") {
-			if(color.length === 7) { // #rrggbb
-				return {
-					a: 255,
-					r: parseInt(color.substring(1, 3), 16),
-					g: parseInt(color.substring(3, 5), 16),
-					b: parseInt(color.substring(5, 7), 16)
-				}
-			}
-			else if(color.length === 9) { // #aarrggbb
-				return {
-					a: parseInt(color.substring(1, 3), 16),
-					r: parseInt(color.substring(3, 5), 16),
-					g: parseInt(color.substring(5, 7), 16),
-					b: parseInt(color.substring(7, 9), 16)
-				}
-			}
-			else { // #rgb
-				var r = color.charAt(1),
-					g = color.charAt(2),
-					b = color.charAt(3);
-
-				return {
-					a: 255,
-					r: parseInt(r + r, 16),
-					g: parseInt(g + g, 16),
-					b: parseInt(b + b, 16),
-				}
-			}
-		}
-		else if(color.substring(0, 4) === "rgb(") {
-			var s = color.indexOf("(") + 1,
-				e = color.indexOf(")"),
-				channels = color.substring(s, e).split(",");
-			return {
-				a: 255,
-				r: parseInt(channels[0], 10),
-				g: parseInt(channels[1], 10),
-				b: parseInt(channels[2], 10),
-			}
-		}
-		else if(color.substring(0, 4) === "rgba") {
-			var s = color.indexOf("(") + 1,
-				e = color.indexOf(")"),
-				channels = color.substring(s, e).split(",");
-			return {
-				a: parseFloat(channels[3]) * 255,
-				r: parseInt(channels[0], 10),
-				g: parseInt(channels[1], 10),
-				b: parseInt(channels[2], 10),
-			}
-		}
-		else {
-			color = color.toLowerCase();
-			if(namedColors[color] != null) {
-				return getColorObj(namedColors[color]);
-			}
-		}
-		return 0;
-	}
-
-	function interpolateColor(arr, t) {
-		var c0 = arr[0],
-			c1 = arr[1];
-
-		var alpha = c0.a + (c1.a - c0.a) * t,
-			red = Math.round(c0.r + (c1.r - c0.r) * t),
-			green = Math.round(c0.g + (c1.g - c0.g) * t),
-			blue = Math.round(c0.b + (c1.b - c0.b) * t);
-		return "rgba(" + red + "," + green + "," + blue + "," + (alpha / 255) + ")";
-	}
-
-	var namedColors = {
-		aliceblue: "#f0f8ff",
-		antiquewhite: "#faebd7",
-		aqua: "#00ffff",
-		aquamarine: "#7fffd4",
-		azure: "#f0ffff",
-		beige: "#f5f5dc",
-		bisque: "#ffe4c4",
-		black: "#000000",
-		blanchedalmond: "#ffebcd",
-		blue: "#0000ff",
-		blueviolet: "#8a2be2",
-		brown: "#a52a2a",
-		burlywood: "#deb887",
-		cadetblue: "#5f9ea0",
-		chartreuse: "#7fff00",
-		chocolate: "#d2691e",
-		coral: "#ff7f50",
-		cornflowerblue: "#6495ed",
-		cornsilk: "#fff8dc",
-		crimson: "#dc143c",
-		cyan: "#00ffff",
-		darkblue: "#00008b",
-		darkcyan: "#008b8b",
-		darkgoldenrod: "#b8860b",
-		darkgray: "#a9a9a9",
-		darkgrey: "#a9a9a9",
-		darkgreen: "#006400",
-		darkkhaki: "#bdb76b",
-		darkmagenta: "#8b008b",
-		darkolivegreen: "#556b2f",
-		darkorange: "#ff8c00",
-		darkorchid: "#9932cc",
-		darkred: "#8b0000",
-		darksalmon: "#e9967a",
-		darkseagreen: "#8fbc8f",
-		darkslateblue: "#483d8b",
-		darkslategray: "#2f4f4f",
-		darkslategrey: "#2f4f4f",
-		darkturquoise: "#00ced1",
-		darkviolet: "#9400d3",
-		deeppink: "#ff1493",
-		deepskyblue: "#00bfff",
-		dimgray: "#696969",
-		dimgrey: "#696969",
-		dodgerblue: "#1e90ff",
-		firebrick: "#b22222",
-		floralwhite: "#fffaf0",
-		forestgreen: "#228b22",
-		fuchsia: "#ff00ff",
-		gainsboro: "#dcdcdc",
-		ghostwhite: "#f8f8ff",
-		gold: "#ffd700",
-		goldenrod: "#daa520",
-		gray: "#808080",
-		grey: "#808080",
-		green: "#008000",
-		greenyellow: "#adff2f",
-		honeydew: "#f0fff0",
-		hotpink: "#ff69b4",
-		indianred: "#cd5c5c",
-		indigo: "#4b0082",
-		ivory: "#fffff0",
-		khaki: "#f0e68c",
-		lavender: "#e6e6fa",
-		lavenderblush: "#fff0f5",
-		lawngreen: "#7cfc00",
-		lemonchiffon: "#fffacd",
-		lightblue: "#add8e6",
-		lightcoral: "#f08080",
-		lightcyan: "#e0ffff",
-		lightgoldenrodyellow: "#fafad2",
-		lightgray: "#d3d3d3",
-		lightgrey: "#d3d3d3",
-		lightgreen: "#90ee90",
-		lightpink: "#ffb6c1",
-		lightsalmon: "#ffa07a",
-		lightseagreen: "#20b2aa",
-		lightskyblue: "#87cefa",
-		lightslategray: "#778899",
-		lightslategrey: "#778899",
-		lightsteelblue: "#b0c4de",
-		lightyellow: "#ffffe0",
-		lime: "#00ff00",
-		limegreen: "#32cd32",
-		linen: "#faf0e6",
-		magenta: "#ff00ff",
-		maroon: "#800000",
-		mediumaquamarine: "#66cdaa",
-		mediumblue: "#0000cd",
-		mediumorchid: "#ba55d3",
-		mediumpurple: "#9370d8",
-		mediumseagreen: "#3cb371",
-		mediumslateblue: "#7b68ee",
-		mediumspringgreen: "#00fa9a",
-		mediumturquoise: "#48d1cc",
-		mediumvioletred: "#c71585",
-		midnightblue: "#191970",
-		mintcream: "#f5fffa",
-		mistyrose: "#ffe4e1",
-		moccasin: "#ffe4b5",
-		navajowhite: "#ffdead",
-		navy: "#000080",
-		oldlace: "#fdf5e6",
-		olive: "#808000",
-		olivedrab: "#6b8e23",
-		orange: "#ffa500",
-		orangered: "#ff4500",
-		orchid: "#da70d6",
-		palegoldenrod: "#eee8aa",
-		palegreen: "#98fb98",
-		paleturquoise: "#afeeee",
-		palevioletred: "#d87093",
-		papayawhip: "#ffefd5",
-		peachpuff: "#ffdab9",
-		peru: "#cd853f",
-		pink: "#ffc0cb",
-		plum: "#dda0dd",
-		powderblue: "#b0e0e6",
-		purple: "#800080",
-		red: "#ff0000",
-		rosybrown: "#bc8f8f",
-		royalblue: "#4169e1",
-		saddlebrown: "#8b4513",
-		salmon: "#fa8072",
-		sandybrown: "#f4a460",
-		seagreen: "#2e8b57",
-		seashell: "#fff5ee",
-		sienna: "#a0522d",
-		silver: "#c0c0c0",
-		skyblue: "#87ceeb",
-		slateblue: "#6a5acd",
-		slategray: "#708090",
-		slategrey: "#708090",
-		snow: "#fffafa",
-		springgreen: "#00ff7f",
-		steelblue: "#4682b4",
-		tan: "#d2b48c",
-		teal: "#008080",
-		thistle: "#d8bfd8",
-		tomato: "#ff6347",
-		turquoise: "#40e0d0",
-		violet: "#ee82ee",
-		wheat: "#f5deb3",
-		white: "#ffffff",
-		whitesmoke: "#f5f5f5",
-		yellow: "#ffff00",
-		yellowgreen: "#9acd32",
-	}
-
-	return {
-		getColor: getColor
-	};
-});
-define('app/shapes/shape',["app/valueparser", "app/colorparser"], function(valueParser, colorParser) {
-
-	return {
-		styles: null,
-		interpolation: null,
-
-		create: function(type, props) {
-			var obj = Object.create(this);
-			obj.init(type, props || {});
-			return obj;
-		},
-
-		init: function(type, props) {
-			this.props = props;
-			for(var prop in props) {
-				var p = props[prop];
-				if(typeof p === "function") {
-					props[prop] = p.bind(props);
-				}
-			}
-			this.draw = type.draw;
-			this.list = [];
-		},
-
-		add: function(item) {
-			this.list.push(item);
-			return item;
-		},
-
-		clear: function() {
-			this.list.length = 0;
-		},
-
-		render: function(context, t, skipInterpolation) {
-			if(!skipInterpolation) {
-				t *= this.props.speedMult || 1;
-				t += this.props.phase || 0;
-				var t = this.interpolation.interpolate(t);
-			}
-
-			this.startDraw(context, t);
-			this.draw(context, t);
-			for(var i in this.list) {
-				this.list[i].render(context, t, true);
-			}
-			this.endDraw(context, t);
-		},
-
-		startDraw: function(context, t) {
-			context.save();
-			context.lineWidth = this.getNumber("lineWidth", t, this.styles.lineWidth);
-			context.strokeStyle = this.getColor("strokeStyle", t, this.styles.strokeStyle);
-			context.fillStyle = this.getColor("fillStyle", t, this.styles.fillStyle);
-			context.lineCap = this.getString("lineCap", t, this.styles.lineCap);
-			context.lineJoin = this.getString("lineJoin", t, this.styles.lineJoin);
-			context.miterLimit = this.getString("miterLimit", t, this.styles.miterLimit);
-			context.globalAlpha = this.getNumber("globalAlpha", t, this.styles.globalAlpha);
-			context.translate(this.getNumber("translationX", t, this.styles.translationX), this.getNumber("translationY", t, this.styles.translationY));
-			context.globalCompositeOperation = this.getString("blendMode", t, this.styles.blendMode);
-			var shake = this.getNumber("shake", t, this.styles.shake);
-			context.translate(Math.random() * shake - shake / 2, Math.random() * shake - shake / 2);
-
-			var lineDash = this.getArray("lineDash", t, this.styles.lineDash);
-			if(lineDash) {
-				context.setLineDash(lineDash);
-			}
-			context.beginPath();
-		},
-
-		drawFillAndStroke: function(context, t, doFill, doStroke) {
-			var fill = this.getBool("fill", t, doFill),
-				stroke = this.getBool("stroke", t, doStroke);
-
-			context.save();
-			if(fill) {
-				this.setShadowParams(context, t);
-				context.fill();
-			}
-			context.restore();
-			if(stroke) {
-				if(!fill) {
-					this.setShadowParams(context, t);
-				}
-				context.stroke();
-			}
-		},
-
-		setShadowParams: function(context, t) {
-			context.shadowColor = this.getColor("shadowColor", t, this.styles.shadowColor);
-			context.shadowOffsetX = this.getNumber("shadowOffsetX", t, this.styles.shadowOffsetX);
-			context.shadowOffsetY = this.getNumber("shadowOffsetY", t, this.styles.shadowOffsetY);
-			context.shadowBlur = this.getNumber("shadowBlur", t, this.styles.shadowBlur);
-		},
-
-		endDraw: function(context) {
-			context.restore();
-		},
-
-		getNumber: function(prop, t, def) {
-			return valueParser.getNumber(this.props[prop], t, def);
-		},
-
-		getColor: function(prop, t, def) {
-			return colorParser.getColor(this.props[prop], t, def);
-		},
-
-		getString: function(prop, t, def) {
-			return valueParser.getString(this.props[prop], t, def);
-		},
-
-		getBool: function(prop, t, def) {
-			return valueParser.getBool(this.props[prop], t, def);
-		},
-
-		getArray: function(prop, t, def) {
-			return valueParser.getArray(this.props[prop], t, def);
-		},
-
-		getObject: function(prop, t, def) {
-			return valueParser.getObject(this.props[prop], t, def);
-		},
-
-		getPosition: function(prop, t, def) {
-			return valueParser.getPosition(this.props[prop], t, def);
-		}
-	}
-});
-
-define('app/shapes/arrow',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				w = this.getNumber("w", t, 100),
-				h = this.getNumber("h", t, 100),
-				pointPercent = this.getNumber("pointPercent", t, 0.5),
-				shaftPercent = this.getNumber("shaftPercent", t, 0.5);
-				
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-
-			// context.translate(-w / 2, 0);
-
-			context.moveTo(-w / 2, -h * shaftPercent * 0.5);
-			context.lineTo(w / 2 - w * pointPercent, -h * shaftPercent * 0.5);
-			context.lineTo(w / 2 - w * pointPercent, -h * 0.5);
-			context.lineTo(w / 2, 0);
-			context.lineTo(w / 2 - w * pointPercent, h * 0.5);
-			context.lineTo(w / 2 - w * pointPercent, h * shaftPercent * 0.5);
-			context.lineTo(-w / 2, h * shaftPercent * 0.5);
-			context.lineTo(-w / 2, -h * shaftPercent * 0.5);
-
-			this.drawFillAndStroke(context, t, true, false);
-		}
-	}
-});
-define('app/shapes/arcSegment',[],function() {
-
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				radius = this.getNumber("radius", t, 50),
-				startAngle = this.getNumber("startAngle", t, 0),
-				endAngle = this.getNumber("endAngle", t, 360);
-
-			if(startAngle > endAngle) {
-				var temp = startAngle;
-				startAngle = endAngle;
-				endAngle = temp;
-			}
-			var arc = this.getNumber("arc", t, 20),
-				start = startAngle - 1,
-				end = startAngle + t * (endAngle - startAngle + arc);
-
-			if(end > startAngle + arc) {
-				start = end - arc;
-			}
-			if(end > endAngle) {
-				end = endAngle + 1;
-			}
-
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-			context.arc(0, 0, radius, start * Math.PI / 180, end * Math.PI / 180);
-
-			this.drawFillAndStroke(context, t, false, true);		
-		}
-	}
-});
-
-define('app/shapes/beziercurve',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x0 = this.getNumber("x0", t, 50),
-				y0 = this.getNumber("y0", t, 10),
-				x1 = this.getNumber("x1", t, 200),
-				y1 = this.getNumber("y1", t, 100),
-				x2 = this.getNumber("x2", t, 0),
-				y2 = this.getNumber("y2", t, 100),
-				x3 = this.getNumber("x3", t, 150),
-				y3 = this.getNumber("y3", t, 10);
-
-		    context.moveTo(x0, y0);
-		    context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-
-			this.drawFillAndStroke(context, t, false, true);	
-		}
-	}
-});
-
-define('app/shapes/beziersegment',[],function() {
-
-	function bezier(t, v0, v1, v2, v3) {
-		return (1 - t) * (1 - t) * (1 - t) * v0 + 3 * (1 - t) * (1 - t) * t * v1 + 3 * (1 - t) * t * t * v2 + t * t * t * v3;
-	}
-
-	return {
-		draw: function(context, t) {
-			var x0 = this.getNumber("x0", t, 50),
-				y0 = this.getNumber("y0", t, 10),
-				x1 = this.getNumber("x1", t, 200),
-				y1 = this.getNumber("y1", t, 100),
-				x2 = this.getNumber("x2", t, 0),
-				y2 = this.getNumber("y2", t, 100),
-				x3 = this.getNumber("x3", t, 150),
-				y3 = this.getNumber("y3", t, 10),
-				percent = this.getNumber("percent", t, 0.1),
-				t1 = t * (1 + percent),
-				t0 = t1 - percent,
-				res = 0.01,
-				x,
-				y;
-
-			t1 = Math.min(t1, 1.001);
-			t0 = Math.max(t0, -0.001);
-
-			for(var i = t0; i < t1; i += res) {
-				x = bezier(i, x0, x1, x2, x3);
-				y = bezier(i, y0, y1, y2, y3);
-				if(i === t0) {
-				    context.moveTo(x, y);
-				}
-				else {
-		    		context.lineTo(x, y);
-				}
-			}
-			x = bezier(t1, x0, x1, x2, x3);
-			y = bezier(t1, y0, y1, y2, y3);
-	   		context.lineTo(x, y);
-
-			this.drawFillAndStroke(context, t, false, true);
-		}
-	}
-});
-
-define('app/shapes/circle',[],function() {
-
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				radius = this.getNumber("radius", t, 50),
-				startAngle = this.getNumber("startAngle", t, 0),
-				endAngle = this.getNumber("endAngle", t, 360),
-				drawFromCenter = this.getBool("drawFromCenter", t, false);
-
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-			if(drawFromCenter) {
-				context.moveTo(0, 0);
-			}
-			context.arc(0, 0, radius, startAngle * Math.PI / 180, endAngle * Math.PI / 180);
-			if(drawFromCenter) {
-				context.closePath();
-			}
-
-			this.drawFillAndStroke(context, t, true, false);
-		}
-	}
-});
-
-define('app/shapes/container',[],function() {
-
-    return {
-        draw: function(context, t) {
-            var x = this.getNumber("x", t, 0),
-                y = this.getNumber("y", t, 0);
-
-            context.translate(x, y);
-            context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+define('utils/UIUtil',{
+
+    createElement: function(element, className, parent, style) {
+        var el = document.createElement(element);
+        if(className) {
+            el.className = className;
         }
-    }
-});
-
-define('app/shapes/cube',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				z = this.getNumber("z", t, 0),
-				size = this.getNumber("size", t, 100),
-				rotationX = this.getNumber("rotationX", t, 0) * Math.PI / 180,
-				rotationY = this.getNumber("rotationY", t, 0) * Math.PI / 180,
-				rotationZ = this.getNumber("rotationZ", t, 0) * Math.PI / 180;
-
-			var points = makePoints();
-			scale(points, size / 2);
-			rotateX(points, rotationX);
-			rotateY(points, rotationY);
-			rotateZ(points, rotationZ);
-			project(points, z);
-
-			context.lineJoin = this.getString("lineJoin", t, "round");
-			context.lineWidth = this.getNumber("lineWidth", t, 1);
-
-			context.translate(x, y);
-
-			context.moveTo(points[0].sx, points[0].sy);
-			context.lineTo(points[1].sx, points[1].sy);
-			context.lineTo(points[2].sx, points[2].sy);
-			context.lineTo(points[3].sx, points[3].sy);
-			context.lineTo(points[0].sx, points[0].sy);
-
-			context.moveTo(points[4].sx, points[4].sy);
-			context.lineTo(points[5].sx, points[5].sy);
-			context.lineTo(points[6].sx, points[6].sy);
-			context.lineTo(points[7].sx, points[7].sy);
-			context.lineTo(points[4].sx, points[4].sy);
-
-			context.moveTo(points[0].sx, points[0].sy);
-			context.lineTo(points[4].sx, points[4].sy);
-
-			context.moveTo(points[1].sx, points[1].sy);
-			context.lineTo(points[5].sx, points[5].sy);
-
-			context.moveTo(points[2].sx, points[2].sy);
-			context.lineTo(points[6].sx, points[6].sy);
-
-			context.moveTo(points[3].sx, points[3].sy);
-			context.lineTo(points[7].sx, points[7].sy);
-
-			this.setShadowParams(context, t);
-			context.stroke();		
-		}
-	}
-	
-	function scale(points, size) {
-		for(var i = 0; i < points.length; i++) {
-			var p = points[i];
-			p.x *= size;
-			p.y *= size;
-			p.z *= size;
-		}
-	}
-
-	function rotateX(points, angle) {
-		var cos = Math.cos(angle),
-			sin = Math.sin(angle);
-		for(var i = 0; i < points.length; i++) {
-			var p = points[i],
-				y = p.y * cos - p.z * sin,
-				z = p.z * cos + p.y * sin;
-			p.y = y;
-			p.z = z;
-		}
-	}
-
-	function rotateY(points, angle) {
-		var cos = Math.cos(angle),
-			sin = Math.sin(angle);
-		for(var i = 0; i < points.length; i++) {
-			var p = points[i],
-				x = p.x * cos - p.z * sin,
-				z = p.z * cos + p.x * sin;
-			p.x = x;
-			p.z = z;
-		}
-	}
-
-	function rotateZ(points, angle) {
-		var cos = Math.cos(angle),
-			sin = Math.sin(angle);
-		for(var i = 0; i < points.length; i++) {
-			var p = points[i],
-				x = p.x * cos - p.y * sin,
-				y = p.y * cos + p.x * sin;
-			p.x = x;
-			p.y = y;
-		}
-	}
-
-	function project(points, z) {
-		var fl = 300;
-		for(var i = 0; i < points.length; i++) {
-			var p = points[i],
-				scale = fl / (fl + p.z + z);
-			p.sx = p.x * scale;
-			p.sy = p.y * scale;
-		}
-	}
-
-	function makePoints() {
-		return [
-			{
-				x: -1,
-				y: -1,
-				z: -1
-			},
-			{
-				x: 1,
-				y: -1,
-				z: -1
-			},
-			{
-				x: 1,
-				y: 1,
-				z: -1
-			},
-			{
-				x: -1,
-				y: 1,
-				z: -1
-			},
-			{
-				x: -1,
-				y: -1,
-				z: 1
-			},
-			{
-				x: 1,
-				y: -1,
-				z: 1
-			},
-			{
-				x: 1,
-				y: 1,
-				z: 1
-			},
-			{
-				x: -1,
-				y: 1,
-				z: 1
-			}
-		];
-	}
-});
-
-define('app/shapes/curve',[],function() {
-
-	return {
-		draw: function(context, t) {
-			var x0 = this.getNumber("x0", t, 20),
-				y0 = this.getNumber("y0", t, 10),
-				x1 = this.getNumber("x1", t, 100),
-				y1 = this.getNumber("y1", t, 200),
-				x2 = this.getNumber("x2", t, 180),
-				y2 = this.getNumber("y2", t, 10);
-
-		    context.moveTo(x0, y0);
-		    context.quadraticCurveTo(x1, y1, x2, y2);
-
-			this.drawFillAndStroke(context, t, false, true);
-		}
-	}
-});
-
-define('app/shapes/curvesegment',[],function() {
-
-	function quadratic(t, v0, v1, v2) {
-		return (1 - t) * (1 - t) * v0 + 2 * (1 - t) * t * v1 + t * t * v2;
-	}
-
-	return {
-		draw: function(context, t) {
-			var x0 = this.getNumber("x0", t, 20),
-				y0 = this.getNumber("y0", t, 20),
-				x1 = this.getNumber("x1", t, 100),
-				y1 = this.getNumber("y1", t, 200),
-				x2 = this.getNumber("x2", t, 180),
-				y2 = this.getNumber("y2", t, 20),
-				percent = this.getNumber("percent", t, 0.1),
-				t1 = t * (1 + percent),
-				t0 = t1 - percent,
-				res = 0.01,
-				x,
-				y;
-
-			t1 = Math.min(t1, 1);
-			t0 = Math.max(t0, 0);
-
-			for(var i = t0; i < t1; i += res) {
-				x = quadratic(i, x0, x1, x2);
-				y = quadratic(i, y0, y1, y2);
-				if(i === t0) {
-				    context.moveTo(x, y);
-				}
-				else {
-		    		context.lineTo(x, y);
-				}
-			}
-			x = quadratic(t1, x0, x1, x2);
-			y = quadratic(t1, y0, y1, y2);
-	   		context.lineTo(x, y);
-
-			this.drawFillAndStroke(context, t, false, true);		}
-	}
-});
-
-define('app/shapes/gear',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				radius = this.getNumber("radius", t, 50),
-				toothHeight = this.getNumber("toothHeight", t, 10),
-				hub = this.getNumber("hub", t, 10),
-				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
-				teeth = this.getNumber("teeth", t, 10),
-				toothAngle = this.getNumber("toothAngle", t, 0.3),
-				face = 0.5 - toothAngle / 2,
-				side = 0.5 - face,
-				innerRadius = radius - toothHeight;
-
-			context.translate(x, y);
-			context.rotate(rotation);
-			context.save();
-			context.moveTo(radius, 0);
-			var angle = Math.PI * 2 / teeth;
-
-			for(var i = 0; i < teeth; i++) {
-				context.rotate(angle * face);
-				context.lineTo(radius, 0);
-				context.rotate(angle * side);
-				context.lineTo(innerRadius, 0);
-				context.rotate(angle * face);
-				context.lineTo(innerRadius, 0);
-				context.rotate(angle * side);
-				context.lineTo(radius, 0);
-			}
-			context.lineTo(radius, 0);
-			context.restore();
-
-			context.moveTo(hub, 0);
-			context.arc(0, 0, hub, 0, Math.PI * 2, true);
-
-			this.drawFillAndStroke(context, t, true, false);
-		}
-	}
-});
-
-define('app/shapes/grid',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 0),
-				y = this.getNumber("y", t, 0),
-				w = this.getNumber("w", t, 100),
-				h = this.getNumber("h", t, 100),
-				gridSize = this.getNumber("gridSize", t, 20);
-				
-			for(var i = y; i <= y + h; i += gridSize) {
-				context.moveTo(x, i);
-				context.lineTo(x + w, i);
-			}
-			for(i = x; i <= x + w; i += gridSize) {
-				context.moveTo(i, y);
-				context.lineTo(i, y + h);
-			}
-
-			this.drawFillAndStroke(context, t, false, true);		
-		}
-	}
-});
-
-define('app/shapes/heart',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				w = this.getNumber("w", t, 50),
-				h = this.getNumber("h", t, 50);
-
-			var x0 = 0,
-				y0 = -.25,
-				x1 = .2,
-				y1 = -.8,
-				x2 = 1.1,
-				y2 = -.2,
-				x3 = 0,
-				y3 = .5;
-
-		    context.save();
-		    context.translate(x, y);
-		    context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-		    context.save();
-		    context.scale(w, h);
-		    context.moveTo(x0, y0);
-		    context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
-		    context.bezierCurveTo(-x2, y2, -x1, y1, -x0, y0);
-		    context.restore();
-			this.drawFillAndStroke(context, t, true, false);
-		    context.restore();
-		}
-	}
-});
-
-define('app/shapes/isobox',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				size = this.getNumber("size", t, 60),
-				h = this.getNumber("h", t, 40),
-				colorLeft = this.getColor("colorLeft", t, "#999999"),
-				colorRight = this.getColor("colorRight", t, "#cccccc"),
-				colorTop = this.getColor("colorTop", t, "#eeeeee");
-				
-			context.translate(x, y);
-
-			if(h >= 0) {
-				context.fillStyle = colorLeft;
-				context.beginPath();
-				context.moveTo(-size / 2, 0);
-				context.lineTo(0, size / 4);
-				context.lineTo(0, size / 4 - h);
-				context.lineTo(-size / 2, -h);
-				context.lineTo(-size / 2, 0);
-				this.drawFillAndStroke(context, t, true, false);
-
-				context.fillStyle = colorRight;
-				context.beginPath();
-				context.moveTo(size / 2, 0);
-				context.lineTo(0, size / 4);
-				context.lineTo(0, size / 4 - h);
-				context.lineTo(size / 2, -h);
-				context.lineTo(size / 2, 0);
-				this.drawFillAndStroke(context, t, true, false);
-
-				context.fillStyle = colorTop;
-				context.beginPath();
-				context.moveTo(-size / 2, -h + 0.25);
-				context.lineTo(0, -size / 4 - h);
-				context.lineTo(size / 2, -h);
-				context.lineTo(0, size / 4 - h);
-				context.lineTo(-size / 2, -h);
-				this.drawFillAndStroke(context, t, true, false);
-			}
-			else {
-				// clip path
-				context.beginPath();
-				context.moveTo(-size / 2, 0);
-				context.lineTo(0, -size / 4);
-				context.lineTo(size / 2, 0);
-				context.lineTo(0, size / 4);
-				context.lineTo(-size / 2, 0);
-				context.clip();
-
-
-				context.fillStyle = colorRight;
-				context.beginPath();
-				context.moveTo(-size / 2, 0);
-				context.lineTo(0, -size / 4);
-				context.lineTo(0, -size / 4 -h);
-				context.lineTo(-size / 2, -h);
-				context.lineTo(-size / 2, 0);
-				this.drawFillAndStroke(context, t, true, false);
-
-				context.fillStyle = colorLeft;
-				context.beginPath();
-				context.moveTo(size / 2, 0);
-				context.lineTo(0, -size / 4);
-				context.lineTo(0, -size / 4 -h);
-				context.lineTo(size / 2, -h);
-				context.lineTo(size / 2, 0);
-				this.drawFillAndStroke(context, t, true, false);
-
-				context.fillStyle = colorTop;
-				context.beginPath();
-				context.moveTo(-size / 2, -h);
-				context.lineTo(0, -size / 4 - h);
-				context.lineTo(size / 2, -h);
-				context.lineTo(0, size / 4 - h);
-				context.lineTo(-size / 2, -h);
-				this.drawFillAndStroke(context, t, true, false);
-			}
-
-
-		}
-	}
-});
-
-define('app/shapes/line',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x0 = this.getNumber("x0", t, 0),
-				y0 = this.getNumber("y0", t, 0),
-				x1 = this.getNumber("x1", t, 100),
-				y1 = this.getNumber("y1", t, 100);
-				
-			context.moveTo(x0, y0);
-			context.lineTo(x1, y1);
-
-			this.drawFillAndStroke(context, t, false, true);		
-		}
-	}
-});
-
-define('app/shapes/oval',[],function() {
-
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				rx = this.getNumber("rx", t, 50),
-				ry = this.getNumber("ry", t, 50),
-				startAngle = this.getNumber("startAngle", t, 0),
-				endAngle = this.getNumber("endAngle", t, 360),
-				drawFromCenter = this.getBool("drawFromCenter", t, false);
-
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-			context.save();
-			context.scale(rx / 100, ry / 100);
-			if(drawFromCenter) {
-				context.moveTo(0, 0);
-			}
-			context.arc(0, 0, 100, startAngle * Math.PI / 180, endAngle * Math.PI / 180);
-			if(drawFromCenter) {
-				context.closePath();
-			}
-			context.restore();
-
-			this.drawFillAndStroke(context, t, true, false);
-		}
-	}
-});
-
-define('app/shapes/path',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var path = this.getArray("path", t, []),
-				startPercent = this.getNumber("startPercent", t, 0),
-				endPercent = this.getNumber("endPercent", t, 1),
-				startPoint = Math.floor(path.length / 2 * startPercent),
-				endPoint = Math.floor(path.length / 2 * endPercent),
-				startIndex = startPoint * 2,
-				endIndex = endPoint * 2;
-
-			if(startIndex > endIndex) {
-				var temp = startIndex;
-				startIndex = endIndex;
-				endIndex = temp;
-			}
-
-		    context.moveTo(path[startIndex], path[startIndex + 1]);
-
-		    for(var i = startIndex + 2; i < endIndex - 1; i += 2) {
-		    	context.lineTo(path[i], path[i + 1]);
-		    }
-
-			this.drawFillAndStroke(context, t, false, true);		}
-	}
-});
-
-define('app/shapes/poly',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				radius = this.getNumber("radius", t, 50),
-				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
-				sides = this.getNumber("sides", t, 5);
-
-			context.translate(x, y);
-			context.rotate(rotation);
-			context.moveTo(radius, 0);
-			for(var i = 1; i < sides; i++) {
-				var angle = Math.PI * 2 / sides * i;
-				context.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
-			}
-			context.closePath();
-
-			this.drawFillAndStroke(context, t, true, false);
-		}
-	}
-});
-		
-
-define('app/shapes/ray',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				angle = this.getNumber("angle", t, 0) * Math.PI / 180,
-				length = this.getNumber("length", t, 100);
-				
-			context.translate(x, y);
-			context.rotate(angle);
-			context.moveTo(0, 0);
-			context.lineTo(length, 0);
-
-			this.drawFillAndStroke(context, t, false, true);
-		}
-	}
-});
-
-define('app/shapes/raysegment',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				angle = this.getNumber("angle", t, 0) * Math.PI / 180,
-				length = this.getNumber("length", t, 100),
-				segmentLength = this.getNumber("segmentLength", t, 50),				
-		    	start = -0.01,
-		    	end = (length + segmentLength) * t;
-
-		    if(end > segmentLength) {
-		      start = end - segmentLength;
-		    }
-		    if(end > length) {
-		      end = length + 0.01;
-		    }
-
-		    context.translate(x, y);
-		    context.rotate(angle);
-			context.moveTo(start, 0);
-			context.lineTo(end, 0);
-
-			this.drawFillAndStroke(context, t, false, true);
-		}
-	}
-});
-
-define('app/shapes/rect',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				w = this.getNumber("w", t, 100),
-				h = this.getNumber("h", t, 100);
-				
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-			if(this.getBool("drawFromCenter", t, true)) {
-				context.rect(-w * 0.5, -h * 0.5, w, h);
-			}
-			else {
-				context.rect(0, 0, w, h);
-			}
-
-			this.drawFillAndStroke(context, t, true, false);
-		}
-	}
-});
-
-define('app/shapes/segment',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x0 = this.getNumber("x0", t, 0),
-				y0 = this.getNumber("y0", t, 0),
-				x1 = this.getNumber("x1", t, 100),
-				y1 = this.getNumber("y1", t, 100),
-				segmentLength = this.getNumber("segmentLength", t, 50),
-				dx = x1 - x0,
-			    dy = y1 - y0,
-			    angle = Math.atan2(dy, dx),
-			    dist = Math.sqrt(dx * dx + dy * dy),
-		    	start = -0.01,
-		    	end = (dist + segmentLength) * t;
-
-		    if(end > segmentLength) {
-		      start = end - segmentLength;
-		    }
-		    if(end > dist) {
-		      end = dist + 0.01;
-		    }
-
-		    context.translate(x0, y0);
-		    context.rotate(angle);
-			context.moveTo(start, 0);
-			context.lineTo(end, 0);
-
-			this.drawFillAndStroke(context, t, false, true);
-		}
-	}
-});
-
-define('app/shapes/spiral',[],function() {
-
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, "100"),
-				y = this.getNumber("y", t, "100"),
-				innerRadius = this.getNumber("innerRadius", t, 10),
-				outerRadius = this.getNumber("outerRadius", t, 90),
-				turns = this.getNumber("turns", t, 6),
-				res = this.getNumber("res", t, 1) * Math.PI / 180,
-				fullAngle = Math.PI * 2 * turns;
-
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-
-
-			if(fullAngle > 0) {
-				for(var a = 0; a < fullAngle; a += res) {
-					var r = innerRadius + (outerRadius - innerRadius) * a / fullAngle;
-					context.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-				}
-			}
-			else {
-				for(var a = 0; a > fullAngle; a -= res) {
-					var r = innerRadius + (outerRadius - innerRadius) * a / fullAngle;
-					context.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-				}
-			}
-			this.drawFillAndStroke(context, t, false, true);
-		}
-	};
-
-});
-define('app/shapes/star',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				innerRadius = this.getNumber("innerRadius", t, 25),
-				outerRadius = this.getNumber("outerRadius", t, 50),
-				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
-				points = this.getNumber("points", t, 5);
-
-			context.translate(x, y);
-			context.rotate(rotation);
-			context.moveTo(outerRadius, 0);
-			for(var i = 1; i < points * 2; i++) {
-				var angle = Math.PI * 2 / points / 2 * i,
-					r = i % 2 ? innerRadius : outerRadius;
-				context.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
-			}
-			context.closePath();
-
-
-			this.drawFillAndStroke(context, t, true, false);	
-		}
-	}
-});
-
-define('app/shapes/text',[],function() {
-	
-	return {
-		draw: function(context, t) {
-			var x = this.getNumber("x", t, 100),
-				y = this.getNumber("y", t, 100),
-				text = this.getString("text", t, "hello"),
-				fontSize = this.getNumber("fontSize", t, 20),
-				fontWeight = this.getString("fontWeight", t, "normal");
-				fontFamily = this.getString("fontFamily", t, "sans-serif");
-				fontStyle = this.getString("fontStyle", t, "normal");
-
-			context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFamily;
-			var width = context.measureText(text).width;
-			context.translate(x, y);
-			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
-			var shadowsSet = false;
-			context.save();
-			if(this.getBool("fill", t, true)) {
-				this.setShadowParams(context, t);
-				shadowsSet = true;
-				context.fillText(text, -width / 2, fontSize * 0.4);
-			}
-			context.restore();
-			if(this.getBool("stroke", t, false)) {
-				if(!shadowsSet) {
-					this.setShadowParams(context, t);
-				}
-				context.strokeText(text, -width / 2, fontSize * 0.4);
-			}
-		}
-	}
-});
-
-define('app/renderlist',[
-	"app/shapes/shape",
-	"app/shapes/arrow",
-	"app/shapes/arcSegment",
-	"app/shapes/beziercurve",
-	"app/shapes/beziersegment",
-	"app/shapes/circle",
-	"app/shapes/container",
-	"app/shapes/cube",
-	"app/shapes/curve",
-	"app/shapes/curvesegment",
-	"app/shapes/gear",
-	"app/shapes/grid",
-	"app/shapes/heart",
-	"app/shapes/isobox",
-	"app/shapes/line",
-	"app/shapes/oval",
-	"app/shapes/path",
-	"app/shapes/poly",
-	"app/shapes/ray",
-	"app/shapes/raysegment",
-	"app/shapes/rect",
-	"app/shapes/segment",
-	"app/shapes/spiral",
-	"app/shapes/star",
-	"app/shapes/text",
-	],
-	function(
-		Shape,
-		Arrow,
-		ArcSegment,
-		BezierCurve,
-		BezierSegment, 
-		Circle,
-		Container,
-		Cube,
-		Curve,
-		CurveSegment,
-		Gear,
-		Grid,
-		Heart,
-		Isobox,
-		Line,
-		Oval,
-		Path,
-		Poly,
-		Ray,
-		RaySegment,
-		Rect,
-		Segment,
-		Spiral,
-		Star,
-		Text
-	) {
-
-
-	var canvas = null,
-		context = null,
-		width = 0,
-		height = 0,
-		list = [],
-		styles = null,
-		interpolation = null,
-		glc = null;
-
-	function init(pGlc, w, h, pStyles, pInterpolation) {
-		glc = pGlc
-		canvas = document.createElement("canvas");
-		width = canvas.width = w;
-		height = canvas.height = h;
-		context = canvas.getContext("2d");
-		styles = pStyles
-		Shape.styles = styles;
-		Shape.interpolation = interpolation = pInterpolation;
-	}
-
-	function size(w, h) {
-		width = canvas.width = w;
-		height = canvas.height = h;
-	}
-
-	function add(item) {
-		if(item.props.parent) {
-			item.props.parent.add(item);
-		}
-		else {
-			list.push(item);
-		}
-		render(0);
-		return item;
-	}
-
-	function clear() {
-		list.length = 0;
-	}
-
-	function addArrow(props) {
-		return add(Shape.create(Arrow, props));
-	}
-
-	function addArcSegment(props) {
-		return add(Shape.create(ArcSegment, props));
-	}
-
-	function addBezierCurve(props) {
-		return add(Shape.create(BezierCurve, props));
-	}
-
-	function addBezierSegment(props) {
-		return add(Shape.create(BezierSegment, props));
-	}
-
-	function addCircle(props) {
-		return add(Shape.create(Circle, props));
-	}
-
-	function addContainer(props) {
-		return add(Shape.create(Container, props));
-	}
-
-	function addCube(props) {
-		return add(Shape.create(Cube, props));
-	}
-
-	function addCurve(props) {
-		return add(Shape.create(Curve, props));
-	}
-
-	function addCurveSegment(props) {
-		return add(Shape.create(CurveSegment, props));
-	}
-
-	function addGear(props) {
-		return add(Shape.create(Gear, props));
-	}
-
-	function addGrid(props) {
-		return add(Shape.create(Grid, props));
-	}
-
-	function addHeart(props) {
-		return add(Shape.create(Heart, props));
-	}
-
-	function addIsobox(props) {
-		return add(Shape.create(Isobox, props));
-	}
-
-	function addLine(props) {
-		return add(Shape.create(Line, props));
-	}
-	
-	function addOval(props) {
-		return add(Shape.create(Oval, props));
-	}
-	
-	function addPath(props) {
-		return add(Shape.create(Path, props));
-	}
-	
-	function addPoly(props) {
-		return add(Shape.create(Poly, props));
-	}
-	
-	function addRay(props) {
-		return add(Shape.create(Ray, props));
-	}
-
-	function addRaySegment(props) {
-		return add(Shape.create(RaySegment, props));
-	}
-
-	function addRect(props) {
-		return add(Shape.create(Rect, props));
-	}
-
-	function addSegment(props) {
-		return add(Shape.create(Segment, props));
-	}
-
-	function addSpiral(props) {
-		return add(Shape.create(Spiral, props));
-	}
-
-	function addStar(props) {
-		return add(Shape.create(Star, props));
-	}
-
-	function addText(props) {
-		return add(Shape.create(Text, props));
-	}
-
-	function render(t) {
-		if(styles.backgroundColor === "transparent") {
-			context.clearRect(0, 0, width, height);
-		}
-		else {
-			context.fillStyle = styles.backgroundColor;
-  			context.fillRect(0, 0, width, height);
-  		}
-  		var interpolatedT = interpolation.interpolate(t);
-		if(glc.onEnterFrame) {
-			context.save();
-			glc.onEnterFrame(interpolatedT);
-			context.restore();
-		}
-		for(var i = 0; i < list.length; i++) {
-			list[i].render(context, t);
-		}
-		if(glc.onExitFrame) {
-			context.save();
-			glc.onExitFrame(interpolatedT);
-			context.restore();
-		}
-	}
-
-	function getCanvas() {
-		return canvas;
-	}
-
-	function getContext() {
-		return context;
-	}
-
-	return {
-		init: init,
-		size: size,
-		getCanvas: getCanvas,
-		getContext: getContext,
-		add: add,
-		clear: clear,
-		addArrow: addArrow,
-		addArcSegment: addArcSegment,
-		addBezierCurve: addBezierCurve,
-		addBezierSegment: addBezierSegment,
-		addCircle: addCircle,
-		addContainer: addContainer,
-		addCube: addCube,
-		addCurve: addCurve,
-		addCurveSegment: addCurveSegment,
-		addGear: addGear,
-		addGrid: addGrid,
-		addHeart: addHeart,
-		addIsobox: addIsobox,
-		addLine: addLine,
-		addOval: addOval,
-		addPath: addPath,
-		addPoly: addPoly,
-		addRay: addRay,
-		addRaySegment: addRaySegment,
-		addRect: addRect,
-		addSegment: addSegment,
-		addSpiral: addSpiral,
-		addStar: addStar,
-		addText: addText,
-		render: render
-	};
-
-});
-
-define('app/scheduler',[],function() {
-
-	var t = 0,
-		duration = 2,
-		fps = 30,
-		running = false,
-		stopping = false,
-		looping = false,
-		controller = null,
-		renderList = null
-
-	function init(pController) {
-		controller = pController;
-	}
-
-	function render() {
-		if(running && !stopping) {
-			controller.onRender(t);
-		    advance();
-			setTimeout(onTimeout, 1000 / fps);
-		}
-		else {
-			running = false;
-			looping = false;
-			stopping = false;
-	    	controller.onComplete();
-	   	}
-	}
-
-	function onTimeout() {
-		requestAnimationFrame(render);
-	}
-
-	function advance() {
-		var numFrames = duration * fps,
-			speed = 1 / numFrames; 
-		t += speed;
-	    if(Math.round(t * 10000) / 10000 >= 1) {
-	    	if(looping) {
-	    		t -= 1;
-	    	}
-	    	else {
-		    	t = 0;
-		    	stop();
-		    }
-	    }
-	}
-
-	function loop() {
-		if(!running) {
-			t = 0;
-			stopping = false;
-			looping = true;
-			running = true;
-			render();
-		}
-	}
-
-	function stop() {
-		stopping = true;
-		t = 0;
-	}
-
-	function playOnce() {
-		if(!running) {
-			t = 0;
-			looping = false;
-			running = true;
-			render();		
-		}
-	}
-
-	function isRunning() {
-		return running;
-	}
-
-	function setDuration(value) {
-		duration = value;
-	}
-
-	function getDuration() {
-		return duration;
-	}
-
-	function setFPS(value) {
-		fps = value;
-	}
-
-	function getFPS() {
-		return fps;
-	}
-
-
-	return {
-		init: init,
-		loop: loop,
-		playOnce: playOnce,
-		stop: stop,
-		isRunning: isRunning,
-		setDuration: setDuration,
-		getDuration: getDuration,
-		setFPS: setFPS,
-		getFPS: getFPS
-	};
-
-});
-
-define('app/controller',[],function() {
-    var glc = null,
-        scheduler = null,
-        controlPanel = null,
-        toolbar = null,
-        canvasPanel = null,
-        outputPanel = null,
-        GIFEncoder = null,
-        model = null,
-        renderList = null,
-        codePanel = null,
-        infoPanel = null,
-        spritesheet = null,
-        reset = null;
-
-    function init(internalInterface) {
-        glc = internalInterface.glc;
-        scheduler = internalInterface.scheduler;
-        renderList = internalInterface.renderList;
-        model = internalInterface.model;
-        GIFEncoder = internalInterface.GIFEncoder;
-        controlPanel = internalInterface.controlPanel;
-        toolbar = internalInterface.toolbar;
-        canvasPanel = internalInterface.canvasPanel;
-        outputPanel = internalInterface.outputPanel;
-        codePanel = internalInterface.codePanel;
-        infoPanel = internalInterface.infoPanel;
-        spritesheet = internalInterface.spritesheet;
-        reset = internalInterface.reset;
-    }
-
-
-    function playOnce() {
-        scheduler.playOnce();
-        disableControls();
-        controlPanel.setStatus("playing");
-    }
-
-    function loop() {
-        scheduler.loop();
-        disableControls();
-        controlPanel.setStatus("playing");
-    }
-
-    function stop() {
-        scheduler.stop();
-        enableControls();
-        controlPanel.setStatus("stopped");
-    }
-
-    function enableControls() {
-        toolbar.enableControls();
-        canvasPanel.enableControls();
-    }
-
-    function disableControls() {
-        toolbar.disableControls();
-        canvasPanel.disableControls();
-    }
-
-    function captureStill() {
-        var canvas = renderList.getCanvas(),
-            dataURL = canvas.toDataURL();
-        outputPanel.setWidth(model.w + 12);
-        outputPanel.setPNG(dataURL);
-    }
-
-    function startEncoder() {
-        GIFEncoder.setMaxColors(model.maxColors);
-        GIFEncoder.setRepeat(0);
-        GIFEncoder.setDelay(1000 / scheduler.getFPS());
-        GIFEncoder.start();
-    }
-
-    function chooseFile(event) {
-        model.file = event.target.files[0];
-        reload();
-    }
-
-    function reload() {
-        if(!model.file) return;
-        clearOutput();
-
-        var reader = new FileReader();
-        reader.onload = function() {
-            setCode(reader.result, true);
+        if(parent) {
+            parent.appendChild(el);
         }
-        reader.readAsText(model.file);
-    }
-
-    function updateCode() {
-        setCode(codePanel.getCode(), false);
-    }
-
-    function newFile() {
-        if(window.confirm("You will lose any unsaved changes.")) {
-            stop();
-            codePanel.newFile();
-            setCode(codePanel.getCode(), false);
-        }
-    }
-
-    function setCode(code, updateCodePanel) {
-        renderList.clear();
-        var script = document.getElementById("loaded_script");
-        if(script) {
-            document.head.removeChild(script);
-        }
-
-        script = document.createElement("script");
-        script.id = "loaded_script";
-        document.head.appendChild(script);
-
-        script.textContent = code;
-        if(updateCodePanel) {
-            codePanel.setCode(code);
-        }
-
-        canvasPanel.hide();
-        reset();
-        if(window.onGLC) {
-            setTimeout(function() {
-                canvasPanel.show();
-                window.onGLC(glc);
-            }, 100);
-        }
-    }
-
-    function makeGif() {
-        if(!scheduler.isRunning()) {
-            clearOutput();
-            model.capture = true;
-            startEncoder();
-            playOnce();
-        }
-        else {
-            controlPanel.setStatus("Animation already running");
-        }
-    }
-
-    function makeSpriteSheet() {
-        if(!scheduler.isRunning()) {
-            clearOutput();
-            model.captureSpriteSheet = true;
-            initSpriteSheet();
-            playOnce();
-        }
-        else {
-            controlPanel.setStatus("Animation already running");
-        }
-    }
-
-    function onRender(t) {
-        canvasPanel.setTime(t);
-        renderList.render(t);
-        if(model.capture) {
-            controlPanel.setStatus("capturing...");
-            GIFEncoder.addFrame(renderList.getContext());
-        }
-        if(model.captureSpriteSheet) {
-            spritesheet.addFrame(renderList.getCanvas());
-        }
-    }
-
-    function onComplete() {
-        if(model.capture) {
-            model.capture = false;
-            GIFEncoder.finish();
-            outputPanel.setGIF(GIFEncoder.stream().getData());
-        }
-        if(model.captureSpriteSheet) {
-            model.captureSpriteSheet = false;
-            outputPanel.setWidth(spritesheet.getSpriteSheetSize() + 12);
-            outputPanel.setPNG(spritesheet.getImage());
-        }
-        controlPanel.setStatus("stopped");
-        enableControls();
-    }
-
-    function clearOutput() {
-        outputPanel.clearOutput();
-    }
-
-    function renderFrame(value) {
-        renderList.render(value);
-    }
-
-    function showInfoPanel() {
-        infoPanel.show();
-    }
-
-    function saveCode() {
-        codePanel.saveCode();
-    }
-
-    function initSpriteSheet() {
-        spritesheet.init(scheduler.getFPS(), scheduler.getDuration());
-    }
-
-    function openFile() {
-        toolbar.chooseFileDialog();
-    }
-
-    function size(width, height) {
-        model.w = width;
-        model.h = height;
-        GIFEncoder.setSize(width, height);
-        spritesheet.setSize(width, height);
-        renderList.size(model.w, model.h);
-        canvasPanel.setWidth(model.w + 12);
-        outputPanel.setWidth(model.w + 12);
-    }
-
-    return {
-        init: init,
-        playOnce: playOnce,
-        loop: loop,
-        stop: stop,
-        enableControls: enableControls,
-        disableControls: disableControls,
-        clearOutput: clearOutput,
-        captureStill: captureStill,
-        renderFrame: renderFrame,
-        startEncoder: startEncoder,
-        chooseFile: chooseFile,
-        newFile: newFile,
-        reload: reload,
-        showInfoPanel: showInfoPanel,
-        initSpriteSheet: initSpriteSheet,
-        updateCode: updateCode,
-        makeGif: makeGif,
-        makeSpriteSheet: makeSpriteSheet,
-        saveCode: saveCode,
-        onComplete: onComplete,
-        onRender: onRender,
-        openFile: openFile,
-        size: size
-    };
-});
-
-define('app/styles',[],function() {
-	var defaultStyles = {
-		backgroundColor: "#ffffff",
-		lineWidth: 5,
-		strokeStyle: "#000000",
-		fillStyle: "#000000",
-		lineCap: "round",
-		lineJoin: "miter",
-		lineDash: [],
-		miterLimit: 10,
-		shadowColor: null,
-		shadowOffsetX: 0,
-		shadowOffsetY: 0,
-		shadowBlur: 0,
-		globalAlpha: 1,
-		translationX: 0,
-		translationY: 0,
-		shake: 0,
-		blendMode: "source-over",
-		reset: reset
-	},
-
-	styles = {};
-
-	reset();
-
-	function reset() {
-		for(var prop in defaultStyles) {
-			styles[prop] = defaultStyles[prop];
-		}
-	}
-
-
-
-	return styles;
-
-});
-
-define('app/interpolation',[],function() {
-
-    function init(pModel) {
-        model = pModel;
-    }
-
-    function interpolate(t) {
-        switch(model.mode) {
-            case "bounce":
-                if(model.easing) {
-                    var a = t * Math.PI * 2;
-                    return 0.5 - Math.cos(a) * 0.5;
-                }
-                else {
-                    t = t % 1;
-                    return t < 0.5 ? t * 2 : t = (1 - t) * 2;
-                }
-                break;
-
-            case "single":
-            default:
-                if(t > 1) {
-                    t %= 1;
-                }
-                if(model.easing) {
-                    var a = t * Math.PI;
-                    return 0.5 - Math.cos(a) * 0.5;
-                }
-                else{
-                    return t;
-                }
-        }
-    }
-
-
-	return {
-        init: init,
-        interpolate: interpolate,
-	}
-});
-define('app/spritesheet',[],function() {
-    var canvas = document.createElement("canvas"),
-        context = canvas.getContext("2d"),
-        spriteSheetSize = 0,
-        spriteSheetX = 0,
-        spriteSheetY = 0,
-        frameWidth = 0,
-        frameHeight = 0;
-
-    function setSize(width, height) {
-        frameWidth = width;
-        frameHeight = height;
-    }
-
-    function addFrame(frame) {
-        context.drawImage(frame, spriteSheetX, spriteSheetY);
-        spriteSheetX += frameWidth;
-        if(spriteSheetX + frameWidth > spriteSheetSize) {
-            spriteSheetX = 0;
-            spriteSheetY += frameHeight;
-        }
-    }
-
-    function getImage() {
-        return canvas.toDataURL();
-    }
-
-    function init(fps, duration) {
-        var numFrames = fps * duration,
-            framesSqrt = Math.ceil(Math.sqrt(numFrames));
-        spriteSheetSize = framesSqrt * Math.max(frameWidth, frameHeight);
-        if(spriteSheetSize > 2048) {
-            if(!confirm("Warning: Sprite sheets create a large bitmap with each frame of your animation laid out in a grid. Your sprite sheet will be " + spriteSheetSize + "x" + spriteSheetSize + ", which is pretty dang big. That OK with you?")) {
-                return;
+        if(style) {
+            for(var prop in style) {
+                el.style[prop] = style[prop];
             }
         }
-        canvas.width = canvas.height = spriteSheetSize;
-        context.clearRect(0, 0, spriteSheetSize, spriteSheetSize);
+        return el;
+    },
 
-        spriteSheetX = 0;
-        spriteSheetY = 0;
+    createDiv: function(className, parent, style) {
+        return this.createElement("div", className, parent, style);
+    },
+
+    createImage: function(className, parent, style) {
+        return this.createElement("img", className, parent, style);
+    },
+
+    createInput: function(type, className, parent, style, event, handler) {
+        var input = this.createElement("input", className, parent, style);
+        input.type = type;
+        input.addEventListener(event, handler);
+        return input;
+    },
+
+    createCanvas: function(className, parent, style) {
+        return this.createElement("canvas", className, parent, style);
+    },
+
+    createScript: function(id, code, parent) {
+        var script = this.createElement("script", null, null);
+        if(code) {
+            script.textContent = code;
+        }
+        if(parent) {
+            parent.appendChild(script);
+        }
+        return script;
+    },
+
+    createSelect: function(className, parent, style, options, handler) {
+        var select = this.createElement("select", className, parent, style);
+        if(options) {
+            for(var i = 0; i < options.length; i++) {
+                select.add(new Option(options[i]));
+            }
+        }
+        select.addEventListener("change", handler);
+        return select;
+    },
+
+    createCheckbox(className, labelText, parent, style, handler) {
+        var label = this.createElement("label", className, parent, style);
+        label.textContent = labelText;
+        var checkbox = this.createInput("checkbox", className, null, style, "change", handler);
+        label.insertBefore(checkbox, label.firstChild);
+        return checkbox;
+    },
+
+    createSpan: function(className, text, parent, style) {
+        var span = this.createElement("span", className, parent, style);
+        if(text) {
+            span.innerHTML = text;
+        }
     }
-
-    function getSpriteSheetSize() {
-        return spriteSheetSize;
-    }
-
-
-
-
-    return {
-        setSize: setSize,
-        addFrame: addFrame,
-        getImage: getImage,
-        init: init,
-        getSpriteSheetSize: getSpriteSheetSize
-    };
 
 
 });
-(function() {
-	var QuickSettings = {
-		_topZ: 1,
-
-		_panel: null,
-		_titleBar: null,
-		_content: null,
-		_startX: 0,
-		_startY: 0,
-		_hidden: false,
-		_collapsed: false,
-		_controls: null,
-		_keyCode: -1,
-		_draggable: true,
-		_collapsible: true,
-		_globalChangeHandler: null,
-		_moveListener: null,
-
-		create: function(x, y, title) {
-			var obj = Object.create(this);
-			obj._init(x, y, title);
-			return obj;
-		},
-
-		_init: function(x, y, title) {
-			this._bindHandlers();
-			this._createPanel(x, y);
-			this._createTitleBar(title || "QuickSettings");
-			this._createContent();
-
-			document.body.appendChild(this._panel);
-		},
-
-		_bindHandlers: function() {
-			this._startDrag = this._startDrag.bind(this);
-			this._drag = this._drag.bind(this);
-			this._endDrag = this._endDrag.bind(this);
-			this._doubleClickTitle = this._doubleClickTitle.bind(this);
-			this._onKeyUp = this._onKeyUp.bind(this);
-		},
-
-		_createPanel: function(x, y) {
-			this._panel = document.createElement("div");
-			this._panel.className = "msettings_main";
-			this._panel.style.zIndex = ++QuickSettings._topZ;
-			this.setPosition(x || 0, y || 0);
-			this._controls = {};
-		},
-
-		_createTitleBar: function(text) {
-			this._titleBar = document.createElement("div");
-			this._titleBar.textContent = text;
-			this._titleBar.className = "msettings_title_bar";
-
-			this._titleBar.addEventListener("mousedown", this._startDrag);
-			this._titleBar.addEventListener("dblclick", this._doubleClickTitle);
-
-			this._panel.appendChild(this._titleBar);
-		},
-
-		_createContent: function() {
-			this._content = document.createElement("div");
-			this._content.className = "msettings_content";
-			this._panel.appendChild(this._content);
-		},
-
-		setPosition: function(x, y) {
-			this._panel.style.left = x + "px";
-			this._panel.style.top = Math.max(y, 0) + "px";
-		},
-
-		setSize: function(w, h) {
-			this._panel.style.width = w + "px";
-			this._content.style.width = w + "px";
-			this._content.style.height = (h - this._titleBar.offsetHeight) + "px";
-		},
-
-		setWidth: function(w) {
-			this._panel.style.width = w + "px";
-			this._content.style.width = w + "px";
-		},
-
-		setDraggable: function(draggable) {
-			this._draggable = draggable;
-			if(this._draggable || this._collapsible) {
-				this._titleBar.style.cursor = "pointer";
-			}
-			else {
-				this._titleBar.style.cursor = "default";
-			}
-		},
-
-		setCollapsible: function(collapsible) {
-			this._collapsible = collapsible;
-			if(this._draggable || this._collapsible) {
-				this._titleBar.style.cursor = "pointer";
-			}
-			else {
-				this._titleBar.style.cursor = "default";
-			}
-		},
-
-		_startDrag: function(event) {
-			if(this._draggable) {
-				this._panel.style.zIndex = ++QuickSettings._topZ;
-				document.addEventListener("mousemove", this._drag);
-				document.addEventListener("mouseup", this._endDrag);
-				this._startX = event.clientX;
-				this._startY = event.clientY;
-			}
-			event.preventDefault();
-		},
-
-		_drag: function(event) {
-			var x = parseInt(this._panel.style.left),
-				y = parseInt(this._panel.style.top),
-				mouseX = event.clientX,
-				mouseY = event.clientY;
-
-			this.setPosition(x + mouseX - this._startX, y + mouseY - this._startY);
-			this._startX = mouseX;
-			this._startY = mouseY;
-			event.preventDefault();
-		},
-
-		_endDrag: function(event) {
-			document.removeEventListener("mousemove", this._drag);
-			document.removeEventListener("mouseup", this._endDrag);
-			if(this._moveListener) {
-				this._moveListener(this._panel.offsetLeft, this._panel.offsetTop);
-			}
-			event.preventDefault();
-		},
-
-		_doubleClickTitle: function() {
-			if(this._collapsible) {
-				this.toggleCollapsed();
-			}
-		},
-
-		setGlobalChangeHandler: function(handler) {
-			this._globalChangeHandler = handler;
-		},
-
-		setMoveListener: function(listener) {
-			this._moveListener = listener;
-		},
-
-		toggleCollapsed: function() {
-			if(this._collapsed) {
-				this.expand();
-			}
-			else {
-				this.collapse();
-			}
-		},
-
-		collapse: function() {
-			this._panel.removeChild(this._content);
-			this._collapsed = true;
-		},
-
-		expand: function() {
-			this._panel.appendChild(this._content);
-			this._collapsed = false;
-		},
-
-		hide: function() {
-			this._panel.style.visibility = "hidden";
-			this._hidden = true;
-		},
-
-		show: function() {
-			this._panel.style.visibility = "visible";
-			this._panel.style.zIndex = ++QuickSettings._topZ;
-			this._hidden = false;
-		},
-
-		_createContainer: function() {
-			var container = document.createElement("div");
-			container.className = "msettings_container";
-			return container;
-		},
-
-		_createLabel: function(title) {
-			var label = document.createElement("div");
-			label.innerHTML = title;
-			label.className = "msettings_label";
-			return label;
-		},
-
-		setKey: function(char) {
-			this._keyCode = char.toUpperCase().charCodeAt(0);
-			document.body.addEventListener("keyup", this.onKeyUp);
-		},
-
-		_onKeyUp: function(event) {
-			if(event.keyCode === this._keyCode) {
-				this.toggleVisibility();
-			}
-		},
-
-		toggleVisibility: function() {
-			if(this._hidden) {
-				this.show();
-			}
-			else {
-				this.hide();
-			}
-		},
-
-		bindRange: function(title, min, max, value, step, object) {
-			this.addRange(title, min, max, value, step, function(value) {
-				object[title] = value;
-			});
-		},
-
-		addRange: function(title, min, max, value, step, callback) {
-			var container = this._createContainer();
-
-			var range = document.createElement("input");
-			range.type = "range";
-			range.id = title;
-			range.min = min || 0;
-			range.max = max || 100;
-			range.step = step || 1;
-			range.value = value || 0;
-			range.className = "msettings_range";
-
-			var label = this._createLabel("<b>" + title + ":</b> " + range.value);
-
-			container.appendChild(label);
-			container.appendChild(range);
-			this._content.appendChild(container);
-			this._controls[title] = {
-				container: container,
-				control: range,
-				label: label,
-				callback: callback
-			};
-
-			var eventName = "input";
-			if(this._isIE()) {
-				eventName = "change";
-			}
-			var gch = this._globalChangeHandler;
-			range.addEventListener(eventName, function() {
-				label.innerHTML = "<b>" + title + ":</b> " + range.value;
-				if(callback) {
-					callback(parseFloat(range.value));
-				}
-				if(gch) {
-					gch();
-				}
-			});
-		}, 
-
-		_isIE: function() {
-			if(navigator.userAgent.indexOf("rv:11") != -1) {
-				return true;
-			}
-			if(navigator.userAgent.indexOf("MSIE") != -1) {
-				return true;
-			}
-			return false;
-		},
-
-		getRangeValue: function(title) {
-			return this._controls[title].control.value;
-		},
-
-		setRangeValue: function(title, value) {
-			var control = this._controls[title];
-			control.control.value = value;
-			control.label.innerHTML = "<b>" + title + ":</b> " + control.control.value;
-			if(control.callback) {
-				control.callback(parseFloat(control.control.value));
-			}
-			if(this._globalChangeHandler) {
-				this._globalChangeHandler();
-			}
-		},
-
-		setRangeParameters: function(title, min, max, step) {
-			var control = this._controls[title];
-			control.control.min = min;
-			control.control.max = max;
-			control.control.step = step;
-		},
-
-		bindBoolean: function(title, value, object) {
-			this.addBoolean(title, value, function(value) {
-				object[title] = value;
-			});
-		},
-
-		addBoolean: function(title, value, callback) {
-			var container = this._createContainer();
-
-			var label = document.createElement("span");
-			label.className = "msettings_checkbox_label";
-			label.textContent = title;
-
-			var checkbox = document.createElement("input");
-			checkbox.type = "checkbox";
-			checkbox.id = title;
-			checkbox.checked = value;
-			checkbox.className = "msettings_checkbox";
-
-			container.appendChild(checkbox);
-			container.appendChild(label);
-			this._content.appendChild(container);
-			this._controls[title] = {
-				container: container,
-				control: checkbox,
-				callback: callback
-			};
-
-			var gch = this._globalChangeHandler;
-			checkbox.addEventListener("change", function() {
-				if(callback) {
-					callback(checkbox.checked);
-				}
-				if(gch) {
-					gch();
-				}
-			});
-			label.addEventListener("click", function() {
-				if(checkbox.disabled) {
-					return;
-				}
-				checkbox.checked = !checkbox.checked;
-				if(callback) {
-					callback(checkbox.checked);
-				}
-				if(gch) {
-					gch();
-				}
-			});
-		},
-
-		getBoolean: function(title) {
-			return this._controls[title].control.checked;
-		},
-
-		setBoolean: function(title, value) {
-			this._controls[title].control.checked = value;
-			if(this._controls[title].callback) {
-				this._controls[title].callback(value);
-			}
-			if(this._globalChangeHandler) {
-				this._globalChangeHandler();
-			}
-		},
-
-		addButton: function(title, callback) {
-			var container = this._createContainer();
-
-			var button = document.createElement("input");
-			button.type = "button";
-			button.id = title;
-			button.value = title;
-			button.className = "msettings_button";
-
-			container.appendChild(button);
-			this._content.appendChild(container);
-			this._controls[title] = {
-				container: container,
-				control: button
-			}
-
-			var gch = this._globalChangeHandler;
-			button.addEventListener("click", function() {
-				if(callback) {
-					callback(button);
-				}
-				if(gch) {
-					gch();
-				}
-			});
-		},
-
-		bindColor: function(title, color, object) {
-			this.addColor(title, color, function(value) {
-				object[title] = value;
-			});
-		},
-
-		addColor: function(title, color, callback) {
-			var container = this._createContainer();
-			var label = this._createLabel("<b>" + title + ":</b> " + color);
-
-			var colorInput = document.createElement("input");
-			try {
-				colorInput.type = "color";
-			}
-			catch(e) {
-				colorInput.type = "text";
-			}
-			colorInput.id = title;
-			colorInput.value = color || "#ff0000";
-			colorInput.className = "msettings_color";
-
-			container.appendChild(label);
-			container.appendChild(colorInput);
-			this._content.appendChild(container);
-			this._controls[title] = {
-				container: container,
-				control: colorInput,
-				label: label,
-				callback: callback
-			};
-
-			var gch = this._globalChangeHandler;
-			colorInput.addEventListener("input", function() {
-				label.innerHTML = "<b>" + title + ":</b> " + colorInput.value;
-				if(callback) {
-					callback(colorInput.value);
-				}
-				if(gch) {
-					gch();
-				}
-			});
-		},
-
-		getColor: function(title) {
-			return this._controls[title].control.value;
-		},
-
-		setColor: function(title, value) {
-			var control = this._controls[title];
-			control.control.value = value;
-			control.label.innerHTML = "<b>" + title + ":</b> " + control.control.value;
-			if(control.callback) {
-				control.callback(control.control.value);
-			}
-			if(this._globalChangeHandler) {
-				this._globalChangeHandler();
-			}
-		},
-
-		bindText: function(title, text, object) {
-			this.addText(title, text, function(value) {
-				object[title] = value;
-			});
-		},
-
-		addText: function(title, text, callback) {
-			var container = this._createContainer();
-			var label = this._createLabel("<b>" + title + "</b>");
-
-			var textInput = document.createElement("input");
-			textInput.type = "text";
-			textInput.id = title;
-			textInput.value = text || "";
-			textInput.className = "msettings_text_input";
-
-			container.appendChild(label);
-			container.appendChild(textInput);
-			this._content.appendChild(container);
-			this._controls[title] = {
-				container: container,
-				control: textInput,
-				label: label,
-				callback: callback
-			}
-
-			var gch = this._globalChangeHandler;
-			textInput.addEventListener("input", function() {
-				if(callback) {
-					callback(textInput.value);
-				}
-				if(gch) {
-					gch();
-				}
-			});
-		}, 
-
-		addTextArea: function(title, text, callback) {
-			var container = this._createContainer();
-			var label = this._createLabel("<b>" + title + "</b>");
-
-			var textInput = document.createElement("textarea");
-			textInput.id = title;
-			textInput.rows = 5;
-			textInput.value = text || "";
-			textInput.className = "msettings_textarea";
-
-			container.appendChild(label);
-			container.appendChild(textInput);
-			this._content.appendChild(container);
-			this._controls[title] = {
-				container: container,
-				control: textInput,
-				label: label,
-				callback: callback
-			}
-
-			var gch = this._globalChangeHandler;
-			textInput.addEventListener("input", function() {
-				if(callback) {
-					callback(textInput.value);
-				}
-				if(gch) {
-					gch();
-				}
-			});
-		}, 
-
-		setTextAreaRows: function(title, rows) {
-			this._controls[title].control.rows = rows;
-		},
-
-		getText: function(title) {
-			return this._controls[title].control.value;
-		},
-
-		setText: function(title, text) {
-			var control = this._controls[title];
-			control.control.value = text;
-			if(control.callback) {
-				control.callback(text);
-			}
-			if(this._globalChangeHandler) {
-				this._globalChangeHandler();
-			}
-		},
-
-		addInfo: function(title, info) {
-			var container = this._createContainer();
-			container.innerHTML = info;
-			this._controls[title] = {
-				container: container
-			};
-			this._content.appendChild(container);
-		},
-
-		bindDropDown: function(title, items, object) {
-			this.addDropDown(title, items, function(value) {
-				object[title] = value.value;
-			});
-		},
-
-		addDropDown: function(title, items, callback) {
-			var container = this._createContainer();
-
-			var label = this._createLabel("<b>" + title + "</b>");
-			var select = document.createElement("select");
-			for(var i = 0; i < items.length; i++) {
-				var option = document.createElement("option");
-				option.label = items[i];
-				select.add(option);
-			};
-			var gch = this._globalChangeHandler;
-			select.addEventListener("change", function() {
-				var index = select.selectedIndex,
-					options = select.options;
-
-				if(callback) {
-					callback({
-						index: index,
-						value: options[index].label
-					});
-				}
-				if(gch) {
-					gch();
-				}
-			});
-			select.className = "msettings_select";
-
-			container.appendChild(label);
-			container.appendChild(select);
-			this._content.appendChild(container);
-
-			this._controls[title] = {
-				container: container,
-				control: select,
-				label: label,
-				callback: callback
-			};
-		},
-
-		getDropDownValue: function(title) {
-			var control = this._controls[title],
-				select = control.control,
-				index = select.selectedIndex,
-				options = select.options;
-			return {
-				index: index,
-				value: options[index].label
-			}
-		},
-
-		setDropDownIndex: function(title, index) {
-			var control = this._controls[title],
-				options = control.control.options;
-			control.control.selectedIndex = index;
-			if(control.callback) {
-				control.callback({
-					index: index,
-					value: options[index].label
-				});
-			}
-			if(this._globalChangeHandler) {
-				this._globalChangeHandler();
-			}
-		},
-
-		getInfo: function(title) {
-			return this._controls[title].container.innerHTML;
-		},
-
-		setInfo: function(title, info) {
-			this._controls[title].container.innerHTML = info;
-		},
-
-		addImage: function(title, imageURL) {
-			var container = this._createContainer(),
-				label = this._createLabel("<b>" + title + "</b>");
-				img = document.createElement("img");
-			img.className = "msettings_image";
-			img.src = imageURL;
-
-			container.appendChild(label);
-			container.appendChild(img);
-			this._content.appendChild(container);
-
-			this._controls[title] = {
-				container: container,
-				control: img,
-				label: label
-			};
-		},
-
-		setImageURL: function(title, imageURL) {
-			this._controls[title].control.src = imageURL;
-		},
-
-		addProgressBar: function(title, max, value, showNumbers) {
-			var container = this._createContainer(),
-				label = this._createLabel("");
-				progress = document.createElement("progress");
-			progress.className = "msettings_progress";
-			progress.max = max;
-			progress.value = value;
-			if(showNumbers) {
-				label.innerHTML = "<b>" + title + ":<b> " + value + " / " + max;
-			}
-			else {
-				label.innerHTML = "<b>" + title + "<b>";
-			}
-
-			container.appendChild(label);
-			container.appendChild(progress);
-			this._content.appendChild(container);
-
-			this._controls[title] = {
-				container: container,
-				control: progress,
-				showNumbers: showNumbers,
-				label: label
-			};
-		},
-
-		getProgress: function(title) {
-			return this._controls[title].control.value;
-		},
-
-		setProgress: function(title, value) {
-			var progress = this._controls[title].control;
-			progress.value = value;
-			if(this._controls[title].showNumbers) {
-				this._controls[title].label.innerHTML = "<b>" + title + ":<b> " + progress.value + " / " + progress.max;
-			}
-			else {
-				this._controls[title].label.innerHTML = "<b>" + title + "<b>";
-			}
-		},
-
-		addElement: function(title, element) {
-			var container = this._createContainer(),
-				label = this._createLabel("<b>" + title + "</b>");
-
-			container.appendChild(label);
-			container.appendChild(element);
-			this._content.appendChild(container);
-
-			this._controls[title] = {
-				container: container,
-				label: label
-			};
-		},
-
-		addHTML: function(title, html) {
-			var div = document.createElement("div");
-			div.innerHTML = html;
-			this.addElement(title, div);
-		},
-
-		removeControl: function(title) {
-			if(this._controls[title]){
-				var container = this._controls[title].container;
-			}
-			if(container && container.parentElement) {
-				container.parentElement.removeChild(container);
-			}
-			this._controls[title] = null;
-		},
-
-		enableControl: function(title) {
-			if(this._controls[title].control) {
-				this._controls[title].control.disabled = false;
-			}
-		},
-
-		disableControl: function(title) {
-			if(this._controls[title].control) {
-				this._controls[title].control.disabled = true;
-			}
-		}
-	};
-
-	if (typeof define === "function" && define.amd) {
-	    define('libs/quicksettings',QuickSettings);
-	} else {
-	   window.QuickSettings = QuickSettings;
-	}
-
-}());
-
+define('ui/canvas/CanvasView',['require','utils/UIUtil'],function(require) {
+    
+    var UIUtil = require("utils/UIUtil"),
+        listener = null,
+        div = null,
+        canvas = null,
+        context = null,
+        scrubberLabel = null,
+        scrubber = null;
+
+    function init(pListener) {
+        listener = pListener;
+        div = UIUtil.createDiv("canvas_panel", document.getElementById("content"));
+        var scrubberDiv = UIUtil.createDiv("scrubber_div", div);
+        scrubberLabel = UIUtil.createDiv("control_label", scrubberDiv);
+        scrubberLabel.innerHTML = "Position: 0";
+        scrubber = UIUtil.createInput("range", "slider", scrubberDiv, null, "input", onScrub);
+        scrubber.min = 0;
+        scrubber.max = 1;
+        scrubber.step = 0.01;
+        scrubber.value = 0;
+
+
+        canvas = UIUtil.createCanvas(null, div);
+        canvas.width = glcConfig.canvasWidth;
+        canvas.height = glcConfig.canvasHeight;
+        context = canvas.getContext("2d");
+    }
+
+    function onScrub() {
+        setScrubberLabel();
+        listener.onScrub(Number(scrubber.value));
+    }
+
+    function setScrubberLabel() {
+        scrubberLabel.innerHTML = "Position: " + scrubber.value;
+    }
+
+    function setX(x) {
+        div.style.left = x + "px";        
+    }
+
+    function setCanvasSize(w, h) {
+        canvas.width = w;
+        canvas.height = h;
+    }
+
+    function getCanvas() {
+        return canvas;
+    }
+
+    function getContext() {
+        return context;
+    }
+
+    function setTime(t) {
+        scrubber.value = t;
+        setScrubberLabel();
+    }
+
+    function disableScrubber() {
+        scrubber.disabled = true;
+    }
+
+    function enableScrubber() {
+        scrubber.disabled = false;
+
+    }
+
+
+    return {
+        init: init,
+        setX: setX,
+        setCanvasSize: setCanvasSize,
+        getCanvas: getCanvas,
+        getContext: getContext,
+        setTime: setTime,
+        disableScrubber: disableScrubber,
+        enableScrubber: enableScrubber
+    }
+
+});
+define('ui/canvas/CanvasController',['require','ui/canvas/CanvasView'],function(require) {
+    
+    var CanvasView = require("ui/canvas/CanvasView"),
+        MainController = null;
+
+    function init(pMainController) {
+        MainController = pMainController;
+        CanvasView.init(this);
+    }
+
+
+    function getView() {
+        return CanvasView;
+    }
+
+    function setCanvasSize(w, h) {
+        CanvasView.setCanvasSize(w, h);
+    }
+
+    function setTime(t) {
+        CanvasView.setTime(t);
+    }
+
+    function getCanvas() {
+        return CanvasView.getCanvas();
+    }
+
+    function getContext() {
+        return CanvasView.getContext();
+    }
+
+    function disableScrubber() {
+        CanvasView.disableScrubber();
+    }
+
+    function enableScrubber() {
+        CanvasView.enableScrubber();
+    }
+
+    function onScrub(time) {
+        MainController.onRender(time);
+    }
+
+    function getStill() {
+        return this.getCanvas().toDataURL();
+    }
+
+    return {
+        init: init,
+        getView: getView,
+        setCanvasSize: setCanvasSize,
+        setTime: setTime,
+        getCanvas: getCanvas,
+        getContext: getContext,
+        disableScrubber: disableScrubber,
+        enableScrubber: enableScrubber,
+        onScrub: onScrub,
+        getStill: getStill
+    };
+});
+define('ui/properties/PropertiesView',['require','utils/UIUtil'],function(require) {
+
+    var UIUtil = require("utils/UIUtil"),
+        listener = null,
+        div = null,
+        durationLabel,
+        durationSlider,
+        fpsLabel,
+        fpsSlider,
+        maxColorLabel,
+        maxColorsSlider,
+        modeSelect,
+        easingCheckBox,
+        easingLabel,
+        status;
+
+    function init(pListener) {
+        listener = pListener;
+        div = UIUtil.createDiv("control_panel", document.getElementById("content"));
+        
+        durationLabel = UIUtil.createDiv("control_label", div);
+        durationLabel.innerHTML = "Duration: 2";
+        durationSlider = UIUtil.createInput("range", "slider", div, null, "input", onDurationChange);
+        durationSlider.min = 0.5;
+        durationSlider.max = 30;
+        durationSlider.step = 0.5;
+        durationSlider.value = 2;
+
+        fpsLabel = UIUtil.createDiv("control_label", div);
+        fpsLabel.innerHTML = "FPS: 30";
+        fpsSlider = UIUtil.createInput("range", "slider", div, null, "input", onFPSChange);
+        fpsSlider.min = 1;
+        fpsSlider.max = 60;
+        fpsSlider.step = 1;
+        fpsSlider.value = 30;
+        
+        maxColorLabel = UIUtil.createDiv("control_label", div);
+        maxColorLabel.innerHTML = "Max Colors: 256";
+        maxColorsSlider = UIUtil.createInput("range", "slider", div, null, "input", onMaxColorsChange);
+        maxColorsSlider.min = 1;
+        maxColorsSlider.max = 256;
+        maxColorsSlider.step = 1;
+        maxColorsSlider.value = 256;
+
+        modeSelect = UIUtil.createSelect("dropdown", div, null, ["bounce", "single"], onModeChange);
+
+        easingCheckBox = UIUtil.createCheckbox("control_label", "Easing", div, {verticalAlign: "top"}, onEasingChange);
+        easingCheckBox.checked = true;
+
+        status = UIUtil.createDiv("control_label", div, { marginTop: "20px"});
+        setStatus("stopped");
+
+    }
+
+    function onDurationChange() {
+        durationLabel.innerHTML = "Duration: " + durationSlider.value;
+        listener.onDurationChange(Number(durationSlider.value));
+    }
+
+    function onFPSChange() {
+        fpsLabel.innerHTML = "FPS: " + fpsSlider.value;
+        listener.onFPSChange(Number(fpsSlider.value));
+    }
+
+    function onMaxColorsChange() {
+        maxColorLabel.innerHTML = "Max Colors: " + maxColorsSlider.value;
+        listener.onMaxColorsChange(Number(maxColorsSlider.value));
+    }
+
+    function onModeChange() {
+        listener.onModeChange(modeSelect.value);
+    }
+
+    function onEasingChange() {
+        listener.onEasingChange(easingCheckBox.checked);
+    }
+
+    function setDuration(duration) {
+        durationSlider.value = duration;
+        durationLabel.innerHTML = "Duration: " + durationSlider.value;
+    }
+
+    function setFPS(fps) {
+        fpsSlider.value = fps;
+        fpsLabel.innerHTML = "FPS: " + fpsSlider.value;
+    }
+
+    function setMaxColors(maxColors) {
+        maxColorsSlider.value = maxColors;
+        maxColorLabel.innerHTML = "Max Colors: " + maxColorsSlider.value;
+    }
+
+    function setMode(mode) {
+        modeSelect.value = mode;
+    }
+
+    function setEasing(easing) {
+        easingCheckBox.checked = easing;
+    }
+
+    function setStatus(pStatus) {
+        status.innerHTML = "Status: " + pStatus;
+    }
+
+    function disable() {
+        fpsSlider.disabled = true;
+        maxColorsSlider.disabled = true;
+        durationSlider.disabled = true;
+        modeSelect.disabled = true;
+        easingCheckBox.disabled = true;
+    }
+
+    function enable() {
+        fpsSlider.disabled = false;
+        maxColorsSlider.disabled = false;
+        durationSlider.disabled = false;
+        modeSelect.disabled = false;
+        easingCheckBox.disabled = false;
+    }
+
+    return {
+        init: init,
+        setDuration: setDuration,
+        setFPS: setFPS,
+        setMaxColors: setMaxColors,
+        setMode: setMode,
+        setEasing: setEasing,
+        setStatus: setStatus,
+        disable: disable,
+        enable: enable
+    }
+
+});
+define('ui/properties/PropertiesController',['require','ui/properties/PropertiesView'],function(require) {
+
+    var PropertiesView = require("ui/properties/PropertiesView"),
+        MainController = null,
+        duration = 2,
+        fps = 30,
+        maxColors = 256,
+        mode = "bounce",
+        easing = true;
+
+    function init(pMainController) {
+        MainController = pMainController;
+        PropertiesView.init(this);
+    }
+
+    function onDurationChange(pDuration) {
+        duration = pDuration;
+        MainController.setDuration(duration);
+    }
+
+    function onFPSChange(pFps) {
+        fps = pFps;
+        MainController.setFPS(fps);
+    }
+
+    function onMaxColorsChange(pMaxColors) {
+        maxColors = pMaxColors;
+        MainController.setMaxColors(maxColors);
+    }
+
+    function onModeChange(pMode) {
+        mode = pMode;
+        MainController.setMode(mode);
+    }
+
+    function onEasingChange(pEasing) {
+        easing = pEasing;
+        MainController.setEasing(easing);
+    }
+
+    function setDuration(pDuration) {
+        if(duration !== pDuration) {
+            duration = pDuration;
+            PropertiesView.setDuration(duration);
+        }
+    }
+
+    function getDuration() {
+        return duration;
+    }
+
+    function setFPS(pFps) {
+        if(fps !== pFps) {
+            fps = pFps;
+            PropertiesView.setFPS(fps);
+        }
+    }
+
+    function getFPS() {
+        return fps;
+    }
+
+    function setMaxColors(pMaxColors) {
+        if(maxColors !== pMaxColors) {
+            maxColors = pMaxColors;
+            PropertiesView.setMaxColors(maxColors);
+        }
+    }
+
+    function setMode(pMode) {
+        if(mode !== pMode) {
+            mode = pMode;
+            PropertiesView.setMode(mode);        
+        }
+    }
+
+    function setEasing(pEasing) {
+        if(easing !== pEasing) {
+            easing = pEasing;
+            PropertiesView.setEasing(easing);        
+        }
+    }
+
+    function setStatus(status) {
+        PropertiesView.setStatus(status);
+    }
+
+    function disable() {
+        PropertiesView.disable();
+    }
+
+    function enable() {
+        PropertiesView.enable();
+    }
+
+    return {
+        init: init,
+        onDurationChange: onDurationChange,
+        onFPSChange: onFPSChange,
+        onMaxColorsChange: onMaxColorsChange,
+        onModeChange: onModeChange,
+        onEasingChange: onEasingChange,
+        setDuration: setDuration,
+        getDuration: getDuration,
+        setFPS: setFPS,
+        getFPS: getFPS,
+        setMaxColors: setMaxColors,
+        setMode: setMode,
+        setEasing: setEasing,
+        setStatus: setStatus,
+        disable: disable,
+        enable: enable
+    };
+
+});
 /*
   LZWEncoder.js
 
@@ -4226,7 +1785,2676 @@ define('libs/GIFEncoder',["libs/LZWEncoder", "libs/NeuQuant"], function(LZWEncod
 	return exports;
 
 });
-define('libs/color',[],function() {
+define('app/encode/Encoder',['require','libs/GIFEncoder'],function(require) {
+
+    var GIFEncoder = require("libs/GIFEncoder"),
+        encoding = false,
+        maxColors = 256,
+        fps = 30,
+        dataURL = null,
+        width = 400,
+        height = 400;
+
+
+    function start() {
+        GIFEncoder.setSize(width, height);
+        GIFEncoder.setMaxColors(maxColors);
+        GIFEncoder.setRepeat(0);
+        GIFEncoder.setDelay(1000 / fps);
+        GIFEncoder.start();
+        encoding = true;
+    }
+
+    function addFrame(context) {
+        GIFEncoder.addFrame(context);
+    }
+
+    function complete() {
+        GIFEncoder.finish();
+        var data = GIFEncoder.stream().getData();
+        dataURL = "data:image/gif;base64," + encode64(data);
+        encoding = false;
+    }
+
+    function isEncoding() {
+        return encoding;
+    }
+
+    function getDataURL() {
+        return dataURL;
+    }
+
+    function setSize(w, h) {
+        width = w;
+        height = h;
+    }
+
+    function setMaxColors(pMaxColors) {
+        maxColors = pMaxColors;
+    }
+
+    function setFPS(pFPS) {
+        fps = pFPS;
+    }
+
+
+    function encode64(input) {
+        var output = "", i = 0, l = input.length,
+        key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
+        chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        while (i < l) {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+            if (isNaN(chr2)) {
+                enc3 = enc4 = 64;
+            }
+            else if (isNaN(chr3)) {
+                enc4 = 64;
+            }
+            output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
+        }
+        return output;
+    }
+
+
+    return {
+        start: start,
+        addFrame: addFrame,
+        complete: complete,
+        isEncoding: isEncoding,
+        getDataURL: getDataURL,
+        setSize: setSize,
+        setMaxColors: setMaxColors,
+        setFPS: setFPS
+    }
+
+});
+define('app/encode/SpriteSheet',[],function() {
+    var canvas = document.createElement("canvas"),
+        context = canvas.getContext("2d"),
+        spriteSheetSize = 0,
+        spriteSheetX = 0,
+        spriteSheetY = 0,
+        frameWidth = 0,
+        frameHeight = 0,
+        encoding = false;
+
+    function addFrame(frame) {
+        context.drawImage(frame, spriteSheetX, spriteSheetY);
+        spriteSheetX += frameWidth;
+        if(spriteSheetX + frameWidth > spriteSheetSize) {
+            spriteSheetX = 0;
+            spriteSheetY += frameHeight;
+        }
+    }
+
+    function getDataURL() {
+        return canvas.toDataURL();
+    }
+
+    function start(fps, duration, width, height) {
+        var numFrames = fps * duration;
+
+        frameWidth = width;
+        frameHeight = height;
+        var w = frameWidth * numFrames,
+            h = frameHeight,
+            i = 1;
+
+        while(h <= w) {
+            i++;
+            w = frameWidth * Math.ceil(numFrames / i);
+            h = frameHeight * i;
+        } 
+
+        i--;
+        spriteSheetSize = frameWidth * Math.ceil(numFrames / i);
+
+        if(spriteSheetSize > 2048) {
+            if(!confirm("Warning: Sprite sheets create a large bitmap with each frame of your animation laid out in a grid. Your sprite sheet will be " + spriteSheetSize + "x" + spriteSheetSize + ", which is pretty dang big. That OK with you?")) {
+                return;
+            }
+        }
+        canvas.width = canvas.height = spriteSheetSize;
+        context.clearRect(0, 0, spriteSheetSize, spriteSheetSize);
+
+        spriteSheetX = 0;
+        spriteSheetY = 0;
+        encoding = true;
+    }
+
+    function complete() {
+        encoding = false;
+    }
+
+    function getSpriteSheetSize() {
+        return spriteSheetSize;
+    }
+
+    function isEncoding() {
+        return encoding;
+    }
+
+
+
+    return {
+        addFrame: addFrame,
+        getDataURL: getDataURL,
+        getSpriteSheetSize: getSpriteSheetSize,
+        isEncoding: isEncoding,
+        start: start,
+        complete: complete
+    };
+
+
+});
+define('ui/toolbar/ToolbarView',['require','utils/UIUtil'],function(require) {
+
+    var UIUtil = require("utils/UIUtil"),
+        div = null,
+        callbacks = null,
+        buttons = null;
+
+    function init() {
+        div = UIUtil.createDiv("toolbar", document.getElementById("content"));
+        callbacks = {};
+        buttons = {};
+        setKeyHandlers();
+    }
+
+    function addButton(id, img, text, callback) {
+        var btn = UIUtil.createDiv("toolbar_button", div);
+        btn.innerHTML = "<img src='" + img + "'><br/>" + text;
+        btn.addEventListener("click", callback);
+        buttons[id] = btn;
+    }
+
+    function setKey(key, event, callback) {
+        callbacks[key] = {
+            callback: callback,
+            event: event
+        };
+    }
+
+    function addSeparator() {
+        UIUtil.createDiv("toolbar_separator", div);
+    }
+
+    function setKeyHandlers() {
+        document.body.addEventListener("keyup", function(event) {
+            if(event.ctrlKey && callbacks[event.keyCode]) {
+                if(callbacks[event.keyCode].event == "keyup") {
+                    callbacks[event.keyCode].callback();
+                }
+                event.preventDefault();
+            }
+        });
+        document.body.addEventListener("keydown", function(event) {
+            if(event.ctrlKey && callbacks[event.keyCode]) {
+                if(callbacks[event.keyCode].event == "keydown") {
+                    callbacks[event.keyCode].callback();
+                }
+                event.preventDefault();
+            }
+        });
+    };
+
+    function enableBtn(id) {
+        buttons[id].className = "toolbar_button";
+    }
+
+    function disableBtn(id) {
+        buttons[id].className = "toolbar_button disabled";
+    }
+
+
+    return {
+        init: init,
+        addButton: addButton,
+        addSeparator: addSeparator,
+        enableBtn: enableBtn,
+        disableBtn: disableBtn,
+        setKey: setKey
+    }
+
+});
+define('ui/toolbar/ToolbarController',['require','ui/toolbar/ToolbarView'],function(require) {
+
+    var ToolbarView = require("ui/toolbar/ToolbarView"),
+        isStandalone = false,
+        MainController = null,
+        CanvasController = null;
+        Scheduler = null,
+        playEnabled = true;
+
+    function init(pMainController) {
+        MainController = pMainController;
+
+        ToolbarView.init();
+        if(!glcConfig.externalEditor) {
+            ToolbarView.addButton("new_btn", "icons/new.png", "NEW", MainController.newFile);
+            ToolbarView.addButton("open_btn", "icons/open.png", "OPEN", MainController.open);
+            ToolbarView.addButton("save_btn", "icons/save.png", "SAVE", MainController.save);
+            if(isStandalone) {
+                ToolbarView.addButton("saveas_btn", "icons/saveas.png", "SAVE AS", MainController.saveAs);
+            }
+            ToolbarView.addButton("compile_btn", "icons/compile.png", "COMPILE", MainController.compile);
+            ToolbarView.addSeparator();
+
+            ToolbarView.setKey(79, "keydown", MainController.open); // O
+            ToolbarView.setKey(83, "keydown", MainController.save); // S
+            ToolbarView.setKey(13, "keyup", MainController.compile); // Enter
+        }
+
+        ToolbarView.addButton("loop_btn", "icons/loop.png", "LOOP", MainController.loop);
+        ToolbarView.addButton("once_btn", "icons/once.png", "ONCE", MainController.playOnce);
+        ToolbarView.addButton("pause_btn", "icons/pause.png", "PAUSE", MainController.stop);
+        ToolbarView.addSeparator();
+
+        ToolbarView.addButton("gif_btn", "icons/gif.png", "MAKE GIF", MainController.makeGif);
+        ToolbarView.addButton("still_btn", "icons/still.png", "CAPTURE STILL", MainController.captureStill);
+        ToolbarView.addButton("sprite_btn", "icons/sprite.png", "SPRITE SHEET", MainController.makeSpriteSheet);
+        ToolbarView.addSeparator();
+
+        ToolbarView.addButton("icon_btn", "icons/help.png", "ABOUT", MainController.showAbout);
+
+        ToolbarView.setKey(71, "keydown", makeGif); // G
+        ToolbarView.setKey(32, "keyup", MainController.toggleLoop);
+
+        ToolbarView.disableBtn("pause_btn");
+    }
+
+    function makeGif() {
+        if(playEnabled) {
+            MainController.makeGif();
+        }
+    }
+
+    function enablePlay() {
+        playEnabled = true;
+        ToolbarView.enableBtn("loop_btn");
+        ToolbarView.enableBtn("once_btn");
+        ToolbarView.disableBtn("pause_btn")
+        ToolbarView.enableBtn("gif_btn");
+        ToolbarView.enableBtn("sprite_btn");
+    }
+
+    function disablePlay() {
+        playEnabled = false;
+        ToolbarView.disableBtn("loop_btn");
+        ToolbarView.disableBtn("once_btn");
+        ToolbarView.enableBtn("pause_btn")
+        ToolbarView.disableBtn("gif_btn");
+        ToolbarView.disableBtn("sprite_btn");
+    }
+
+
+    return {
+        init: init,
+        enablePlay: enablePlay,
+        disablePlay: disablePlay
+    };
+});
+define('app/Scheduler',[],function() {
+
+	var t = 0,
+		duration = 2,
+		fps = 30,
+		running = false,
+		stopping = false,
+		looping = false,
+		listener = null,
+		renderList = null
+
+	function init(pListener) {
+		listener = pListener;
+	}
+
+	function render() {
+		if(running && !stopping) {
+			listener.onRender(t);
+		    advance();
+			setTimeout(onTimeout, 1000 / fps);
+		}
+		else {
+			running = false;
+			looping = false;
+			stopping = false;
+	    	listener.onComplete();
+	   	}
+	}
+
+	function onTimeout() {
+		requestAnimationFrame(render);
+	}
+
+	function advance() {
+		var numFrames = duration * fps,
+			speed = 1 / numFrames; 
+		t += speed;
+	    if(Math.round(t * 10000) / 10000 >= 1) {
+	    	if(looping) {
+	    		t -= 1;
+	    	}
+	    	else {
+		    	t = 0;
+		    	stop();
+		    }
+	    }
+	}
+
+	function loop() {
+		if(!running) {
+			listener.onStart();
+			t = 0;
+			stopping = false;
+			looping = true;
+			running = true;
+			render();
+		}
+	}
+
+	function stop() {
+		if(running) {
+			stopping = true;
+			t = 0;
+		}
+	}
+
+	function playOnce() {
+		if(!running) {
+			listener.onStart();
+			t = 0;
+			looping = false;
+			running = true;
+			render();		
+		}
+	}
+
+	function isRunning() {
+		return running;
+	}
+
+	function setDuration(value) {
+		duration = value;
+	}
+
+	function getDuration() {
+		return duration;
+	}
+
+	function setFPS(value) {
+		fps = value;
+	}
+
+	function getFPS() {
+		return fps;
+	}
+
+
+	return {
+		init: init,
+		loop: loop,
+		playOnce: playOnce,
+		stop: stop,
+		isRunning: isRunning,
+		setDuration: setDuration,
+		getDuration: getDuration,
+		setFPS: setFPS,
+		getFPS: getFPS
+	};
+
+});
+
+define('ui/about/AboutView',['require','utils/UIUtil'],function(require) {
+    var UIUtil = require("utils/UIUtil"),
+        overlay = null,
+        closeButton = null,
+        contentDiv = null;
+
+    init();
+
+    function init() {
+        overlay = UIUtil.createDiv("overlay");
+        closeButton = UIUtil.createDiv("close_button", overlay);
+        closeButton.innerHTML = "CLOSE (ESC)";
+        contentDiv = document.getElementById("content");
+
+        var aboutDiv = UIUtil.createDiv("about_info", overlay);
+
+
+        var txt = "<h1>GIF Loop Coder</h1>";
+        txt += "<p><a href='http://www.gifloopcoder.com'>http://www.gifloopcoder.com</a></p>";
+		txt += "<p>Howdy! Welcome to GIF Loop Coder (GLC). This program is offered free and is open source. A lot of hours went into it, so if you find it useful, pay it back or pay it forward.</p>";
+		txt += "<p><a href='https://www.paypal.me/bit101'>Buy me a beer (or two)</a></p>";
+		txt += "<h2>Keys:</h2>";
+		txt += "<p>Ctrl-Enter - compile and run<br/>Ctrl-Space - play/pause<br/>Ctrl-O - open file<br/>Ctrl-S - save file<br/>Ctrl-G - make gif<br/>Ctrl-/ - toggle comment in code</p>";
+		txt += "<h2>Credits:</h2>";
+		txt += "<p>Architect, coding, design, etc.: Keith Peters, kp@bit-101.com</p>";
+		txt += "<h3>Contributors:</h3>";
+		txt += "<p><a href='https://twitter.com/p5art'>Jerome Herr</a>, <a href='https://twitter.com/cacheflowe'>Justin Gitlin</a>, <a href='https://twitter.com/andremichelle'>Andre Michelle</a>, <a href='https://twitter.com/msurguy'>Maks Surguy</a>, <a href='https://github.com/EduardoLopes'>Eduardo Lopes</a>, <a href='https://github.com/crummy'>Malcolm Crum</a>, <a href='https://github.com/Landerson352'>Lincoln Anderson</a></p>";
+		txt += "<h3>GIF Encoder:</h3>";
+		txt += "<p>Kevin Weiner, Thibault Imbert, Kevin Kwok, Johan Nordberg. <a href='https://github.com/antimatter15/jsgif'>https://github.com/antimatter15/jsgif</a></p>";
+		txt += "<h3>Code editor:</h3>";
+		txt += "<p><a href='https://codemirror.net/'>https://codemirror.net/</a></p>";
+		txt += "<h3>Icons:</h3>";
+		txt += "<p><a href='http://ionicons.com/'>http://ionicons.com/</a></p>";
+		aboutDiv.innerHTML = txt;
+
+    }
+
+    function show() {
+        document.body.appendChild(overlay);
+        contentDiv.className += " blur";
+        closeButton.addEventListener("click", hide);
+        document.body.addEventListener("keyup", onKeyUp);
+    }
+
+    function onKeyUp(event) {
+        // escape key
+        if(event.keyCode === 27) {
+            hide();
+        }
+    }
+
+    function hide() {
+        if(overlay.parentElement) {
+            overlay.parentElement.removeChild(overlay);
+        }
+        closeButton.removeEventListener("click", hide);
+        document.body.removeEventListener("keyup", onKeyUp);
+        contentDiv.className = "content";
+    }
+
+    return {
+        show: show
+    }
+
+});
+define('ui/about/AboutController',['require','ui/about/AboutView'],function(require) {
+
+	var AboutView = require("ui/about/AboutView");
+
+	function show() {
+		AboutView.show();
+	}
+
+	return {
+		show: show
+	}
+
+});
+define('app/MainController',['require','app/encode/Encoder','app/encode/SpriteSheet','ui/toolbar/ToolbarController','app/Scheduler','ui/about/AboutController'],function(require) {
+    
+    // This module routes commmands to and from other modules
+
+
+    var CodeController = null, 
+        CanvasController = null,
+        PropertiesController = null,
+        OutputController = null,
+        RenderList = null,
+        GLCInterface = null,
+        Interpolation = null,
+        Encoder = require("app/encode/Encoder"),
+        SpriteSheet = require("app/encode/SpriteSheet"),
+        ToolbarController = require("ui/toolbar/ToolbarController"),
+        Scheduler = require("app/Scheduler"),
+        AboutController = require("ui/about/AboutController");
+
+
+    function init(pCodeController, pCanvasController, pPropertiesController, pOutputController, pRenderList, pGLCInterface, pInterpolation) {
+        CodeController = pCodeController;
+        CanvasController = pCanvasController;
+        PropertiesController = pPropertiesController;
+        OutputController = pOutputController;
+        RenderList = pRenderList;
+        GLCInterface = pGLCInterface,
+        Interpolation = pInterpolation;
+        ToolbarController.init(this);
+        Scheduler.init(this);
+        var cachedCode = localStorage.getItem("glcCode");
+        if(glcConfig.externalEditor) {
+            reset();
+            window.onGLC(GLCInterface);
+        }
+        else if(cachedCode == null) {
+            newFile(true);
+        }
+        else {
+            CodeController.setCode(cachedCode);
+            compile();
+        }
+    }
+
+    ////////////////////////////////////////
+    // scheduler methods
+    ////////////////////////////////////////
+
+    function onStart() {
+        ToolbarController.disablePlay();
+        CanvasController.disableScrubber();
+        PropertiesController.setStatus("running");
+    }
+
+    function onRender(t) {
+        CanvasController.setTime(t);
+        RenderList.render(t);
+        if(Encoder.isEncoding()) {
+            Encoder.addFrame(CanvasController.getContext());
+        }
+        else if(SpriteSheet.isEncoding()) {
+            SpriteSheet.addFrame(CanvasController.getCanvas());
+        }
+    }
+
+    function onComplete() {
+        ToolbarController.enablePlay();
+        CanvasController.enableScrubber();
+        PropertiesController.setStatus("stopped");
+        PropertiesController.enable();
+        if(Encoder.isEncoding()) {
+            Encoder.complete();
+            var dataURL = Encoder.getDataURL();
+            OutputController.setImage(dataURL, GLCInterface.w, GLCInterface.h);
+        }
+        else if(SpriteSheet.isEncoding()) {
+            SpriteSheet.complete();
+            var dataURL = SpriteSheet.getDataURL();
+            OutputController.setImage(dataURL, SpriteSheet.getSpriteSheetSize(), SpriteSheet.getSpriteSheetSize());
+        }
+    }
+
+
+    ////////////////////////////////////////
+    // file methods
+    ////////////////////////////////////////
+
+    function newFile(ignoreChanges) {
+        stop();
+        CodeController.newFile(ignoreChanges);
+    }
+
+    function open() {
+        CodeController.open();
+    }
+
+    function save() {
+        CodeController.save();
+    }
+
+    function saveAs() {
+        CodeController.saveAs();
+    }
+
+    function compile() {
+        CodeController.compile();
+    }
+
+    function reset() {
+        RenderList.clear();
+        setDuration(2);
+        setFPS(30);
+        setMaxColors(256);
+        setMode("bounce");
+        setEasing(true);
+        setSize(glcConfig.canvasWidth, glcConfig.canvasHeight);
+        GLCInterface.styles.reset();
+        GLCInterface.onEnterFrame = null;
+        GLCInterface.onExitFrame = null;
+    }
+
+
+
+
+    ////////////////////////////////////////
+    // play methods
+    ////////////////////////////////////////
+
+    function loop() {
+        Scheduler.loop();
+    }
+
+    function toggleLoop() {
+        if(Scheduler.isRunning()) {
+            Scheduler.stop();
+        }
+        else {
+            Scheduler.loop();
+        }
+    }
+
+    function playOnce() {
+        Scheduler.playOnce();
+    }
+
+    function stop() {
+        Scheduler.stop();
+    }
+
+
+
+    ////////////////////////////////////////
+    // render methods
+    ////////////////////////////////////////
+
+    function makeGif() {
+        PropertiesController.disable();
+        Encoder.start();
+        playOnce();
+    }
+
+    function captureStill() {
+        stop();
+        var dataURL = CanvasController.getStill();
+        OutputController.setImage(dataURL, GLCInterface.w, GLCInterface.h);
+    }
+
+    function makeSpriteSheet() {
+        SpriteSheet.start(PropertiesController.getFPS(), PropertiesController.getDuration(), GLCInterface.w, GLCInterface.h);
+        if(SpriteSheet.isEncoding()) {
+            PropertiesController.disable();
+            playOnce();
+        }
+    }
+
+
+
+    ////////////////////////////////////////
+    // misc methods
+    ////////////////////////////////////////
+
+    function showAbout() {
+        stop();
+        AboutController.show();
+    }
+
+
+
+    ////////////////////////////////////////
+    // property setters
+    ////////////////////////////////////////
+
+    function setSize(w, h) {
+        CanvasController.setCanvasSize(w, h);
+        RenderList.setSize(w, h);
+        Encoder.setSize(w, h);
+        GLCInterface.w = w;
+        GLCInterface.h = h;
+    }
+
+    function setDuration(duration) {
+        Scheduler.setDuration(duration);
+        PropertiesController.setDuration(duration);
+    }
+
+    function setFPS(fps) {
+        Scheduler.setFPS(fps);
+        PropertiesController.setFPS(fps);
+        Encoder.setFPS(fps);
+    }
+
+    function setMaxColors(maxColors) {
+        PropertiesController.setMaxColors(maxColors);
+        Encoder.setMaxColors(maxColors);
+    }
+
+    function setMode(mode) {
+        Interpolation.setMode(mode);
+        PropertiesController.setMode(mode);
+    }
+
+    function setEasing(easing) {
+        Interpolation.setEasing(easing);
+        PropertiesController.setEasing(easing);
+    }
+
+
+    return {
+        init: init,
+        newFile: newFile,
+        open: open,
+        save: save,
+        saveAs: saveAs,
+        compile: compile,
+        loop: loop,
+        toggleLoop: toggleLoop,
+        playOnce: playOnce,
+        stop: stop,
+        makeGif: makeGif,
+        captureStill: captureStill,
+        makeSpriteSheet: makeSpriteSheet,
+        showAbout: showAbout,
+        onStart: onStart,
+        onRender: onRender,
+        onComplete: onComplete,
+        reset: reset,
+        setSize: setSize,
+        setDuration: setDuration,
+        setFPS: setFPS,
+        setMaxColors: setMaxColors,
+        setMode: setMode,
+        setEasing: setEasing
+    }
+
+
+});
+define('ui/output/OutputView',['require','utils/UIUtil'],function(require) {
+    var UIUtil = require("utils/UIUtil"),
+        overlay = null,
+        image = null,
+        imageInfo = null,
+        closeButton = null,
+        contentDiv = null;
+
+    function init() {
+        overlay = UIUtil.createDiv("overlay");
+        image = UIUtil.createImage("output_image", overlay);
+        imageInfo = UIUtil.createDiv("image_info", overlay);
+        closeButton = UIUtil.createDiv("close_button", overlay);
+        closeButton.innerHTML = "CLOSE (ESC)";
+        contentDiv = document.getElementById("content");
+    }
+
+    function setImage(dataURL, w, h) {
+        var header = 'data:image/xxx;base64,',
+            imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
+        
+        var info = "File size: " + Math.round(imgFileSize / 1024) + "kb<br/>";
+        info += "Image size: " + w + "x" + h + "px<br/>";
+        var scale = 100;
+        if(h > window.innerHeight - 40) {
+            scale = Math.round((window.innerHeight - 40) / h * 100);
+        }
+        else if(w > window.innerWidth - 40) {
+            scale = Math.round((window.innerWidth - 40) / w * 100);
+        }
+        info += "Shown at scale: " + scale + "%<br/>";
+        info += "Right click image to save.";
+        
+
+        imageInfo.innerHTML = info;
+        image.src = dataURL;
+        image.style.maxHeight = window.innerHeight - 40 + "px";
+        image.style.maxWidth = window.innerWidth - 40 + "px";
+        document.body.appendChild(overlay);
+        contentDiv.className += " blur";
+        closeButton.addEventListener("click", hide);
+        document.body.addEventListener("keyup", onKeyUp);
+    }
+
+    function onKeyUp(event) {
+        // escape key
+        if(event.keyCode === 27) {
+            hide();
+        }
+    }
+
+    function hide() {
+        if(overlay.parentElement) {
+            overlay.parentElement.removeChild(overlay);
+        }
+        closeButton.removeEventListener("click", hide);
+        document.body.removeEventListener("keyup", onKeyUp);
+        contentDiv.className = "content";
+    }
+
+    return {
+        init: init,
+        setImage: setImage
+    }
+
+});
+define('ui/output/OutputController',['require','ui/output/OutputView'],function(require) {
+    var OutputView = require("ui/output/OutputView");
+
+    function init() {
+        OutputView.init();
+    }
+
+    function setImage(dataUrl, w, h) {
+        OutputView.setImage(dataUrl, w, h);
+    }
+
+    return {
+        init: init,
+        setImage: setImage
+    }
+
+
+});
+define('app/render/ValueParser',[],function() {
+
+	return {
+
+		getNumber: function(prop, t, def) {
+			if(typeof(prop) === "number") {
+				return prop;
+			}
+			else if(typeof(prop) === "function") {
+				return prop(t);
+			}
+			else if(prop && prop.length === 2) {
+				var start = prop[0],
+				end = prop[1];
+				return start + (end - start) * t;
+			}
+			else if(prop && prop.length) {
+				return prop[Math.round(t * (prop.length - 1))];
+			}
+			return def;
+		},
+
+
+		getString: function(prop, t, def) {
+			if(prop === undefined) {
+				return def;
+			}
+			else if(typeof(prop) === "string") {
+				return prop;
+			}
+			else if(typeof(prop) === "function") {
+				return prop(t);
+			}
+			else if(prop && prop.length) {
+				return prop[Math.round(t * (prop.length - 1))];
+			}
+			return prop;
+		},
+
+		getBool: function(prop, t, def) {
+			if(prop === undefined) {
+				return def;
+			}
+			else if(typeof(prop) === "function") {
+				return prop(t);
+			}
+			else if(prop && prop.length) {
+				return prop[Math.round(t * (prop.length - 1))];
+			}
+			return prop;
+		},
+
+		getArray: function(prop, t, def) {
+			// string will have length, but is useless
+			if(typeof(prop) === "string") {
+				return def;
+			}
+			else if(typeof(prop) === "function") {
+				return prop(t);
+			}
+			else if(prop && (prop.length == 2) && prop[0].length && prop[1].length) {
+				// we seem to have an array of arrays
+				var arr0 = prop[0],
+					arr1 = prop[1],
+					len = Math.min(arr0.length, arr1.length),
+					result = [];
+
+				for(var i = 0; i < len; i++) {
+					var v0 = arr0[i],
+						v1 = arr1[i];
+					result.push(v0 + (v1 - v0) * t);
+				}
+				return result;
+
+			}
+			else if(prop && prop.length > 1) {
+				return prop;
+			}
+			return def;
+		},
+
+		getObject: function(prop, t, def) {
+			if(prop === undefined) {
+				return def;
+			}
+			else if(typeof(prop) === "function") {
+				return prop(t);
+			}
+			else if(prop && prop.length) {
+				return prop[Math.round(t * (prop.length - 1))];
+			}
+			return prop;
+		}
+
+	
+	}
+
+
+	
+});
+
+define('app/render/ColorParser',[],function() {
+	var context = document.createElement("canvas").getContext("2d");
+
+	function getColor(prop, t, def) {
+		if(prop === undefined) {
+			return def;
+		}
+		if(typeof(prop) === "string") {
+			if(prop.charAt(0) === "#" && prop.length > 7) {
+				var obj = getColorObj(prop);
+				return getColorString(obj);
+			}
+			return prop;
+		}
+		else if(typeof(prop) === "function") {
+			return prop(t);
+		}
+		else if(prop && prop.length === 2) {
+			if(isLinearGradient(prop)) {
+				return parseLinearGradient(prop, t);
+			}
+			if(isRadialGradient(prop)) {
+				return parseRadialGradient(prop, t);
+			}
+			var c0 = getColorObj(prop[0]),
+				c1 = getColorObj(prop[1]);
+			return interpolateColor([c0, c1], t);
+		}
+		else if(prop && prop.length) {
+			return  prop[Math.round(t * (prop.length - 1))];
+		}
+		if(prop.type === "linearGradient") {
+			var g = context.createLinearGradient(prop.x0, prop.y0, prop.x1, prop.y1);
+			for(var i = 0; i < prop.colorStops.length; i++) {
+				var stop = prop.colorStops[i];
+				g.addColorStop(stop.position, stop.color);
+			}
+			return g;
+		}
+		if(prop.type === "radialGradient") {
+			var g = context.createRadialGradient(prop.x0, prop.y0, prop.r0, prop.x1, prop.y1, prop.r1);
+			for(var i = 0; i < prop.colorStops.length; i++) {
+				var stop = prop.colorStops[i];
+				g.addColorStop(stop.position, stop.color);
+			}
+			return g;
+		}
+		return def;
+	}
+
+	function isLinearGradient(prop) {
+		return prop[0].type === "linearGradient" && prop[1].type === "linearGradient";
+	}
+
+	function parseLinearGradient(prop, t) {
+		var g0 = prop[0],
+			g1 = prop[1],
+			x0 = g0.x0 + (g1.x0 - g0.x0) * t,
+			y0 = g0.y0 + (g1.y0 - g0.y0) * t,
+			x1 = g0.x1 + (g1.x1 - g0.x1) * t,
+			y1 = g0.y1 + (g1.y1 - g0.y1) * t;
+
+		var g = context.createLinearGradient(x0, y0, x1, y1);
+		for(var i = 0; i < g0.colorStops.length; i++) {
+			var stopA = g0.colorStops[i],
+				stopB = g1.colorStops[i],
+				position = stopA.position + (stopB.position - stopA.position) * t,
+				colorA = getColorObj(stopA.color),
+				colorB = getColorObj(stopB.color),
+				color = interpolateColor([colorA, colorB], t);
+			g.addColorStop(position, color);
+		}
+		return g;
+	}
+
+	function isRadialGradient(prop) {
+		return prop[0].type === "radialGradient" && prop[1].type === "radialGradient";
+	}
+
+	function parseRadialGradient(prop, t) {
+		var g0 = prop[0],
+			g1 = prop[1],
+			x0 = g0.x0 + (g1.x0 - g0.x0) * t,
+			y0 = g0.y0 + (g1.y0 - g0.y0) * t,
+			r0 = g0.r0 + (g1.r0 - g0.r0) * t,
+			x1 = g0.x1 + (g1.x1 - g0.x1) * t,
+			y1 = g0.y1 + (g1.y1 - g0.y1) * t,
+			r1 = g0.r1 + (g1.r1 - g0.r1) * t;
+
+		var g = context.createRadialGradient(x0, y0, r0, x1, y1, r1);
+		for(var i = 0; i < g0.colorStops.length; i++) {
+			var stopA = g0.colorStops[i],
+				stopB = g1.colorStops[i],
+				position = stopA.position + (stopB.position - stopA.position) * t,
+				colorA = getColorObj(stopA.color),
+				colorB = getColorObj(stopB.color),
+				color = interpolateColor([colorA, colorB], t);
+			g.addColorStop(position, color);
+		}
+		return g;
+	}
+
+	function getColorString(obj) {
+		return "rgba(" + obj.r + "," + obj.g + "," + obj.b + "," + (obj.a / 255) + ")";
+	}
+
+
+
+	function getColorObj(color) {
+		if(color.charAt(0) === "#") {
+			if(color.length === 7) { // #rrggbb
+				return {
+					a: 255,
+					r: parseInt(color.substring(1, 3), 16),
+					g: parseInt(color.substring(3, 5), 16),
+					b: parseInt(color.substring(5, 7), 16)
+				}
+			}
+			else if(color.length === 9) { // #aarrggbb
+				return {
+					a: parseInt(color.substring(1, 3), 16),
+					r: parseInt(color.substring(3, 5), 16),
+					g: parseInt(color.substring(5, 7), 16),
+					b: parseInt(color.substring(7, 9), 16)
+				}
+			}
+			else { // #rgb
+				var r = color.charAt(1),
+					g = color.charAt(2),
+					b = color.charAt(3);
+
+				return {
+					a: 255,
+					r: parseInt(r + r, 16),
+					g: parseInt(g + g, 16),
+					b: parseInt(b + b, 16),
+				}
+			}
+		}
+		else if(color.substring(0, 4) === "rgb(") {
+			var s = color.indexOf("(") + 1,
+				e = color.indexOf(")"),
+				channels = color.substring(s, e).split(",");
+			return {
+				a: 255,
+				r: parseInt(channels[0], 10),
+				g: parseInt(channels[1], 10),
+				b: parseInt(channels[2], 10),
+			}
+		}
+		else if(color.substring(0, 4) === "rgba") {
+			var s = color.indexOf("(") + 1,
+				e = color.indexOf(")"),
+				channels = color.substring(s, e).split(",");
+			return {
+				a: parseFloat(channels[3]) * 255,
+				r: parseInt(channels[0], 10),
+				g: parseInt(channels[1], 10),
+				b: parseInt(channels[2], 10),
+			}
+		}
+		else {
+			color = color.toLowerCase();
+			if(namedColors[color] != null) {
+				return getColorObj(namedColors[color]);
+			}
+		}
+		return 0;
+	}
+
+	function interpolateColor(arr, t) {
+		var c0 = arr[0],
+			c1 = arr[1];
+
+		var alpha = c0.a + (c1.a - c0.a) * t,
+			red = Math.round(c0.r + (c1.r - c0.r) * t),
+			green = Math.round(c0.g + (c1.g - c0.g) * t),
+			blue = Math.round(c0.b + (c1.b - c0.b) * t);
+		return "rgba(" + red + "," + green + "," + blue + "," + (alpha / 255) + ")";
+	}
+
+	var namedColors = {
+		aliceblue: "#f0f8ff",
+		antiquewhite: "#faebd7",
+		aqua: "#00ffff",
+		aquamarine: "#7fffd4",
+		azure: "#f0ffff",
+		beige: "#f5f5dc",
+		bisque: "#ffe4c4",
+		black: "#000000",
+		blanchedalmond: "#ffebcd",
+		blue: "#0000ff",
+		blueviolet: "#8a2be2",
+		brown: "#a52a2a",
+		burlywood: "#deb887",
+		cadetblue: "#5f9ea0",
+		chartreuse: "#7fff00",
+		chocolate: "#d2691e",
+		coral: "#ff7f50",
+		cornflowerblue: "#6495ed",
+		cornsilk: "#fff8dc",
+		crimson: "#dc143c",
+		cyan: "#00ffff",
+		darkblue: "#00008b",
+		darkcyan: "#008b8b",
+		darkgoldenrod: "#b8860b",
+		darkgray: "#a9a9a9",
+		darkgrey: "#a9a9a9",
+		darkgreen: "#006400",
+		darkkhaki: "#bdb76b",
+		darkmagenta: "#8b008b",
+		darkolivegreen: "#556b2f",
+		darkorange: "#ff8c00",
+		darkorchid: "#9932cc",
+		darkred: "#8b0000",
+		darksalmon: "#e9967a",
+		darkseagreen: "#8fbc8f",
+		darkslateblue: "#483d8b",
+		darkslategray: "#2f4f4f",
+		darkslategrey: "#2f4f4f",
+		darkturquoise: "#00ced1",
+		darkviolet: "#9400d3",
+		deeppink: "#ff1493",
+		deepskyblue: "#00bfff",
+		dimgray: "#696969",
+		dimgrey: "#696969",
+		dodgerblue: "#1e90ff",
+		firebrick: "#b22222",
+		floralwhite: "#fffaf0",
+		forestgreen: "#228b22",
+		fuchsia: "#ff00ff",
+		gainsboro: "#dcdcdc",
+		ghostwhite: "#f8f8ff",
+		gold: "#ffd700",
+		goldenrod: "#daa520",
+		gray: "#808080",
+		grey: "#808080",
+		green: "#008000",
+		greenyellow: "#adff2f",
+		honeydew: "#f0fff0",
+		hotpink: "#ff69b4",
+		indianred: "#cd5c5c",
+		indigo: "#4b0082",
+		ivory: "#fffff0",
+		khaki: "#f0e68c",
+		lavender: "#e6e6fa",
+		lavenderblush: "#fff0f5",
+		lawngreen: "#7cfc00",
+		lemonchiffon: "#fffacd",
+		lightblue: "#add8e6",
+		lightcoral: "#f08080",
+		lightcyan: "#e0ffff",
+		lightgoldenrodyellow: "#fafad2",
+		lightgray: "#d3d3d3",
+		lightgrey: "#d3d3d3",
+		lightgreen: "#90ee90",
+		lightpink: "#ffb6c1",
+		lightsalmon: "#ffa07a",
+		lightseagreen: "#20b2aa",
+		lightskyblue: "#87cefa",
+		lightslategray: "#778899",
+		lightslategrey: "#778899",
+		lightsteelblue: "#b0c4de",
+		lightyellow: "#ffffe0",
+		lime: "#00ff00",
+		limegreen: "#32cd32",
+		linen: "#faf0e6",
+		magenta: "#ff00ff",
+		maroon: "#800000",
+		mediumaquamarine: "#66cdaa",
+		mediumblue: "#0000cd",
+		mediumorchid: "#ba55d3",
+		mediumpurple: "#9370d8",
+		mediumseagreen: "#3cb371",
+		mediumslateblue: "#7b68ee",
+		mediumspringgreen: "#00fa9a",
+		mediumturquoise: "#48d1cc",
+		mediumvioletred: "#c71585",
+		midnightblue: "#191970",
+		mintcream: "#f5fffa",
+		mistyrose: "#ffe4e1",
+		moccasin: "#ffe4b5",
+		navajowhite: "#ffdead",
+		navy: "#000080",
+		oldlace: "#fdf5e6",
+		olive: "#808000",
+		olivedrab: "#6b8e23",
+		orange: "#ffa500",
+		orangered: "#ff4500",
+		orchid: "#da70d6",
+		palegoldenrod: "#eee8aa",
+		palegreen: "#98fb98",
+		paleturquoise: "#afeeee",
+		palevioletred: "#d87093",
+		papayawhip: "#ffefd5",
+		peachpuff: "#ffdab9",
+		peru: "#cd853f",
+		pink: "#ffc0cb",
+		plum: "#dda0dd",
+		powderblue: "#b0e0e6",
+		purple: "#800080",
+		red: "#ff0000",
+		rosybrown: "#bc8f8f",
+		royalblue: "#4169e1",
+		saddlebrown: "#8b4513",
+		salmon: "#fa8072",
+		sandybrown: "#f4a460",
+		seagreen: "#2e8b57",
+		seashell: "#fff5ee",
+		sienna: "#a0522d",
+		silver: "#c0c0c0",
+		skyblue: "#87ceeb",
+		slateblue: "#6a5acd",
+		slategray: "#708090",
+		slategrey: "#708090",
+		snow: "#fffafa",
+		springgreen: "#00ff7f",
+		steelblue: "#4682b4",
+		tan: "#d2b48c",
+		teal: "#008080",
+		thistle: "#d8bfd8",
+		tomato: "#ff6347",
+		turquoise: "#40e0d0",
+		violet: "#ee82ee",
+		wheat: "#f5deb3",
+		white: "#ffffff",
+		whitesmoke: "#f5f5f5",
+		yellow: "#ffff00",
+		yellowgreen: "#9acd32",
+	}
+
+	return {
+		getColor: getColor
+	};
+});
+define('app/render/shapes/shape',["app/render/ValueParser", "app/render/ColorParser"], function(ValueParser, ColorParser) {
+
+	return {
+		styles: null,
+		interpolation: null,
+
+		create: function(type, props) {
+			var obj = Object.create(this);
+			obj.init(type, props || {});
+			return obj;
+		},
+
+		init: function(type, props) {
+			this.props = props;
+			for(var prop in props) {
+				var p = props[prop];
+				if(typeof p === "function") {
+					props[prop] = p.bind(props);
+				}
+			}
+			this.draw = type.draw;
+			this.list = [];
+		},
+
+		add: function(item) {
+			this.list.push(item);
+			return item;
+		},
+
+		clear: function() {
+			this.list.length = 0;
+		},
+
+		render: function(context, t, skipInterpolation) {
+			if(!skipInterpolation) {
+				t *= this.props.speedMult || 1;
+				t += this.props.phase || 0;
+				var t = this.interpolation.interpolate(t);
+			}
+
+			this.startDraw(context, t);
+			this.draw(context, t);
+			for(var i in this.list) {
+				this.list[i].render(context, t, true);
+			}
+			this.endDraw(context, t);
+		},
+
+		startDraw: function(context, t) {
+			context.save();
+			context.lineWidth = this.getNumber("lineWidth", t, this.styles.lineWidth);
+			context.strokeStyle = this.getColor("strokeStyle", t, this.styles.strokeStyle);
+			context.fillStyle = this.getColor("fillStyle", t, this.styles.fillStyle);
+			context.lineCap = this.getString("lineCap", t, this.styles.lineCap);
+			context.lineJoin = this.getString("lineJoin", t, this.styles.lineJoin);
+			context.miterLimit = this.getString("miterLimit", t, this.styles.miterLimit);
+			context.globalAlpha = this.getNumber("globalAlpha", t, this.styles.globalAlpha);
+			context.translate(this.getNumber("translationX", t, this.styles.translationX), this.getNumber("translationY", t, this.styles.translationY));
+			context.globalCompositeOperation = this.getString("blendMode", t, this.styles.blendMode);
+			var shake = this.getNumber("shake", t, this.styles.shake);
+			context.translate(Math.random() * shake - shake / 2, Math.random() * shake - shake / 2);
+
+			var lineDash = this.getArray("lineDash", t, this.styles.lineDash);
+			if(lineDash) {
+				context.setLineDash(lineDash);
+			}
+			context.beginPath();
+		},
+
+		drawFillAndStroke: function(context, t, doFill, doStroke) {
+			var fill = this.getBool("fill", t, doFill),
+				stroke = this.getBool("stroke", t, doStroke);
+
+			context.save();
+			if(fill) {
+				this.setShadowParams(context, t);
+				context.fill();
+			}
+			context.restore();
+			if(stroke) {
+				if(!fill) {
+					this.setShadowParams(context, t);
+				}
+				context.stroke();
+			}
+		},
+
+		setShadowParams: function(context, t) {
+			context.shadowColor = this.getColor("shadowColor", t, this.styles.shadowColor);
+			context.shadowOffsetX = this.getNumber("shadowOffsetX", t, this.styles.shadowOffsetX);
+			context.shadowOffsetY = this.getNumber("shadowOffsetY", t, this.styles.shadowOffsetY);
+			context.shadowBlur = this.getNumber("shadowBlur", t, this.styles.shadowBlur);
+		},
+
+		endDraw: function(context) {
+			context.restore();
+		},
+
+		getNumber: function(prop, t, def) {
+			return ValueParser.getNumber(this.props[prop], t, def);
+		},
+
+		getColor: function(prop, t, def) {
+			return ColorParser.getColor(this.props[prop], t, def);
+		},
+
+		getString: function(prop, t, def) {
+			return ValueParser.getString(this.props[prop], t, def);
+		},
+
+		getBool: function(prop, t, def) {
+			return ValueParser.getBool(this.props[prop], t, def);
+		},
+
+		getArray: function(prop, t, def) {
+			return ValueParser.getArray(this.props[prop], t, def);
+		},
+
+		getObject: function(prop, t, def) {
+			return ValueParser.getObject(this.props[prop], t, def);
+		},
+
+		getPosition: function(prop, t, def) {
+			return ValueParser.getPosition(this.props[prop], t, def);
+		}
+	}
+});
+
+define('app/render/shapes/arrow',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				w = this.getNumber("w", t, 100),
+				h = this.getNumber("h", t, 100),
+				pointPercent = this.getNumber("pointPercent", t, 0.5),
+				shaftPercent = this.getNumber("shaftPercent", t, 0.5);
+				
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+
+			// context.translate(-w / 2, 0);
+
+			context.moveTo(-w / 2, -h * shaftPercent * 0.5);
+			context.lineTo(w / 2 - w * pointPercent, -h * shaftPercent * 0.5);
+			context.lineTo(w / 2 - w * pointPercent, -h * 0.5);
+			context.lineTo(w / 2, 0);
+			context.lineTo(w / 2 - w * pointPercent, h * 0.5);
+			context.lineTo(w / 2 - w * pointPercent, h * shaftPercent * 0.5);
+			context.lineTo(-w / 2, h * shaftPercent * 0.5);
+			context.lineTo(-w / 2, -h * shaftPercent * 0.5);
+
+			this.drawFillAndStroke(context, t, true, false);
+		}
+	}
+});
+define('app/render/shapes/arcSegment',[],function() {
+
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				radius = this.getNumber("radius", t, 50),
+				startAngle = this.getNumber("startAngle", t, 0),
+				endAngle = this.getNumber("endAngle", t, 360);
+
+			if(startAngle > endAngle) {
+				var temp = startAngle;
+				startAngle = endAngle;
+				endAngle = temp;
+			}
+			var arc = this.getNumber("arc", t, 20),
+				start = startAngle - 1,
+				end = startAngle + t * (endAngle - startAngle + arc);
+
+			if(end > startAngle + arc) {
+				start = end - arc;
+			}
+			if(end > endAngle) {
+				end = endAngle + 1;
+			}
+
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+			context.arc(0, 0, radius, start * Math.PI / 180, end * Math.PI / 180);
+
+			this.drawFillAndStroke(context, t, false, true);		
+		}
+	}
+});
+
+define('app/render/shapes/beziercurve',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x0 = this.getNumber("x0", t, 50),
+				y0 = this.getNumber("y0", t, 10),
+				x1 = this.getNumber("x1", t, 200),
+				y1 = this.getNumber("y1", t, 100),
+				x2 = this.getNumber("x2", t, 0),
+				y2 = this.getNumber("y2", t, 100),
+				x3 = this.getNumber("x3", t, 150),
+				y3 = this.getNumber("y3", t, 10),
+				showPoints = this.getBool("showPoints", t, false);
+
+		    context.moveTo(x0, y0);
+		    context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+
+			this.drawFillAndStroke(context, t, false, true);
+
+			if(showPoints) {
+				context.fillStyle = "black";
+				context.fillRect(x0 - 2, y0 - 2, 4, 4);
+				context.fillRect(x1 - 2, y1 - 2, 4, 4);
+				context.fillRect(x2 - 2, y2 - 2, 4, 4);
+				context.fillRect(x3 - 2, y3 - 2, 4, 4);
+			}
+		}
+	}
+});
+
+define('app/render/shapes/beziersegment',[],function() {
+
+	function bezier(t, v0, v1, v2, v3) {
+		return (1 - t) * (1 - t) * (1 - t) * v0 + 3 * (1 - t) * (1 - t) * t * v1 + 3 * (1 - t) * t * t * v2 + t * t * t * v3;
+	}
+
+	return {
+		draw: function(context, t) {
+			var x0 = this.getNumber("x0", t, 50),
+				y0 = this.getNumber("y0", t, 10),
+				x1 = this.getNumber("x1", t, 200),
+				y1 = this.getNumber("y1", t, 100),
+				x2 = this.getNumber("x2", t, 0),
+				y2 = this.getNumber("y2", t, 100),
+				x3 = this.getNumber("x3", t, 150),
+				y3 = this.getNumber("y3", t, 10),
+				percent = this.getNumber("percent", t, 0.1),
+				showPoints = this.getBool("showPoints", t, false),
+				t1 = t * (1 + percent),
+				t0 = t1 - percent,
+				res = 0.01,
+				x,
+				y;
+
+			t1 = Math.min(t1, 1.001);
+			t0 = Math.max(t0, -0.001);
+
+			for(var i = t0; i < t1; i += res) {
+				x = bezier(i, x0, x1, x2, x3);
+				y = bezier(i, y0, y1, y2, y3);
+				if(i === t0) {
+				    context.moveTo(x, y);
+				}
+				else {
+		    		context.lineTo(x, y);
+				}
+			}
+			x = bezier(t1, x0, x1, x2, x3);
+			y = bezier(t1, y0, y1, y2, y3);
+	   		context.lineTo(x, y);
+
+			this.drawFillAndStroke(context, t, false, true);
+
+			if(showPoints) {
+				context.fillStyle = "black";
+				context.fillRect(x0 - 2, y0 - 2, 4, 4);
+				context.fillRect(x1 - 2, y1 - 2, 4, 4);
+				context.fillRect(x2 - 2, y2 - 2, 4, 4);
+				context.fillRect(x3 - 2, y3 - 2, 4, 4);
+			}
+		}
+	}
+});
+
+define('app/render/shapes/circle',[],function() {
+
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				radius = this.getNumber("radius", t, 50),
+				startAngle = this.getNumber("startAngle", t, 0),
+				endAngle = this.getNumber("endAngle", t, 360),
+				drawFromCenter = this.getBool("drawFromCenter", t, false);
+
+			// guard against negative radii, which will break.
+			// alternate handling: Math.max(radius, 0);
+			// this seems more useful
+			radius = Math.abs(radius);
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+			if(drawFromCenter) {
+				context.moveTo(0, 0);
+			}
+			context.arc(0, 0, radius, startAngle * Math.PI / 180, endAngle * Math.PI / 180);
+			if(drawFromCenter) {
+				context.closePath();
+			}
+
+			this.drawFillAndStroke(context, t, true, false);
+		}
+	}
+});
+
+define('app/render/shapes/container',[],function() {
+
+    return {
+        draw: function(context, t) {
+            var x = this.getNumber("x", t, 0),
+                y = this.getNumber("y", t, 0);
+
+            context.translate(x, y);
+            context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+        }
+    }
+});
+
+define('app/render/shapes/cube',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				z = this.getNumber("z", t, 0),
+				size = this.getNumber("size", t, 100),
+				rotationX = this.getNumber("rotationX", t, 0) * Math.PI / 180,
+				rotationY = this.getNumber("rotationY", t, 0) * Math.PI / 180,
+				rotationZ = this.getNumber("rotationZ", t, 0) * Math.PI / 180;
+
+			var points = makePoints();
+			scale(points, size / 2);
+			rotateX(points, rotationX);
+			rotateY(points, rotationY);
+			rotateZ(points, rotationZ);
+			project(points, z);
+
+			context.lineJoin = this.getString("lineJoin", t, "round");
+			context.lineWidth = this.getNumber("lineWidth", t, 1);
+
+			context.translate(x, y);
+
+			context.moveTo(points[0].sx, points[0].sy);
+			context.lineTo(points[1].sx, points[1].sy);
+			context.lineTo(points[2].sx, points[2].sy);
+			context.lineTo(points[3].sx, points[3].sy);
+			context.lineTo(points[0].sx, points[0].sy);
+
+			context.moveTo(points[4].sx, points[4].sy);
+			context.lineTo(points[5].sx, points[5].sy);
+			context.lineTo(points[6].sx, points[6].sy);
+			context.lineTo(points[7].sx, points[7].sy);
+			context.lineTo(points[4].sx, points[4].sy);
+
+			context.moveTo(points[0].sx, points[0].sy);
+			context.lineTo(points[4].sx, points[4].sy);
+
+			context.moveTo(points[1].sx, points[1].sy);
+			context.lineTo(points[5].sx, points[5].sy);
+
+			context.moveTo(points[2].sx, points[2].sy);
+			context.lineTo(points[6].sx, points[6].sy);
+
+			context.moveTo(points[3].sx, points[3].sy);
+			context.lineTo(points[7].sx, points[7].sy);
+
+			this.setShadowParams(context, t);
+			context.stroke();		
+		}
+	}
+	
+	function scale(points, size) {
+		for(var i = 0; i < points.length; i++) {
+			var p = points[i];
+			p.x *= size;
+			p.y *= size;
+			p.z *= size;
+		}
+	}
+
+	function rotateX(points, angle) {
+		var cos = Math.cos(angle),
+			sin = Math.sin(angle);
+		for(var i = 0; i < points.length; i++) {
+			var p = points[i],
+				y = p.y * cos - p.z * sin,
+				z = p.z * cos + p.y * sin;
+			p.y = y;
+			p.z = z;
+		}
+	}
+
+	function rotateY(points, angle) {
+		var cos = Math.cos(angle),
+			sin = Math.sin(angle);
+		for(var i = 0; i < points.length; i++) {
+			var p = points[i],
+				x = p.x * cos - p.z * sin,
+				z = p.z * cos + p.x * sin;
+			p.x = x;
+			p.z = z;
+		}
+	}
+
+	function rotateZ(points, angle) {
+		var cos = Math.cos(angle),
+			sin = Math.sin(angle);
+		for(var i = 0; i < points.length; i++) {
+			var p = points[i],
+				x = p.x * cos - p.y * sin,
+				y = p.y * cos + p.x * sin;
+			p.x = x;
+			p.y = y;
+		}
+	}
+
+	function project(points, z) {
+		var fl = 300;
+		for(var i = 0; i < points.length; i++) {
+			var p = points[i],
+				scale = fl / (fl + p.z + z);
+			p.sx = p.x * scale;
+			p.sy = p.y * scale;
+		}
+	}
+
+	function makePoints() {
+		return [
+			{
+				x: -1,
+				y: -1,
+				z: -1
+			},
+			{
+				x: 1,
+				y: -1,
+				z: -1
+			},
+			{
+				x: 1,
+				y: 1,
+				z: -1
+			},
+			{
+				x: -1,
+				y: 1,
+				z: -1
+			},
+			{
+				x: -1,
+				y: -1,
+				z: 1
+			},
+			{
+				x: 1,
+				y: -1,
+				z: 1
+			},
+			{
+				x: 1,
+				y: 1,
+				z: 1
+			},
+			{
+				x: -1,
+				y: 1,
+				z: 1
+			}
+		];
+	}
+});
+
+define('app/render/shapes/curve',[],function() {
+
+	return {
+		draw: function(context, t) {
+			var x0 = this.getNumber("x0", t, 20),
+				y0 = this.getNumber("y0", t, 10),
+				x1 = this.getNumber("x1", t, 100),
+				y1 = this.getNumber("y1", t, 200),
+				x2 = this.getNumber("x2", t, 180),
+				y2 = this.getNumber("y2", t, 10),
+				showPoints = this.getBool("showPoints", t, false);
+
+
+		    context.moveTo(x0, y0);
+		    context.quadraticCurveTo(x1, y1, x2, y2);
+
+			this.drawFillAndStroke(context, t, false, true);
+			if(showPoints) {
+				context.fillStyle = "black";
+				context.fillRect(x0 - 2, y0 - 2, 4, 4);
+				context.fillRect(x1 - 2, y1 - 2, 4, 4);
+				context.fillRect(x2 - 2, y2 - 2, 4, 4);
+			}
+		}
+	}
+});
+
+define('app/render/shapes/curvesegment',[],function() {
+
+	function quadratic(t, v0, v1, v2) {
+		return (1 - t) * (1 - t) * v0 + 2 * (1 - t) * t * v1 + t * t * v2;
+	}
+
+	return {
+		draw: function(context, t) {
+			var x0 = this.getNumber("x0", t, 20),
+				y0 = this.getNumber("y0", t, 20),
+				x1 = this.getNumber("x1", t, 100),
+				y1 = this.getNumber("y1", t, 200),
+				x2 = this.getNumber("x2", t, 180),
+				y2 = this.getNumber("y2", t, 20),
+				percent = this.getNumber("percent", t, 0.1),
+				showPoints = this.getBool("showPoints", t, false),
+				t1 = t * (1 + percent),
+				t0 = t1 - percent,
+				res = 0.01,
+				x,
+				y;
+
+			t1 = Math.min(t1, 1);
+			t0 = Math.max(t0, 0);
+
+			for(var i = t0; i < t1; i += res) {
+				x = quadratic(i, x0, x1, x2);
+				y = quadratic(i, y0, y1, y2);
+				if(i === t0) {
+				    context.moveTo(x, y);
+				}
+				else {
+		    		context.lineTo(x, y);
+				}
+			}
+			x = quadratic(t1, x0, x1, x2);
+			y = quadratic(t1, y0, y1, y2);
+	   		context.lineTo(x, y);
+
+
+			this.drawFillAndStroke(context, t, false, true);
+			if(showPoints) {
+				context.fillStyle = "black";
+				context.fillRect(x0 - 2, y0 - 2, 4, 4);
+				context.fillRect(x1 - 2, y1 - 2, 4, 4);
+				context.fillRect(x2 - 2, y2 - 2, 4, 4);
+			}
+		}
+	}
+});
+
+define('app/render/shapes/gear',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				radius = this.getNumber("radius", t, 50),
+				toothHeight = this.getNumber("toothHeight", t, 10),
+				hub = this.getNumber("hub", t, 10),
+				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
+				teeth = this.getNumber("teeth", t, 10),
+				toothAngle = this.getNumber("toothAngle", t, 0.3),
+				face = 0.5 - toothAngle / 2,
+				side = 0.5 - face,
+				innerRadius = radius - toothHeight;
+
+			context.translate(x, y);
+			context.rotate(rotation);
+			context.save();
+			context.moveTo(radius, 0);
+			var angle = Math.PI * 2 / teeth;
+
+			for(var i = 0; i < teeth; i++) {
+				context.rotate(angle * face);
+				context.lineTo(radius, 0);
+				context.rotate(angle * side);
+				context.lineTo(innerRadius, 0);
+				context.rotate(angle * face);
+				context.lineTo(innerRadius, 0);
+				context.rotate(angle * side);
+				context.lineTo(radius, 0);
+			}
+			context.lineTo(radius, 0);
+			context.restore();
+
+			context.moveTo(hub, 0);
+			context.arc(0, 0, hub, 0, Math.PI * 2, true);
+
+			this.drawFillAndStroke(context, t, true, false);
+		}
+	}
+});
+
+define('app/render/shapes/grid',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 0),
+				y = this.getNumber("y", t, 0),
+				w = this.getNumber("w", t, 100),
+				h = this.getNumber("h", t, 100),
+				gridSize = this.getNumber("gridSize", t, 20);
+				
+			for(var i = y; i <= y + h; i += gridSize) {
+				context.moveTo(x, i);
+				context.lineTo(x + w, i);
+			}
+			for(i = x; i <= x + w; i += gridSize) {
+				context.moveTo(i, y);
+				context.lineTo(i, y + h);
+			}
+
+			this.drawFillAndStroke(context, t, false, true);		
+		}
+	}
+});
+
+define('app/render/shapes/heart',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				w = this.getNumber("w", t, 50),
+				h = this.getNumber("h", t, 50);
+
+			var x0 = 0,
+				y0 = -.25,
+				x1 = .2,
+				y1 = -.8,
+				x2 = 1.1,
+				y2 = -.2,
+				x3 = 0,
+				y3 = .5;
+
+		    context.save();
+		    context.translate(x, y);
+		    context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+		    context.save();
+		    context.scale(w, h);
+		    context.moveTo(x0, y0);
+		    context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+		    context.bezierCurveTo(-x2, y2, -x1, y1, -x0, y0);
+		    context.restore();
+			this.drawFillAndStroke(context, t, true, false);
+		    context.restore();
+		}
+	}
+});
+
+define('app/render/shapes/isobox',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				size = this.getNumber("size", t, 60),
+				h = this.getNumber("h", t, 40),
+				colorLeft = this.getColor("colorLeft", t, "#999999"),
+				colorRight = this.getColor("colorRight", t, "#cccccc"),
+				colorTop = this.getColor("colorTop", t, "#eeeeee");
+				
+			context.translate(x, y);
+
+			if(h >= 0) {
+				context.fillStyle = colorTop;
+				context.beginPath();
+				context.moveTo(-size / 2, -h);
+				context.lineTo(0, -size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(size / 2, -1);
+				context.lineTo(0, size / 4 - 1);
+				context.lineTo(-size / 2, -1);				
+				context.lineTo(-size / 2, -h);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorLeft;
+				context.beginPath();
+				context.moveTo(-size / 2, 0);
+				context.lineTo(0, size / 4);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(-size / 2, -h);
+				context.lineTo(-size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorRight;
+				context.beginPath();
+				context.moveTo(size / 2, 0);
+				context.lineTo(0, size / 4);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+			}
+			else {
+				// clip path
+				context.beginPath();
+				context.moveTo(-size / 2, 0);
+				context.lineTo(0, -size / 4);
+				context.lineTo(size / 2, 0);
+				context.lineTo(0, size / 4);
+				context.lineTo(-size / 2, 0);
+				context.clip();
+
+
+				context.fillStyle = colorRight;
+				context.beginPath();
+				context.moveTo(-size / 2, 0);
+				context.lineTo(0, -size / 4);
+				context.lineTo(0, -size / 4 -h);
+				context.lineTo(-size / 2, -h);
+				context.lineTo(-size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorLeft;
+				context.beginPath();
+				context.moveTo(size / 2, 0);
+				context.lineTo(0, -size / 4);
+				context.lineTo(0, -size / 4 -h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(size / 2, 0);
+				this.drawFillAndStroke(context, t, true, false);
+
+				context.fillStyle = colorTop;
+				context.beginPath();
+				context.moveTo(-size / 2, -h);
+				context.lineTo(0, -size / 4 - h);
+				context.lineTo(size / 2, -h);
+				context.lineTo(0, size / 4 - h);
+				context.lineTo(-size / 2, -h);
+				this.drawFillAndStroke(context, t, true, false);
+			}
+
+
+		}
+	}
+});
+
+define('app/render/shapes/line',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x0 = this.getNumber("x0", t, 0),
+				y0 = this.getNumber("y0", t, 0),
+				x1 = this.getNumber("x1", t, 100),
+				y1 = this.getNumber("y1", t, 100);
+				
+			context.moveTo(x0, y0);
+			context.lineTo(x1, y1);
+
+			this.drawFillAndStroke(context, t, false, true);		
+		}
+	}
+});
+
+define('app/render/shapes/oval',[],function() {
+
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				rx = this.getNumber("rx", t, 50),
+				ry = this.getNumber("ry", t, 50),
+				startAngle = this.getNumber("startAngle", t, 0),
+				endAngle = this.getNumber("endAngle", t, 360),
+				drawFromCenter = this.getBool("drawFromCenter", t, false);
+
+			// guard against negative radii, which will break.
+			// alternate handling: Math.max(rx, 0);
+			// this seems more useful
+			rx = Math.abs(rx);
+			ry = Math.abs(ry);
+
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+			context.save();
+			context.scale(rx / 100, ry / 100);
+			if(drawFromCenter) {
+				context.moveTo(0, 0);
+			}
+			context.arc(0, 0, 100, startAngle * Math.PI / 180, endAngle * Math.PI / 180);
+			if(drawFromCenter) {
+				context.closePath();
+			}
+			context.restore();
+
+			this.drawFillAndStroke(context, t, true, false);
+		}
+	}
+});
+
+define('app/render/shapes/path',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var path = this.getArray("path", t, []),
+				startPercent = this.getNumber("startPercent", t, 0),
+				endPercent = this.getNumber("endPercent", t, 1),
+				startPoint = Math.floor(path.length / 2 * startPercent),
+				endPoint = Math.floor(path.length / 2 * endPercent),
+				startIndex = startPoint * 2,
+				endIndex = endPoint * 2;
+
+			if(startIndex > endIndex) {
+				var temp = startIndex;
+				startIndex = endIndex;
+				endIndex = temp;
+			}
+
+		    context.moveTo(path[startIndex], path[startIndex + 1]);
+
+		    for(var i = startIndex + 2; i < endIndex - 1; i += 2) {
+		    	context.lineTo(path[i], path[i + 1]);
+		    }
+
+			this.drawFillAndStroke(context, t, false, true);		}
+	}
+});
+
+define('app/render/shapes/poly',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				radius = this.getNumber("radius", t, 50),
+				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
+				sides = this.getNumber("sides", t, 5);
+
+			context.translate(x, y);
+			context.rotate(rotation);
+			context.moveTo(radius, 0);
+			for(var i = 1; i < sides; i++) {
+				var angle = Math.PI * 2 / sides * i;
+				context.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+			}
+			context.closePath();
+
+			this.drawFillAndStroke(context, t, true, false);
+		}
+	}
+});
+		
+
+define('app/render/shapes/ray',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				angle = this.getNumber("angle", t, 0) * Math.PI / 180,
+				length = this.getNumber("length", t, 100);
+				
+			context.translate(x, y);
+			context.rotate(angle);
+			context.moveTo(0, 0);
+			context.lineTo(length, 0);
+
+			this.drawFillAndStroke(context, t, false, true);
+		}
+	}
+});
+
+define('app/render/shapes/raysegment',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				angle = this.getNumber("angle", t, 0) * Math.PI / 180,
+				length = this.getNumber("length", t, 100),
+				segmentLength = this.getNumber("segmentLength", t, 50),				
+		    	start = -0.01,
+		    	end = (length + segmentLength) * t;
+
+		    if(end > segmentLength) {
+		      start = end - segmentLength;
+		    }
+		    if(end > length) {
+		      end = length + 0.01;
+		    }
+
+		    context.translate(x, y);
+		    context.rotate(angle);
+			context.moveTo(start, 0);
+			context.lineTo(end, 0);
+
+			this.drawFillAndStroke(context, t, false, true);
+		}
+	}
+});
+
+define('app/render/shapes/rect',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				w = this.getNumber("w", t, 100),
+				h = this.getNumber("h", t, 100);
+				
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+			if(this.getBool("drawFromCenter", t, true)) {
+				context.rect(-w * 0.5, -h * 0.5, w, h);
+			}
+			else {
+				context.rect(0, 0, w, h);
+			}
+
+			this.drawFillAndStroke(context, t, true, false);
+		}
+	}
+});
+
+define('app/render/shapes/segment',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x0 = this.getNumber("x0", t, 0),
+				y0 = this.getNumber("y0", t, 0),
+				x1 = this.getNumber("x1", t, 100),
+				y1 = this.getNumber("y1", t, 100),
+				segmentLength = this.getNumber("segmentLength", t, 50),
+				dx = x1 - x0,
+			    dy = y1 - y0,
+			    angle = Math.atan2(dy, dx),
+			    dist = Math.sqrt(dx * dx + dy * dy),
+		    	start = -0.01,
+		    	end = (dist + segmentLength) * t;
+
+		    if(end > segmentLength) {
+		      start = end - segmentLength;
+		    }
+		    if(end > dist) {
+		      end = dist + 0.01;
+		    }
+
+		    context.translate(x0, y0);
+		    context.rotate(angle);
+			context.moveTo(start, 0);
+			context.lineTo(end, 0);
+
+			this.drawFillAndStroke(context, t, false, true);
+		}
+	}
+});
+
+define('app/render/shapes/spiral',[],function() {
+
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, "100"),
+				y = this.getNumber("y", t, "100"),
+				innerRadius = this.getNumber("innerRadius", t, 10),
+				outerRadius = this.getNumber("outerRadius", t, 90),
+				turns = this.getNumber("turns", t, 6),
+				res = this.getNumber("res", t, 1) * Math.PI / 180,
+				fullAngle = Math.PI * 2 * turns;
+
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+
+
+			if(fullAngle > 0) {
+				for(var a = 0; a < fullAngle; a += res) {
+					var r = innerRadius + (outerRadius - innerRadius) * a / fullAngle;
+					context.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+				}
+			}
+			else {
+				for(var a = 0; a > fullAngle; a -= res) {
+					var r = innerRadius + (outerRadius - innerRadius) * a / fullAngle;
+					context.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+				}
+			}
+			this.drawFillAndStroke(context, t, false, true);
+		}
+	};
+
+});
+define('app/render/shapes/star',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				innerRadius = this.getNumber("innerRadius", t, 25),
+				outerRadius = this.getNumber("outerRadius", t, 50),
+				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
+				points = this.getNumber("points", t, 5);
+
+			context.translate(x, y);
+			context.rotate(rotation);
+			context.moveTo(outerRadius, 0);
+			for(var i = 1; i < points * 2; i++) {
+				var angle = Math.PI * 2 / points / 2 * i,
+					r = i % 2 ? innerRadius : outerRadius;
+				context.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+			}
+			context.closePath();
+
+
+			this.drawFillAndStroke(context, t, true, false);	
+		}
+	}
+});
+
+define('app/render/shapes/text',[],function() {
+	
+	return {
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				text = this.getString("text", t, "hello"),
+				fontSize = this.getNumber("fontSize", t, 20),
+				fontWeight = this.getString("fontWeight", t, "normal");
+				fontFamily = this.getString("fontFamily", t, "sans-serif");
+				fontStyle = this.getString("fontStyle", t, "normal");
+
+			context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFamily;
+			var width = context.measureText(text).width;
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+			var shadowsSet = false;
+			context.save();
+			if(this.getBool("fill", t, true)) {
+				this.setShadowParams(context, t);
+				shadowsSet = true;
+				context.fillText(text, -width / 2, fontSize * 0.4);
+			}
+			context.restore();
+			if(this.getBool("stroke", t, false)) {
+				if(!shadowsSet) {
+					this.setShadowParams(context, t);
+				}
+				context.strokeText(text, -width / 2, fontSize * 0.4);
+			}
+		}
+	}
+});
+
+define('app/render/RenderList',[
+	"app/render/shapes/shape",
+	"app/render/shapes/arrow",
+	"app/render/shapes/arcSegment",
+	"app/render/shapes/beziercurve",
+	"app/render/shapes/beziersegment",
+	"app/render/shapes/circle",
+	"app/render/shapes/container",
+	"app/render/shapes/cube",
+	"app/render/shapes/curve",
+	"app/render/shapes/curvesegment",
+	"app/render/shapes/gear",
+	"app/render/shapes/grid",
+	"app/render/shapes/heart",
+	"app/render/shapes/isobox",
+	"app/render/shapes/line",
+	"app/render/shapes/oval",
+	"app/render/shapes/path",
+	"app/render/shapes/poly",
+	"app/render/shapes/ray",
+	"app/render/shapes/raysegment",
+	"app/render/shapes/rect",
+	"app/render/shapes/segment",
+	"app/render/shapes/spiral",
+	"app/render/shapes/star",
+	"app/render/shapes/text",
+	],
+	function(
+		Shape,
+		Arrow,
+		ArcSegment,
+		BezierCurve,
+		BezierSegment, 
+		Circle,
+		Container,
+		Cube,
+		Curve,
+		CurveSegment,
+		Gear,
+		Grid,
+		Heart,
+		Isobox,
+		Line,
+		Oval,
+		Path,
+		Poly,
+		Ray,
+		RaySegment,
+		Rect,
+		Segment,
+		Spiral,
+		Star,
+		Text
+	) {
+
+
+	var canvas = null,
+		context = null,
+		width = 0,
+		height = 0,
+		list = [],
+		styles = null,
+		interpolation = null,
+		GLCInterface = null,
+		interval = null;
+
+	function init(pGLCInterface, pStyles, pInterpolation, pCanvas) {
+		GLCInterface = pGLCInterface
+		canvas = pCanvas;
+		setSize(glcConfig.canvasSize, glcConfig.canvasHeight)
+		context = canvas.getContext("2d");
+		styles = pStyles
+		Shape.styles = styles;
+		Shape.interpolation = interpolation = pInterpolation;
+	}
+
+	function setSize(w, h) {
+		width = w;
+		height = h;
+	}
+
+	function add(item) {
+		if(item.props.parent) {
+			item.props.parent.add(item);
+		}
+		else {
+			list.push(item);
+		}
+		clearTimeout(interval);
+		interval = setTimeout(function() {
+			render(0);
+		}, 0);
+		return item;
+	}
+
+	function clear() {
+		list.length = 0;
+	}
+
+	function addArrow(props) {
+		return add(Shape.create(Arrow, props));
+	}
+
+	function addArcSegment(props) {
+		return add(Shape.create(ArcSegment, props));
+	}
+
+	function addBezierCurve(props) {
+		return add(Shape.create(BezierCurve, props));
+	}
+
+	function addBezierSegment(props) {
+		return add(Shape.create(BezierSegment, props));
+	}
+
+	function addCircle(props) {
+		return add(Shape.create(Circle, props));
+	}
+
+	function addContainer(props) {
+		return add(Shape.create(Container, props));
+	}
+
+	function addCube(props) {
+		return add(Shape.create(Cube, props));
+	}
+
+	function addCurve(props) {
+		return add(Shape.create(Curve, props));
+	}
+
+	function addCurveSegment(props) {
+		return add(Shape.create(CurveSegment, props));
+	}
+
+	function addGear(props) {
+		return add(Shape.create(Gear, props));
+	}
+
+	function addGrid(props) {
+		return add(Shape.create(Grid, props));
+	}
+
+	function addHeart(props) {
+		return add(Shape.create(Heart, props));
+	}
+
+	function addIsobox(props) {
+		return add(Shape.create(Isobox, props));
+	}
+
+	function addLine(props) {
+		return add(Shape.create(Line, props));
+	}
+	
+	function addOval(props) {
+		return add(Shape.create(Oval, props));
+	}
+	
+	function addPath(props) {
+		return add(Shape.create(Path, props));
+	}
+	
+	function addPoly(props) {
+		return add(Shape.create(Poly, props));
+	}
+	
+	function addRay(props) {
+		return add(Shape.create(Ray, props));
+	}
+
+	function addRaySegment(props) {
+		return add(Shape.create(RaySegment, props));
+	}
+
+	function addRect(props) {
+		return add(Shape.create(Rect, props));
+	}
+
+	function addSegment(props) {
+		return add(Shape.create(Segment, props));
+	}
+
+	function addSpiral(props) {
+		return add(Shape.create(Spiral, props));
+	}
+
+	function addStar(props) {
+		return add(Shape.create(Star, props));
+	}
+
+	function addText(props) {
+		return add(Shape.create(Text, props));
+	}
+
+	function render(t) {
+		if(styles.backgroundColor === "transparent") {
+			context.clearRect(0, 0, width, height);
+		}
+		else {
+			context.fillStyle = styles.backgroundColor;
+  			context.fillRect(0, 0, width, height);
+  		}
+  		var interpolatedT = interpolation.interpolate(t);
+		if(GLCInterface.onEnterFrame) {
+			context.save();
+			GLCInterface.onEnterFrame(interpolatedT);
+			context.restore();
+		}
+		for(var i = 0; i < list.length; i++) {
+			list[i].render(context, t);
+		}
+		if(GLCInterface.onExitFrame) {
+			context.save();
+			GLCInterface.onExitFrame(interpolatedT);
+			context.restore();
+		}
+	}
+
+	function getCanvas() {
+		return canvas;
+	}
+
+	function getContext() {
+		return context;
+	}
+
+	return {
+		init: init,
+		setSize: setSize,
+		getCanvas: getCanvas,
+		getContext: getContext,
+		add: add,
+		clear: clear,
+		addArrow: addArrow,
+		addArcSegment: addArcSegment,
+		addBezierCurve: addBezierCurve,
+		addBezierSegment: addBezierSegment,
+		addCircle: addCircle,
+		addContainer: addContainer,
+		addCube: addCube,
+		addCurve: addCurve,
+		addCurveSegment: addCurveSegment,
+		addGear: addGear,
+		addGrid: addGrid,
+		addHeart: addHeart,
+		addIsobox: addIsobox,
+		addLine: addLine,
+		addOval: addOval,
+		addPath: addPath,
+		addPoly: addPoly,
+		addRay: addRay,
+		addRaySegment: addRaySegment,
+		addRect: addRect,
+		addSegment: addSegment,
+		addSpiral: addSpiral,
+		addStar: addStar,
+		addText: addText,
+		render: render
+	};
+
+});
+
+define('app/render/Styles',[],function() {
+	var defaultStyles = {
+		backgroundColor: "#ffffff",
+		lineWidth: 1,
+		strokeStyle: "#000000",
+		fillStyle: "#000000",
+		lineCap: "round",
+		lineJoin: "round",
+		lineDash: [],
+		miterLimit: 10,
+		shadowColor: null,
+		shadowOffsetX: 0,
+		shadowOffsetY: 0,
+		shadowBlur: 0,
+		globalAlpha: 1,
+		translationX: 0,
+		translationY: 0,
+		shake: 0,
+		blendMode: "source-over",
+		reset: reset
+	},
+	styles = {};
+
+	reset();
+
+	function reset() {
+		for(var prop in defaultStyles) {
+			styles[prop] = defaultStyles[prop];
+		}
+	}
+
+
+
+	return styles;
+
+});
+
+define('app/render/Interpolation',[],function() {
+    var mode = "bounce",
+        easing = true
+
+    function interpolate(t) {
+        switch(mode) {
+            case "bounce":
+                if(easing) {
+                    var a = t * Math.PI * 2;
+                    return 0.5 - Math.cos(a) * 0.5;
+                }
+                else {
+                    t = t % 1;
+                    return t < 0.5 ? t * 2 : t = (1 - t) * 2;
+                }
+                break;
+
+            case "single":
+            default:
+                if(t > 1) {
+                    t %= 1;
+                }
+                if(easing) {
+                    var a = t * Math.PI;
+                    return 0.5 - Math.cos(a) * 0.5;
+                }
+                else{
+                    return t;
+                }
+        }
+    }
+
+    function setMode(pMode) {
+        mode = pMode.toLowerCase();
+    }
+
+    function setEasing(pEasing) {
+        easing = pEasing;
+    }
+
+
+	return {
+        interpolate: interpolate,
+        setMode: setMode,
+        setEasing: setEasing
+	}
+});
+define('app/render/Color',[],function() {
 
 	function rgba(r, g, b, a) {
 		var clr = Object.create(color);
@@ -4393,317 +4621,45 @@ define('libs/color',[],function() {
 		createRadialGradient: createRadialGradient
 	};
 });
-define('app/ui/controlpanel',["libs/quicksettings"], function(QuickSettings) {
-	var panel = null,
-		model,
-		controller,
-		scheduler,
-		fileInput = null;
+define('app/GLCInterface',['require','app/render/Color'],function(require) {
 
-	// controls:
-	var 
-		modeDropDown = "mode",
-		durationSlider = "duration",
-		fpsSlider = "fps",
-		maxColorsSlider = "Max Colors",
-		easingCheckbox = "easing",
-		statusInfo = "status";
-		// fullScreen = "Full Screen";
+    function init(MainController, Styles, RenderList) {
+        this.loop = MainController.loop;
+        this.playOnce = MainController.playOnce;
+        this.size = MainController.setSize;
+        this.setDuration = MainController.setDuration;
+        this.setFPS = MainController.setFPS;
+        this.setMaxColors = MainController.setMaxColors;
+        this.setMode = MainController.setMode;
+        this.setEasing = MainController.setEasing;
+        this.styles = Styles;
+        this.renderList = RenderList;
+        this.init = null;
+    }
 
 
-	function init(pModel, pController, pScheduler) {
-		var controlPanelX = localStorage.getItem("controlPanelX"),
-			controlPanelY = localStorage.getItem("controlPanelY");
-		if(controlPanelX == null) controlPanelX = window.innerWidth - 200;
-		if(controlPanelY == null) controlPanelY = 60;
+    return {
+        loop: null,
+        playOnce: null,
+        size: null,
+        setDuration: null,
+        setFPS: null,
+        setMode: null,
+        setEasing: null,
+        setMaxColors: null,
+        setQuality: function() {},
+        color: require("app/render/Color"),
+        styles: null,
+        renderList: null,
+        w: glcConfig.canvasWidth,
+        h: glcConfig.canvasHeight,
+        canvas: null,
+        context: null,
+        init: init
+    }
 
-		model = pModel;
-		controller = pController;
-		scheduler = pScheduler;
-		panel = QuickSettings.create(controlPanelX, controlPanelY, "Control Panel");
-
-		// electron only.
-		// if(window.nodeRequire) {
-		// 	var remote = nodeRequire("remote");
-		// 	if(remote) {
-		// 		panel.addButton(fullScreen, function() {
-		// 			var win = remote.getCurrentWindow();
-		// 			if(win.isFullScreen()) {
-		// 				win.setFullScreen(false);
-		// 			}
-		// 			else {
-		// 				win.setFullScreen(true);
-		// 			}
-
-		// 		})
-		// 	}
-		// }
-
-		panel.addRange(durationSlider, 0.5, 10, scheduler.getDuration(), 0.5, scheduler.setDuration);
-		panel.addRange(fpsSlider, 1, 60, scheduler.getFPS(), 1, scheduler.setFPS);
-		panel.addRange(maxColorsSlider, 2, 256, model.maxColors, 1, function(value) {
-			model.maxColors = value;
-		});
-		panel.bindDropDown(modeDropDown, ["bounce", "single"], model);
-		panel.bindBoolean(easingCheckbox, model.easing, model);
-		panel.addInfo(statusInfo, "stopped");
-		panel.setMoveListener(function(x, y) {
-			localStorage.setItem("controlPanelX", x);
-			localStorage.setItem("controlPanelY", y);
-		});
-	}
-
-	function setStatus(status) {
-		panel.setInfo(statusInfo, status);
-	}
-
-	function setFPS(value) {
-		panel.setRangeValue(fpsSlider, value);
-	}
-
-	function setDuration(value) {
-		panel.setRangeValue(durationSlider, value);
-	}
-
-	function setMode(mode) {
-		panel.setDropDownIndex(modeDropDown, mode === "bounce" ? 0 : 1);
-	}
-
-	function setEasing(value) {
-		panel.setBoolean(easingCheckbox, value);
-	}
-
-	function setMaxColors(value) {
-		value = Math.max(2, value);
-		value = Math.min(256, value);
-		panel.setRangeValue(maxColorsSlider, value);
-	}
-
-	return {
-		init: init,
-		setStatus: setStatus,
-		setFPS: setFPS,
-		setDuration: setDuration,
-		setMode: setMode,
-		setEasing: setEasing,
-		setMaxColors: setMaxColors,
-	};
 
 });
-
-define('app/ui/infopanel',["libs/quicksettings"], function(QuickSettings) {
-	var panel = null;
-
-	function init(model, controller) {
-		var infoPanelX = localStorage.getItem("infoPanelX"),
-			infoPanelY = localStorage.getItem("infoPanelY");
-		if(infoPanelX == null) infoPanelX = (window.innerWidth - 150) / 2;
-		if(infoPanelY == null) infoPanelY = 100;
-
-		infoPanel = QuickSettings.create(infoPanelX, infoPanelY, "GIF Loop Coder v" + model.version);
-		infoPanel.addInfo("site", "<a href='http://www.gifloopcoder.com'>http://www.gifloopcoder.com</a>");
-		infoPanel.addInfo("Info", "Howdy! Welcome to GIF Loop Coder (GLC). This program is offered free and is open source. Lots of hours went into it, so if you find it useful, pay it back or pay it forward.");
-		infoPanel.addInfo("tips", "<a href='https://www.paypal.me/bit101'>Buy me a beer (or two)</a>");
-		infoPanel.addInfo("keys", "Keys:<br/>Ctrl-Enter - compile and run<br/>Ctrl-Space - play/pause<br/>Ctrl-O - open file<br/>Ctrl-S - save file<br/>Ctrl-G - make gif<br/>Ctrl-/ - toggle comment in code")
-		infoPanel.addInfo("credits", "Credits:");
-		infoPanel.addInfo("creator", "Architect, coding, design, etc.: Keith Peters, kp@bit-101.com");
-		infoPanel.addInfo("testers", "Contributors: <a href='https://twitter.com/p5art'>Jerome Herr</a>, <a href='https://twitter.com/cacheflowe'>Justin Gitlin</a>, <a href='https://twitter.com/andremichelle'>Andre Michelle</a>, <a href='https://twitter.com/msurguy'>Maks Surguy</a>, <a href='https://github.com/EduardoLopes'>Eduardo Lopes</a>, <a href='https://github.com/crummy'>Malcolm Crum</a>, <a href='https://github.com/Landerson352'>Lincoln Anderson</a>");
-		infoPanel.addInfo("encoder", "GIF Encoder: Kevin Weiner, Thibault Imbert, Kevin Kwok, Johan Nordberg. <a href='https://github.com/antimatter15/jsgif'>https://github.com/antimatter15/jsgif</a>");
-		infoPanel.addInfo("QS", "User interface created with <a href='https://github.com/bit101/quicksettings'>QuickSettings.js</a>.");
-		infoPanel.addInfo("codemirror", "Code editor: <a href='https://codemirror.net/'>https://codemirror.net/</a>");
-		infoPanel.addInfo("icons", "Icons from <a href='http://ionicons.com/'>http://ionicons.com/</a>");
-		infoPanel.addButton("Close", function() {
-			infoPanel.hide();
-		});
-		infoPanel.hide();
-		infoPanel.setMoveListener(function(x, y) {
-			localStorage.setItem("infoPanelX", x);
-			localStorage.setItem("infoPanelY", y);
-		});
-	}
-
-	function show() {
-		infoPanel.show();
-	}
-
-	function setPosition(x, y) {
-		infoPanel.setPosition(x, y);
-	}
-
-	return {
-		init: init,
-		setPosition: setPosition,
-		show: show
-	};
-});
-define('app/ui/canvaspanel',["libs/quicksettings"], function(QuickSettings) {
-	var canvasPanel = null,
-		model = null,
-		controller = null,
-		scheduler;
-
-
-	function init(pModel, pController, pScheduler, canvas) {
-		var canvasPanelX = localStorage.getItem("canvasPanelX"),
-			canvasPanelY = localStorage.getItem("canvasPanelY");
-		if(canvasPanelX == null) canvasPanelX = 400;
-		if(canvasPanelY == null) canvasPanelY = 60;
-
-		model = pModel;
-		controller = pController;
-		scheduler = pScheduler;
-		canvasPanel = QuickSettings.create(canvasPanelX, canvasPanelY, "Canvas Panel");
-		canvasPanel.setWidth(model.w + 12);
-		canvasPanel.addElement("Canvas", canvas);
-		canvasPanel.addRange("Scrub", 0, 1, 0, 0.01, onScrub);
-		canvasPanel.setMoveListener(function(x, y) {
-			localStorage.setItem("canvasPanelX", x);
-			localStorage.setItem("canvasPanelY", y);
-		});
-	}
-
-	function onScrub(value) {
-		if(!scheduler.isRunning()) {
-			controller.renderFrame(value);
-		}
-	}
-
-	function setWidth(width) {
-		canvasPanel.setWidth(width);
-	}
-
-	function setTime(t) {
-		canvasPanel.setRangeValue("Scrub", t);
-	}
-
-	function disableControls() {
-		canvasPanel.disableControl("Scrub");
-	}
-
-	function enableControls() {
-		canvasPanel.enableControl("Scrub");
-	}
-
-	function hide() {
-		canvasPanel.hide();
-	}
-
-	function show() {
-		canvasPanel.show();
-	}
-
-	return {
-		init: init,
-		setWidth: setWidth,
-		setTime: setTime,
-		disableControls: disableControls,
-		enableControls: enableControls,
-		hide: hide,
-		show: show
-	}
-});
-define('app/ui/outputpanel',["libs/quicksettings"], function(QuickSettings) {
-	var outputPanel = null,
-		model = null,
-		controller = null;
-
-
-	// controls
-	var captureImage = "Capture",
-		sizeInfo = "size",
-		clearImageButton = "Clear Image",
-		closePanel = "Close";
-
-	function init(pModel, pController) {
-		model = pModel;
-
-		var outputPanelX = localStorage.getItem("outputPanelX"),
-			outputPanelY = localStorage.getItem("outputPanelY");
-		if(outputPanelX == null) outputPanelX = model.w + 220;
-		if(outputPanelY == null) outputPanelY = 20;
-
-		controller = pController;
-		outputPanel = QuickSettings.create(outputPanelX, outputPanelY, "Output");
-		outputPanel.setWidth(model.w + 12);
-		outputPanel.addImage(captureImage, "");
-		outputPanel.addInfo(sizeInfo, "");
-		outputPanel.addButton(clearImageButton, controller.clearOutput);
-		outputPanel.addButton(closePanel, function() {
-			clearOutput();
-			outputPanel.hide();
-		});
-		outputPanel.hide();
-		outputPanel.setMoveListener(function(x, y) {
-			localStorage.setItem("outputPanelX", x);
-			localStorage.setItem("outputPanelY", y);
-		});
-	}
-
-
-	function setGIF(binaryGIF) {
-		showPanel();
-		var dataURL = "data:image/gif;base64," + encode64(binaryGIF);
-		outputPanel.setImageURL(captureImage, dataURL);
-		var header = 'data:image/gif;base64,',
-			imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
-		outputPanel.setInfo(sizeInfo, "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
-	}
-
-	function setPNG(dataURL) {
-		showPanel();
-		outputPanel.setImageURL(captureImage, dataURL);
-		var header = 'data:image/png;base64,',
-			imgFileSize = Math.round((dataURL.length - header.length) * 3 / 4);
-		outputPanel.setInfo(sizeInfo, "Approx size: " + Math.round(imgFileSize / 1024) + "kb");
-	}
-
-	function setWidth(width) {
-		outputPanel.setWidth(width);
-	}
-
-	function showPanel() {
-		outputPanel.show();
-	}
-
-	function clearOutput() {
-		outputPanel.setImageURL(captureImage, "");
-		outputPanel.setInfo(sizeInfo, "");
-		setWidth(model.w + 12);
-	}
-
-	function encode64(input) {
-		var output = "", i = 0, l = input.length,
-		key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
-		chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-		while (i < l) {
-			chr1 = input.charCodeAt(i++);
-			chr2 = input.charCodeAt(i++);
-			chr3 = input.charCodeAt(i++);
-			enc1 = chr1 >> 2;
-			enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-			enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-			enc4 = chr3 & 63;
-			if (isNaN(chr2)) {
-				enc3 = enc4 = 64;
-			}
-			else if (isNaN(chr3)) {
-				enc4 = 64;
-			}
-			output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
-		}
-		return output;
-	}
-
-
-	return {
-		init: init,
-		setGIF: setGIF,
-		setPNG: setPNG,
-		setWidth: setWidth,
-		clearOutput: clearOutput
-	}
-});
-
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14693,51 +14649,130 @@ CodeMirror.defineMIME("application/typescript", { name: "javascript", typescript
   });
 });
 
-require.config({
-  packages: [{
-    name: "codemirror",
-    location: "../libs/codemirror",
-    main: "lib/codemirror"
-  }]
-});
+define('ui/code/CodeView',['require','utils/UIUtil','libs/codemirror/lib/codemirror','libs/codemirror/mode/javascript/javascript','libs/codemirror/addon/edit/closebrackets','libs/codemirror/addon/comment/comment'],function(require) {
 
-define('app/ui/codePanel',[
-    "libs/quicksettings", 
-    "libs/codemirror/lib/codemirror", 
-    "libs/codemirror/mode/javascript/javascript",
-    "libs/codemirror/addon/edit/closebrackets",
-    "libs/codemirror/addon/comment/comment"
-    ], function(QuickSettings, CodeMirror) {
-    var codePanel = null,
+    var UIUtil = require("utils/UIUtil"),
+        CodeMirror = require("libs/codemirror/lib/codemirror"), 
+        div = null,
         cm = null,
-        controller = null,
-        filename = "";
+        width = 0,
+        toolbarHeight = 51;
 
-    function init(pController) {
-        controller = pController
-        createPanel();
+    require("libs/codemirror/mode/javascript/javascript");
+    require("libs/codemirror/addon/edit/closebrackets");
+    require("libs/codemirror/addon/comment/comment");
+
+    function init() {
+        div = UIUtil.createDiv("code_panel", document.getElementById("content"));
+        width = div.offsetWidth;
+        createCodeMirror();
+        setKeys();
     }
 
-    function createPanel() {
-        cm = CodeMirror(document.body, {
+    function createCodeMirror() {
+        cm = CodeMirror(div, {
             mode: "javascript",
             smartIndent: true,
             indentUnit: 4,
             lineNumbers: true,
             autoCloseBrackets: true
         });
-        cm.setSize(window.innerWidth, window.innerHeight - 56);
         cm.on("change", cacheCode);
-        var cachedCode = localStorage.getItem("glcCode");
-        if(cachedCode == null) {
-            newFile();
+        setWidth(width);
+        window.addEventListener("resize", onResize);
+    }
+
+    function cacheCode() {
+        localStorage.setItem("glcCode", cm.getValue());
+    }
+
+    function newFile() {
+        cm.setValue("function onGLC(glc) {\n    glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+    }
+
+    function onResize() {
+        cm.setSize(width, window.innerHeight - toolbarHeight);  
+    }
+
+    function setWidth(pWidth) {
+        width = pWidth;
+        div.style.width = width + "px";      
+        cm.setSize(width, window.innerHeight - toolbarHeight);  
+    }
+
+    function setKeys() {
+        document.body.addEventListener("keyup", function(event) {
+            if(event.ctrlKey && event.keyCode === 191) {
+                cm.toggleComment();
+            }
+        })
+    }
+
+    function setCode(pCode) {
+        cm.setValue(pCode);
+    }
+
+    function getCode() {
+        return cm.getValue();
+    }
+
+
+    return {
+        init: init,
+        setWidth: setWidth,
+        setCode: setCode,
+        getCode: getCode,
+        newFile: newFile
+    };
+
+});
+define('ui/code/CodeController',['require','ui/code/CodeView','utils/UIUtil'],function(require) {
+
+    var CodeView = require("ui/code/CodeView"),
+        UIUtil = require("utils/UIUtil"),
+        fileInput = null,
+        filename = "",
+        GLCInterface = null,
+        MainController = null;
+
+
+    function init(pGLCInterface, pMainController) {
+        GLCInterface = pGLCInterface;
+        MainController = pMainController;
+        CodeView.init();
+        setUpFileInput();
+    }
+
+    function setUpFileInput() {
+        fileInput = UIUtil.createInput("file", null, null, null, "change", chooseFile);
+    }
+
+    function chooseFile(event) {
+        // when cancelling, sometimes you get no event
+        // sometimes you get an event with 0 files.
+        if(event.target.files.length < 1) return;
+
+        var file = event.target.files[0],
+            reader = new FileReader();
+        reader.onload = function() {
+            CodeView.setCode(reader.result, true);
+            compile();
         }
-        else {
-            cm.setValue(cachedCode);
+        reader.readAsText(file);
+    }
+
+    function newFile(ignoreChanges) {
+        if(ignoreChanges === true || window.confirm("Any unsaved changes will be lost. Create new file?")) {
+            CodeView.newFile();
+            MainController.reset();
         }
     }
 
-    function saveCode() {
+    function open() {
+        fileInput.click();
+    }
+
+    function save() {
         var result = window.prompt("Please enter a file name. File will be saved in current browser download location.", filename);
         if(result) {
             filename = result;
@@ -14745,7 +14780,7 @@ define('app/ui/codePanel',[
                 filename += ".js";
             }
             var link = document.createElement("a");
-            link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(cm.getValue()));
+            link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(CodeView.getCode()));
             link.setAttribute('download', filename);
             link.click();
         }
@@ -14754,364 +14789,195 @@ define('app/ui/codePanel',[
         }
     }
 
+    function saveAs() {
+
+    }
+
+    function compile() {
+        // TODO: reset and clear renderlist
+        var script = document.getElementById("loaded_script");
+        if(script) {
+            document.head.removeChild(script);
+        }
+
+        script = UIUtil.createScript("loaded_script", CodeView.getCode(), document.head);
+
+
+        reload();
+    }
+
+    function reload() {
+        MainController.reset();
+        if(window.onGLC) {
+            window.onGLC(GLCInterface);
+        }
+
+    }
+
+    function getView() {
+        return CodeView;
+    }
 
     function setCode(code) {
-        cm.setValue(code);
+        CodeView.setCode(code);
     }
 
-    function getCode() {
-        return cm.getValue();
-    }
-
-    function toggleComment() {
-        cm.toggleComment();
-    }
-
-    function cacheCode() {
-        localStorage.setItem("glcCode", cm.getValue());
-    }
-
-    function newFile() {
-        cm.setValue("function onGLC(glc) {\n//     glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
-    }
 
     return {
-        saveCode: saveCode,
-        setCode: setCode,
-        getCode: getCode,
         init: init,
-        toggleComment: toggleComment,
-        newFile: newFile
+        newFile: newFile,
+        open: open,
+        save: save,
+        saveAs: saveAs,
+        compile: compile,
+        getView: getView,
+        setCode: setCode
     };
+
 });
-define('app/ui/toolbar',[],function() {
+define('ui/splitter/SplitterView',['require','utils/UIUtil'],function(require) {
 
-    var controller = null,
-        fileInput = null,
-        disabled = false;
+    var UIUtil = require("utils/UIUtil"),
+        div = null,
+        onSplitterMove = null,
+        offset = 0;
 
-        toolbar = document.getElementById("header"),
-        
-        openBtn = document.getElementById("open_btn"),
-        newBtn = document.getElementById("new_btn"),
-        compileBtn = document.getElementById("compile_btn"),
-        saveBtn = document.getElementById("save_btn"),
-        
-        loopBtn = document.getElementById("loop_btn"),
-        onceBtn = document.getElementById("once_btn"),
-        pauseBtn = document.getElementById("pause_btn"),
-        
-        gifBtn = document.getElementById("gif_btn"),
-        stillBtn = document.getElementById("still_btn"),
-        spriteBtn = document.getElementById("sprite_btn"),
+    function init(pOnSplitterMove) {
+        onSplitterMove = pOnSplitterMove;
+        div = UIUtil.createDiv("splitter", document.getElementById("content"));
+        width = div.offsetWidth;
+        UIUtil.createDiv(null, div, { 
+            width: "2px", 
+            height: "20px", 
+            backgroundColor: "#888888",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: (window.innerHeight / 2 - 35) + "px"
 
-        aboutBtn = document.getElementById("about_btn");
+        });
+
+        addEventListeners();
+    }
+
+    function setX(x) {
+        div.style.left = x + "px";
+    }
+
+    function getWidth() {
+        return width;
+    }
 
 
-    function init(pController) {
-        if(!window.glcSettings.useIntegratedEditor) {
-            openBtn.style.display = "none";
-            newBtn.style.display = "none";
-            compileBtn.style.display = "none";
-            saveBtn.style.display = "none";
+    function addEventListeners() {
+        div.addEventListener("mousedown", onMouseDown);
+        window.addEventListener("resize", onWindowResize);
+    }
+
+    function onMouseDown(event) {
+        offset = event.clientX - div.offsetLeft;
+        document.body.addEventListener("mousemove", onMouseMove);
+        document.body.addEventListener("mouseup", onMouseUp);
+    }
+
+    function onMouseMove(event) {
+        if(onSplitterMove) {
+            onSplitterMove(event.clientX - offset);
         }
-        controller = pController;
-        setupFile();
-        addListeners();
-        pauseBtn.className = "disabled";
+        event.preventDefault();
     }
 
-    function setupFile() {
-        fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.addEventListener("change", controller.chooseFile);
-        fileInput.addEventListener("click", function() {
-            this.value = null;
-        })
+    function onMouseUp(event) {
+        document.body.removeEventListener("mousemove", onMouseMove);
+        document.body.removeEventListener("mouseup", onMouseUp);
     }
 
-    function addListeners() {
-        openBtn.addEventListener("click", function() {
-            fileInput.click();
-        });
-
-        newBtn.addEventListener("click", function() {
-            controller.newFile();
-        });
-
-        compileBtn.addEventListener("click", function() {
-            controller.updateCode();
-        });
-
-        saveBtn.addEventListener("click", function() {
-            controller.saveCode();
-        });
-
-        loopBtn.addEventListener("click", function() {
-            controller.loop();
-        });
-
-        onceBtn.addEventListener("click", function() {
-            controller.playOnce();
-        });
-
-        pauseBtn.addEventListener("click", function() {
-            controller.stop();
-        });
-
-        gifBtn.addEventListener("click", function() {
-            if(!disabled) {
-                controller.makeGif();
-            }
-        });
-
-        stillBtn.addEventListener("click", function() {
-            controller.captureStill();
-        });
-
-        spriteBtn.addEventListener("click", function() {
-            if(!disabled) {
-                controller.makeSpriteSheet();
-            }
-        });
-
-        aboutBtn.addEventListener("click", function() {
-            controller.showInfoPanel();
-        });
+    function onWindowResize() {
+        onSplitterMove(div.offsetLeft);
     }
-
-    function enableControls() {
-        disabled = false;
-        loopBtn.className = "";
-        onceBtn.className = "";
-        gifBtn.className = "";
-        spriteBtn.className = "";
-        pauseBtn.className = "disabled";
-    }
-
-    function disableControls() {
-        disabled = true;
-        loopBtn.className = "disabled";
-        onceBtn.className = "disabled";
-        gifBtn.className = "disabled";
-        spriteBtn.className = "disabled";
-        pauseBtn.className = "";
-    }
-
-    function chooseFileDialog() {
-        fileInput.click();
-    }
-
 
     return {
         init: init,
-        enableControls: enableControls,
-        disableControls: disableControls,
-        chooseFileDialog: chooseFileDialog
+        setX: setX,
+        getWidth: getWidth,
     };
 
 });
-define('app/glc',[
-	"app/renderlist", 
-	"app/scheduler",
-	"app/controller",
-	"app/styles",
-	"app/interpolation",
-	"app/spritesheet",
-	"libs/quicksettings",
-	"libs/GIFEncoder",
-	"libs/color",
-	"app/ui/controlpanel",
-	"app/ui/infopanel",
-	"app/ui/canvaspanel",
-	"app/ui/outputpanel",
-	"app/ui/codePanel",
-	"app/ui/toolbar"],
-	
-function(
-	renderList, 
-	scheduler, 
-	controller,
-	styles,
-	interpolation,
-	spritesheet,
-	QuickSettings,
-	GIFEncoder,
-	color,
-	controlPanel,
-	infoPanel,
-	canvasPanel,
-	outputPanel,
-	codePanel,
-	toolbar) {
+define('ui/splitter/SplitterController',['require','ui/splitter/SplitterView'],function(require) {
 
-	// this could be a module too. 
-	// ideally it wouldn't know about scheduler directly
-	var model = {
-		version: "1.0.0",
-		mode: "bounce",
-		easing: true,
-		file: null,
-		maxColors: 256,
-		w: 400,
-		h: 400,
-		capture: false,
-		captureSpriteSheet: false
-	},
-	internalInterface = {
-		glc: null,
-		scheduler: scheduler,
-		renderList: renderList,
-		model: model,
-		GIFEncoder: GIFEncoder,
-		controlPanel: controlPanel,
-		toolbar: toolbar,
-		canvasPanel: canvasPanel,
-		outputPanel: outputPanel,
-		codePanel, codePanel,
-		infoPanel: infoPanel,
-		spritesheet: spritesheet,
-		reset: reset
-	}
+    var SplitterView = require("ui/splitter/SplitterView"),
+        CodeView = null,
+        CanvasView = null;
 
-
-	function init() {
-		window.addEventListener("error", function (event) {//msg, url, lineNumber, column, error) {
-			window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
-		});
-		internalInterface.glc = glc;
-		controller.init(internalInterface);
-		interpolation.init(model);
-		toolbar.init(controller);
-		if(window.glcSettings.useIntegratedEditor) {
-			codePanel.init(controller);
-		}
-		renderList.init(glc, model.w, model.h, styles, interpolation);
-		scheduler.init(controller);
-		canvasPanel.init(model, controller, scheduler, renderList.getCanvas());
-		outputPanel.init(model, controller);
-		controlPanel.init(model, controller, scheduler);
-		infoPanel.init(model, controller);
-		setKeys();
-		glc.context = renderList.getContext();
-		glc.canvas = renderList.getCanvas();
-	}
-
-	function size(width, height) {
-		glc.w = width;
-		glc.h = height;
-		controller.size(width, height);
-	}
-
-	function setKeys() {
-		var useEditor = window.glcSettings.useIntegratedEditor;
-		document.body.addEventListener("keyup", function(event) {
-			// console.log(event.keyCode);
-			if(event.ctrlKey) {
-				switch(event.keyCode) {
-					case 32: // space
-						if(scheduler.isRunning()) {
-							controller.stop();
-						}
-						else {
-							controller.loop();
-						}
-						break;
-					case 71: // G
-						controller.makeGif();
-						break;
-					case 83: // S
-						if(useEditor) {
-							controller.saveCode();
-						}
-						break;
-					case 79: // O
-						if(useEditor) {
-							controller.openFile();
-						}
-						break;
-					case 13: // enter
-						if(useEditor) {
-							controller.updateCode();
-						}
-						break;
-					case 191: // forward slash
-						if(useEditor) {
-							codePanel.toggleComment();
-						}
-						break;
-					default:
-						break;
-				}
-			}
-		});
-		document.body.addEventListener("keydown", function(event) {
-			if(event.ctrlKey) {
-				switch(event.keyCode) {
-					case 32: // space
-					case 71: // G
-					case 83: // S
-					case 79: // O
-					case 13: // enter
-					case 191: // forward slash
-						event.preventDefault();
-						break;
-					default:
-						break;
-				}
-			}
-		});
-	}
-
-	function reset() {
-		scheduler.stop();
-		glc.onEnterFrame = null;
-		glc.onExitFrame = null;
-		glc.size(400, 400);
-		glc.setFPS(30);
-		glc.setDuration(2);
-		glc.setMode("bounce");
-		glc.setEasing(true);
-		glc.setMaxColors(256);
-		glc.setQuality(10);
-		glc.styles.reset();
-	}
-
-
-
-	var glc =  {
-		w: model.w,
-		h: model.h,
-		renderList: renderList,
-		styles: styles,
-		size: size,
-		playOnce: controller.playOnce,
-		loop: controller.loop,
-		setFPS: controlPanel.setFPS,
-		setDuration: controlPanel.setDuration,
-		setMode: controlPanel.setMode,
-		setEasing: controlPanel.setEasing,
-		setMaxColors: controlPanel.setMaxColors,
-		setQuality: GIFEncoder.setQuality,
-		color: color,
-		onEnterFrame: null,
-		onExitFrame: null,
-		context: null,
-		canvas: null
-	};
-
-	init();
-
-	return glc;
-});
-
-require(["app/glc"], function(glc) {
-    if(window.onGLC) {
-        window.onGLC(glc);
+    function init(pCodeView, pCanvasView) {
+        CodeView = pCodeView;
+        CanvasView = pCanvasView;
+        SplitterView.init(onSplitterMove);
     }
-    else {
-        window.glc = glc;
+
+    function onSplitterMove(x) {
+        x = Math.min(x, window.innerWidth - 184);
+        x = Math.max(x, 30);
+        CodeView.setWidth(x);
+        SplitterView.setX(x);
+        CanvasView.setX(x + SplitterView.getWidth());
     }
+
+    return {
+        init: init,
+    };
 });
-define("glcloader", function(){});
+define('main',['require','ui/canvas/CanvasController','ui/properties/PropertiesController','app/MainController','ui/output/OutputController','app/render/RenderList','app/render/Styles','app/render/Interpolation','app/GLCInterface','ui/code/CodeController','ui/splitter/SplitterController'],function(require) {
+    // window.localStorage.clear();
+
+
+    // This module creates all the controllers and other modules and sets up their relationships
+
+    var CodeController = null,
+        SplitterController = null,
+        CanvasController = require("ui/canvas/CanvasController"), 
+        PropertiesController = require("ui/properties/PropertiesController"),
+        MainController = require("app/MainController"),
+        OutputController = require("ui/output/OutputController"),
+        RenderList = require("app/render/RenderList"),
+        Styles = require("app/render/Styles"),
+        Interpolation = require("app/render/Interpolation"),
+        GLCInterface = require("app/GLCInterface");
+
+    init();
+
+    function init() {
+        window.addEventListener("error", function (event) {
+            window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
+        });
+        OutputController.init();
+        GLCInterface.init(MainController, Styles, RenderList);
+        CanvasController.init(MainController);
+        GLCInterface.canvas = CanvasController.getCanvas();
+        GLCInterface.context = GLCInterface.canvas.getContext("2d");
+        RenderList.init(GLCInterface, Styles, Interpolation, CanvasController.getCanvas());
+        PropertiesController.init(MainController);
+        if(glcConfig.externalEditor) {
+            CanvasController.getView().setX(0);
+        }
+        else {
+            CodeController = require("ui/code/CodeController"),
+            CodeController.init(GLCInterface, MainController);
+            SplitterController = require("ui/splitter/SplitterController"),
+            SplitterController.init(CodeController.getView(), CanvasController.getView());
+        }
+        MainController.init(CodeController, 
+                            CanvasController, 
+                            PropertiesController, 
+                            OutputController, 
+                            RenderList, 
+                            GLCInterface, 
+                            Interpolation);
+    }
+
+
+});
+(function() {
+    require(["main"]);
+})();
+define("glclauncher", function(){});
 
