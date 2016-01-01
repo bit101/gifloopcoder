@@ -35,26 +35,28 @@ First I'll set up a circle. This will be centered vertically, and move from -25 
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(400, 200);
-        // glc.setDuration(5);
-        // glc.setFPS(20);
-        // glc.setMode("single");
-        // glc.setEasing(false);
-        // glc.setMaxColors(256);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(400, 200);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    // glc.setMaxColors(256);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
 
-        list.addCircle({
-            x: [-25, 200],
-            y: 200,
-            radius: 25
-        });
+    list.addCircle({
+        <b>x: [-25, 200],</b>
+        y: 200,
+        radius: 25
+    });
 
-        glc.loop();
-    }
+    glc.loop();
+}
+</code></pre>
 
 
 
@@ -64,31 +66,33 @@ So, at the end of the animation we have a circle sitting at the center of the sc
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(400, 200);
-        // glc.setDuration(5);
-        // glc.setFPS(20);
-        // glc.setMode("single");
-        // glc.setEasing(false);
-        // glc.setMaxColors(256);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(400, 200);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    // glc.setMaxColors(256);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
 
-        list.addCircle({
-            x: [-25, 200],
-            y: 100,
-            radius: 25
-        });
-        list.addCircle({
-            x: [200, 425],
-            y: 100,
-            radius: 25
-        });
+    list.addCircle({
+        <b>x: [-25, 200],</b>
+        y: 100,
+        radius: 25
+    });
+    list.addCircle({
+        <b>x: [200, 425],</b>
+        y: 100,
+        radius: 25
+    });
 
-        glc.loop();
-    }
+    glc.loop();
+}
+</code></pre>
 
 
 
@@ -98,39 +102,41 @@ That's much better. You can even chain several objects together like this, and a
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(400, 200);
-        // glc.setDuration(5);
-        // glc.setFPS(20);
-        // glc.setMode("single");
-        // glc.setEasing(false);
-        // glc.setMaxColors(256);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(400, 200);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    // glc.setMaxColors(256);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
 
-        list.addCircle({
-            x: [-25, 150],
-            y: [0, 175],
-            radius: 25,
-            fillStyle: [0xff0000, 0x00ff00]
-        });
-        list.addCircle({
-            x: [150, 300],
-            y: [175, 25],
-            radius: 25,
-            fillStyle: [0x00ff00, 0x0000ff]
-        });
-        list.addCircle({
-            x: [300, 425],
-            y: [25, 200],
-            radius: 25,
-            fillStyle: [0x0000ff, 0xff0000]
-        });
+    list.addCircle({
+        <b>x: [-25, 150],
+        y: [0, 175],
+        radius: 25,
+        fillStyle: [0xff0000, 0x00ff00]</b>
+    });
+    list.addCircle({
+        <b>x: [150, 300],
+        y: [175, 25],
+        radius: 25,
+        fillStyle: [0x00ff00, 0x0000ff]</b>
+    });
+    list.addCircle({
+        <b>x: [300, 425],
+        y: [25, 200],
+        radius: 25,
+        fillStyle: [0x0000ff, 0xff0000]</b>
+    });
 
-        glc.loop();
-    }
+    glc.loop();
+}
+</code></pre>
 
 
 
@@ -162,22 +168,23 @@ Now you can make another object and set `circle` as its parent:
 
 
 
-    var circle = list.addCircle({
-        x: width / 2,
-        y: height / 2,
-        radius: 100,
-        stroke: true,
-        fill: false
-    });
+<pre><code>var circle = list.addCircle({
+    x: width / 2,
+    y: height / 2,
+    radius: 100,
+    stroke: true,
+    fill: false
+});
 
-    list.addRect({
-        x: 100,
-        y: 0,
-        w: 20,
-        h: 20,
-        fillStyle: "red",
-        parent: circle
-    });
+list.addRect({
+    x: 100,
+    y: 0,
+    w: 20,
+    h: 20,
+    fillStyle: "red",
+    <b>parent: circle</b>
+});
+</code></pre>
 
 
 
@@ -189,24 +196,25 @@ Then, if we animate the circle, the rect will animate right along with it. Here,
 
 
 
-    var circle = list.addCircle({
-        x: width / 2,
-        y: height / 2,
-        radius: 100,
-        stroke: true,
-        fill: false,
-        rotation: [0, 180]
-    });
+<pre><code>
+var circle = list.addCircle({
+    x: width / 2,
+    y: height / 2,
+    radius: 100,
+    stroke: true,
+    fill: false,
+    <b>rotation: [0, 180]</b>
+});
 
-    list.addRect({
-        x: 100,
-        y: 0,
-        w: 20,
-        h: 20,
-        fillStyle: "red",
-        parent: circle
-    });
-
+list.addRect({
+    x: 100,
+    y: 0,
+    w: 20,
+    h: 20,
+    fillStyle: "red",
+    parent: circle
+});
+</code></pre>
 
 
 And this gives us:
@@ -217,20 +225,22 @@ Once you get the idea of parenting objects, you'll find all kinds of uses for it
 
 
 
-    var container = list.addContainer({
-        x: width / 2,
-        y: height / 2,
-        rotation: [0, 180]
-    });
+<pre><code>
+<b>var container = list.addContainer({
+    x: width / 2,
+    y: height / 2,
+    rotation: [0, 180]
+});</b>
 
-    list.addRect({
-        x: 100,
-        y: 0,
-        w: 20,
-        h: 20,
-        fillStyle: "red",
-        parent: container
-    });
+list.addRect({
+    x: 100,
+    y: 0,
+    w: 20,
+    h: 20,
+    fillStyle: "red",
+    parent: container
+});
+</code></pre>
 
 
 
@@ -293,7 +303,7 @@ Here, I've set up 5 circles with a simple x-axis animation. They are spaced out 
         var list = glc.renderList,
             width = glc.w,
             height = glc.h;
-
+    
         for(var i = 0; i < 5; i++) {
             list.addCircle({
                 x: [50, 350],
@@ -301,7 +311,7 @@ Here, I've set up 5 circles with a simple x-axis animation. They are spaced out 
                 radius: 25,
             });
         }
-
+    
         glc.loop();
     }
 
@@ -317,31 +327,31 @@ So, say I gave each one of these circles a different `phase`, and spaced them ou
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        // glc.size(400, 400);
-        // glc.setDuration(5);
-        // glc.setFPS(20);
-        // glc.setMode("single");
-        // glc.setEasing(false);
-        // glc.setMaxColors(256);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    // glc.size(400, 400);
+    // glc.setDuration(5);
+    // glc.setFPS(20);
+    // glc.setMode("single");
+    // glc.setEasing(false);
+    // glc.setMaxColors(256);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h;
 
-        for(var i = 0; i < 5; i++) {
-            list.addCircle({
-                x: [50, 350],
-                y: 50 + i * 75,
-                radius: 25,
-                phase: i * 0.2
-            });
-        }
-
-        glc.loop();
+    for(var i = 0; i &lt; 5; i++) {
+        list.addCircle({
+            x: [50, 350],
+            y: 50 + i * 75,
+            radius: 25,
+            <b>phase: i * 0.2</b>
+        });
     }
 
-
+    glc.loop();
+}
+</code></pre>
 
 ![](images/5.5.gif)
 
@@ -353,38 +363,40 @@ Then, there's the `speedMult` property. This essentially multiplies the `t` valu
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(200, 200);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h,
-            color = glc.color;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
 
-        list.addCircle({
-            x: [25, 175],
-            y: 25,
-            radius: 25
-        });
-        list.addCircle({
-            x: [25, 175],
-            y: 75,
-            radius: 25,
-            speedMult: 2
-        });
-        list.addCircle({
-            x: [25, 175],
-            y: 125,
-            radius: 25,
-            speedMult: 3
-        });
-        list.addCircle({
-            x: [25, 175],
-            y: 175,
-            radius: 25,
-            speedMult: 4
-        });
-    }
+    list.addCircle({
+        x: [25, 175],
+        y: 25,
+        radius: 25
+    });
+    list.addCircle({
+        x: [25, 175],
+        y: 75,
+        radius: 25,
+        <b>speedMult: 2</b>
+    });
+    list.addCircle({
+        x: [25, 175],
+        y: 125,
+        radius: 25,
+        <b>speedMult: 3</b>
+    });
+    list.addCircle({
+        x: [25, 175],
+        y: 175,
+        radius: 25,
+        <b>speedMult: 4</b>
+    });
+}
+</code></pre>
 
 
 
@@ -473,7 +485,7 @@ The first half of that should be nothing new to you. Standard set up, draws a cu
 
 Then we define a `glc.onEnterFrame` and `glc.onExitFrame` function. Both get a parameter of `t`. In these functions, you can do whatever you want. Draw your own shapes, as simple or complex as you want. You can factor in the `t` value if you want it to animate along with the rest of the objects, or just ignore it. You have full access to the canvas and context and all that implies.
 
-Just remember the order of operations: 1\. Clear canvas, 2\. `onEnterFrame`, 3\. render objects in list, 4\. `onExitFrame`. So shapes from the render list will get drawn over anything drawn in `onEnterFrame`. And whatever is drawn in `onExitFrame` will be on top of everything else.
+Just remember the order of operations: 1. Clear canvas, 2. `onEnterFrame`, 3. render objects in list, 4. `onExitFrame`. So shapes from the render list will get drawn over anything drawn in `onEnterFrame`. And whatever is drawn in `onExitFrame` will be on top of everything else.
 
 In this example, I just go a little wild with the trig to create an animated ... blob or something in the `onEnterFrame` method. I just wanted to do something crazy that would be difficult to try to do with objects in the render list. In the `onExitFrame` method, I'm drawing a jagged line. Note that in both of these, I'm implementing the `t` value for animation, so things stay in sync. Here's what that gives us:
 

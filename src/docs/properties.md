@@ -337,6 +337,3 @@ And, like all the others, you can assign a function that returns an array:
 
 
 
-
-[top](#top)
-

@@ -1,24 +1,15 @@
+<style type="text/css">
 body {
     font-family: Verdana, Geneva, sans-serif;
     margin: 0 2em;
     color: #eeeeee;
-    background-color: #1c1c1c;
-}
-
-.code {
-    margin: 0 2em;
-    padding: 0 1em;
-    background-color: #111111;
-}
-
-.section {
-    margin: 0 2em;
     background-color: #222222;
-    padding: 1em;
 }
 
-.subsection {
+pre {
     margin: 0 2em;
+    padding: 1em;
+    background-color: #000000;
 }
 
 a:visited {
@@ -28,7 +19,7 @@ a {
     color: #999999;
 }
 
-.bold {
+b {
     font-weight: bold;
     color: #338833;
 }
@@ -46,6 +37,7 @@ img {
     margin: 0 2em;
 }
 
-.current_section {
-    color: #ffff00;
+li {
+    line-height: 1.5em;
 }
+</style>

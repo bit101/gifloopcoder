@@ -274,9 +274,11 @@ This creates a linear gradient that starts at point `x0, y0` and goes to `x1, y1
 
 
 
-    var gradient = color.createLinearGradient(x0, y0, x1, y1);
-    gradient.addColorStop(0, "red");
-    gradient.addColorStop(1, "blue");
+<pre><code>
+var gradient = color.createLinearGradient(x0, y0, x1, y1);
+<b>gradient.addColorStop(0, "red");
+gradient.addColorStop(1, "blue");</b>
+</code></pre>
 
 
 
@@ -284,10 +286,12 @@ You can add as many stops as you want. Just ensure that you keep the positions i
 
 
 
-    var gradient = color.createLinearGradient(x0, y0, x1, y1);
-    gradient.addColorStop(0, "red");
-    gradient.addColorStop(0.5, "green");
-    gradient.addColorStop(1, "blue");
+<pre><code>
+var gradient = color.createLinearGradient(x0, y0, x1, y1);
+gradient.addColorStop(0, "red");
+<b>gradient.addColorStop(0.5, "green");</b>
+gradient.addColorStop(1, "blue");
+</code></pre>
 
 
 
@@ -295,27 +299,28 @@ Now, the gradient will start at red, move through green at the midway point, and
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(200, 200);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h,
-            color = glc.color;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
 
-        var gradient = color.createLinearGradient(0, -100, 0, 100);
-        gradient.addColorStop(0, "red");
-        gradient.addColorStop(0.5, "green");
-        gradient.addColorStop(1, "blue");
+    var gradient = color.createLinearGradient(0, -100, 0, 100);
+    gradient.addColorStop(0, "red");
+    gradient.addColorStop(0.5, "green");
+    gradient.addColorStop(1, "blue");
 
-        list.addCircle({
-            x: 100,
-            y: 100,
-            radius: 100,
-            fillStyle: gradient
-        });
-    }
-
+    list.addCircle({
+        x: 100,
+        y: 100,
+        radius: 100,
+        <b>fillStyle: gradient</b>
+    });
+}
+</code></pre>
 
 
 Here, the gradient goes from point 0, -100 to point 0, 100\. This is relative to the center of the circle we are drawing. Since the circle has a radius of 100, the gradient will go from the top of the circle to the bottom. And here's what this gives us:
@@ -334,30 +339,32 @@ For radial gradients, the process is the same, but you'd call `color.createRadia
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(200, 200);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h,
-            color = glc.color;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
 
-        var gradient = color.createRadialGradient(0, 0, 0, 0, 0, 100);
-        gradient.addColorStop(0, "red");
-        gradient.addColorStop(0.5, "green");
-        gradient.addColorStop(1, "blue");
+    <b>var gradient = color.createRadialGradient(0, 0, 0, 0, 0, 100);
+    gradient.addColorStop(0, "red");
+    gradient.addColorStop(0.5, "green");
+    gradient.addColorStop(1, "blue");</b>
 
-        list.addCircle({
-            x: 100,
-            y: 100,
-            radius: 100,
-            fillStyle: gradient
-        });
-    }
+    list.addCircle({
+        x: 100,
+        y: 100,
+        radius: 100,
+        <b>fillStyle: gradient</b>
+    });
+}
+</code></pre>
 
 
 
-The only difference here is that we created a radial gradient. The first point is 0, 0 with a radius of 0\. The second point is also 0, 0, with a radius of 100\. Color stops are the same. So we get:
+The only difference here is that we created a radial gradient. The first point is 0, 0 with a radius of 0. The second point is also 0, 0, with a radius of 100. Color stops are the same. So we get:
 
 ![](images/3.3.png)
 
@@ -367,31 +374,33 @@ Here you go:
 
 
 
-    function onGLC(glc) {
-        glc.loop();
-        glc.size(200, 200);
-        var list = glc.renderList,
-            width = glc.w,
-            height = glc.h,
-            color = glc.color;
+<pre><code>
+function onGLC(glc) {
+    glc.loop();
+    glc.size(200, 200);
+    var list = glc.renderList,
+        width = glc.w,
+        height = glc.h,
+        color = glc.color;
 
-        var gradient1 = color.createRadialGradient(0, 0, 0, 0, 0, 100);
-        gradient1.addColorStop(0, "red");
-        gradient1.addColorStop(0.5, "green");
-        gradient1.addColorStop(1, "blue");
+    <b>var gradient1 = color.createRadialGradient(0, 0, 0, 0, 0, 100);
+    gradient1.addColorStop(0, "red");
+    gradient1.addColorStop(0.5, "green");
+    gradient1.addColorStop(1, "blue");
 
-        var gradient2 = color.createRadialGradient(0, 0, 0, 0, 0, 100);
-        gradient2.addColorStop(0, "green");
-        gradient2.addColorStop(0.5, "blue");
-        gradient2.addColorStop(1, "red");
+    var gradient2 = color.createRadialGradient(0, 0, 0, 0, 0, 100);
+    gradient2.addColorStop(0, "green");
+    gradient2.addColorStop(0.5, "blue");
+    gradient2.addColorStop(1, "red");</b>
 
-        list.addCircle({
-            x: 100,
-            y: 100,
-            radius: 100,
-            fillStyle: [gradient1, gradient2]
-        });
-    }
+    list.addCircle({
+        x: 100,
+        y: 100,
+        radius: 100,
+        <b>fillStyle: [gradient1, gradient2]</b>
+    });
+}
+</code></pre>
 
 
 

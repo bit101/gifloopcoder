@@ -77,7 +77,7 @@ Now you are ready to add some objects and animate them.
 
 The `glc.renderList`, which we have aliased to `list`, has a number of "add" methods for adding objects. Let's start by adding a circle.
 
-<pre>function onGLC(glc) {
+<pre><code>function onGLC(glc) {
     var list = glc.renderList;
 
     glc.loop();
@@ -92,7 +92,7 @@ The `glc.renderList`, which we have aliased to `list`, has a number of "add" met
 
     <b>list.addCircle();</b>
 
-});</pre>
+});</code></pre>
 
 Now, there are many properties that go into defining a rendered circle: position, radius, stroked or filled or both? Stroke color and width, solid or dashed, fill color, drop shadow parameters. Circles are drawn in HTML5 using the `arc` method, so we also need to know the start and end angle of that arc. But we don't have to specify anything at all here because glc has defaults for everything. You only need define what you want to be different from the default.
 
@@ -116,7 +116,7 @@ Now that we have a circle, let's customize it by setting some of its properties.
 
 Now let's change its radius, and give it a stroke. Then a stroke and fill style (color).
 
-<pre>
+<pre><code>
 list.addCircle({
     x: 200,
     y: 200,
@@ -125,7 +125,7 @@ list.addCircle({
     strokeStyle: "#ff0000",
     fillStyle: "yellow"</b>
 });
-</pre>
+</code></pre>
 
 ![](images/1.4.png)
 
@@ -137,7 +137,7 @@ Now that we've seen how to add an object, let's look at how to animate it.
 
 Animation in glc is done through changing an object from one state to another over time. By state, I mean that the values of one or more of its properties are changed. So, rather than assigning a single value to a property, we animate it by assigning _two_ properties to it. And we do that by assigning an array to that property. For example, to animate the radius of this circle, we just pass in an array, like so:
 
-<pre>
+<pre><code>
 list.addCircle({
     x: 200,
     y: 200,
@@ -146,7 +146,7 @@ list.addCircle({
     strokeStyle: "#ff0000",
     fillStyle: "yellow"
 });
-</pre>
+</code></pre>
 
 Now you should be able to see the circle animating. You can use the stop button to stop it, and the scrubber under the animation to examine the animation frame-by-frame.
 
@@ -154,7 +154,7 @@ Now you should be able to see the circle animating. You can use the stop button 
 
 You can animate almost any property of any object. Even colors in any format - hex strings, rgb or rgba strings or even CSS named colors. You can even mix and match formats. It's all good!
 
-<pre>
+<pre><code>
 list.addCircle({
     x: 200,
     y: 200,
@@ -163,13 +163,13 @@ list.addCircle({
     <b>strokeStyle: ["#f00", "#0000ff"],
     fillStyle: ["rgb(255, 255, 0)", "green"]</b>
 });
-</pre>
+</code></pre>
 
 ![](images/1.6.gif)
 
 Here, the stroke will animate from red to blue, while the fill animates from yellow to green. You can even animate booleans!
 
-<pre>
+<pre><code>
 list.addCircle({
     x: 200,
     y: 200,
@@ -178,7 +178,7 @@ list.addCircle({
     strokeStyle: ["#f00", "#0000ff"],
     fillStyle: ["rgb(255, 255, 0)", "green"]
 });
-</pre>
+</code></pre>
 
 ![](images/1.7.gif)
 

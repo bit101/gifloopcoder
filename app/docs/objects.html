@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <style type="text/css">
+  body {
+      font-family: Verdana, Geneva, sans-serif;
+      margin: 0 2em;
+      color: #eeeeee;
+      background-color: #222222;
+  }
+  
+  pre {
+      margin: 0 2em;
+      padding: 1em;
+      background-color: #000000;
+  }
+  
+  a:visited {
+      color: #999999;
+  }
+  a {
+      color: #999999;
+  }
+  
+  b {
+      font-weight: bold;
+      color: #338833;
+  }
+  
+  p code, li code {
+      color: #449944;
+      font-size: 1.2em;
+  }
+  
+  h3 {
+      margin-top: 3em;
+  }
+  
+  img {
+      margin: 0 2em;
+  }
+  
+  li {
+      line-height: 1.5em;
+  }
+  </style>
+</head>
+<body>
+<p><a href="http://gifloopcoder.com">Home</a></p>
+<h1 id="gif-loop-coder-glc-documentation">GIF Loop Coder (GLC) Documentation</h1>
+<p>Table of Contents</p>
+<ol type="1">
+<li><a href="intro.html">Introduction to GIF Loop Coder (GLC)</a></li>
+<li>Objects</li>
+</ol>
+<ul>
+<li><a href="#arrow">Arrow</a></li>
+<li><a href="#beziercurve">BezierCurve</a></li>
+<li><a href="#circle">Circle</a></li>
+<li><a href="#container">Container</a></li>
+<li><a href="#cube">Cube</a></li>
+<li><a href="#curve">Curve</a></li>
+<li><a href="#gear">Gear</a></li>
+<li><a href="#grid">Grid</a></li>
+<li><a href="#heart">Heart</a></li>
+<li><a href="#isobox">Isobox</a></li>
+<li><a href="#line">Line</a></li>
+<li><a href="#oval">Oval</a></li>
+<li><a href="#path">Path</a></li>
+<li><a href="#poly">Poly</a></li>
+<li><a href="#ray">Ray</a></li>
+<li><a href="#rect">Rect</a></li>
+<li><a href="#spiral">Spiral</a></li>
+<li><a href="#star">Star</a></li>
+<li><a href="#text">Text</a></li>
+<li><a href="#segments">Segment Objects</a>
+<ul>
+<li><a href="#segment">Segment</a></li>
+<li><a href="#arcsegment">ArcSegment</a></li>
+<li><a href="#beziersegment">BezierSegment</a></li>
+<li><a href="#curvesegment">CurveSegment</a></li>
+<li><a href="#raysegment">RaySegment</a></li>
+</ul></li>
+</ul>
+<ol start="3" type="1">
+<li><a href="styles.html">Styles</a></li>
+<li><a href="properties.html">Property Types</a></li>
+<li><a href="tips.html">Tips and Advanced Use</a></li>
+</ol>
+<h2 id="objects">Objects</h2>
+<p>Objects are created by calling various &quot;add&quot; methods on the <code>glc.renderList</code>, passing in a generic object with properties. All of the add methods can be called with no paramters or an empty object to create a default object of that type. The properties passed in override any defaults. Each object has its own specific properties that will define that object, such as, <code>x, y, radius</code>, etc. for a circle, or <code>x0, y0, x1, y1</code>, etc. for a line.</p>
+<p>In addition, all objects can accept a number of &quot;style&quot; properties, such as <code>strokeStyle, fillStyle, lineWidth</code>, various shadow properties, etc. Of course, some of these style properties may not be applicable to a particular object, such as a fill style when drawing a line.</p>
+<p>Read more about style properties in the <a href="#styles">Styles</a> section. This section will cover only object-specific properties.</p>
+<p>All of the properties of all of the objects listed here, and all of the styles properties that can be defined on objects are animatable. It may seem unclear how you can animate a string of text or a boolean value. This is covered in detail in the <a href="properties">Property Types</a> section.</p>
+<p>All of these add methods will return a reference to the object just created. This can be used to make this object the parent of other objects. More info on how to use parenting can be found in the <a href="tips.html#parent">Tips Section</a></p>
+<h3 id="arrow"><a name="arrow"></a>Arrow</h3>
+<p>An arrow object is created with:</p>
+<pre><code>glc.renderList.addArrow(properties);</code></pre>
+<p>This draws an arrow shape.</p>
+<figure>
+<img src="images/2.13.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)             The x value of the center of the arrow.
+y (100)             The y value of the center of the arrow.
+w (100)             The width of the arrow.
+h (100)             The height of the arrow.
+pointPercent (0.5)  The percent of the width of the arrow that the point will take up.
+shaftPercent (0.5)  The percent of the height of the arrow that the shaft will take up 
+rotation (0)        The rotation of the object.
+stroke (false)      Whether the object will be stroked.
+fill (true)         Whether the object will be filled.</code></pre>
+<h3 id="beziercurve"><a name="beziercurve"></a>BezierCurve</h3>
+<p>A bezier curve object is created with:</p>
+<pre><code>glc.renderList.addBezierCurve(properties);</code></pre>
+<p>This draws a standard bezier curve using four points.</p>
+<figure>
+<img src="images/2.1.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x0 (50)             The x value of the first point.
+y0 (10)             The y value of the first point.
+x1 (200)            The x value of the second point.
+y1 (100)            The y value of the second point.
+x2 (0)              The x value of the third point.
+y2 (100)            The y value of the third point.
+x3 (150)            The x value of the fourth point.
+y3 (10)             The y value of the fourth point.
+showPoints (false)  Whether the control points of the curve will be drawn.</code></pre>
+<h3 id="circle"><a name="circle"></a>Circle</h3>
+<p>A circle object is created with:</p>
+<pre><code>glc.renderList.addCircle(properties);</code></pre>
+<p>This draws a circle. Because circles are drawn using the arc command in HTML5, this object also draws arcs by setting the start and end angles.</p>
+<figure>
+<img src="images/2.3.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)                 The x position of the circle.
+y (100)                 The y position of the circle.
+radius (50)             The radius of the circle.
+startAngle (0)          The start angle of the arc. (degrees)
+endAngle (360)          The end angle of the arc. (degrees)
+rotation (0)            The rotation of the circle. (degrees).
+stroke (false)          Whether the object will be stroked.
+fill (true)             Whether the object will be filled.
+drawFromCenter (false)  If true, starts and ends the drawing at the center of the circle rather than points on the radius.</code></pre>
+<h3 id="container"><a name="container"></a>Container</h3>
+<p>A container object is created with:</p>
+<pre><code>glc.renderList.addContainer(properties);</code></pre>
+<p>This creates an empty shape that other shapes can be added to. The container can be positioned on the x, y axes and rotated. More info on how to use parenting can be found in the <a href="tips.html#parent">Tips Section</a></p>
+<figure>
+<img src="images/2.3.gif" alt="" />
+</figure>
+<p>Because the container does not draw anything, any style properties will be ignored. The following properties can be used on a container. All of these properties are animatable.</p>
+<pre><code>x (0)                 The x position of the container.
+y (0)                 The y position of the container.
+rotation (0)            The rotation of the container. (degrees).</code></pre>
+<h3 id="cube"><a name="cube"></a>Cube</h3>
+<p>A cube object is created with:</p>
+<pre><code>glc.renderList.addCube(properties);</code></pre>
+<p>This draws a wireframe cube. At this time, only a stroke is available, no fill.</p>
+<figure>
+<img src="images/2.21.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)         The position value of the cube.
+y (100)         The position value of the cube.
+z (0)           The x position of the cube.
+size (100)      The size of the cube.
+rotationX (0)   The rotation of the cube on the x-axis (degrees).
+rotationY (0)   The rotation of the cube on the y-axis (degrees).
+rotationZ (0)   The rotation of the cube on the z-axis (degrees).</code></pre>
+<h3 id="curve"><a name="curve"></a>Curve</h3>
+<p>A curve object is created with:</p>
+<pre><code>glc.renderList.addCurve(properties);</code></pre>
+<p>This draws a standard quadratic curve using three points.</p>
+<figure>
+<img src="images/2.4.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x0 (20)             The x value of the first point.
+y0 (20)             The y value of the first point.
+x1 (100)            The x value of the second point.
+y1 (200)            The y value of the second point.
+x2 (180)            The x value of the third point.
+y2 (20)             The y value of the third point.
+showPoints (false)  Whether the control points of the curve will be drawn.</code></pre>
+<h3 id="gear"><a name="gear"></a>Gear</h3>
+<p>A gear object is created with:</p>
+<pre><code>glc.renderList.addGear(properties);</code></pre>
+<p>This draws a toothed gear.</p>
+<figure>
+<img src="images/2.14.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)             The x position of the gear.
+y (100)             The y position of the gear.
+radius (50)         The outer radius of the gear.
+teeth (10)          The number of teeth on the gear.
+toothHeight (10)    The height of the gear&#39;s teeth.
+toothAngle (0.3)    Controls the angle of the sides of the teeth (0 - 1).
+hub (10)            The radius of the hub of the gear (inner circle).
+rotation (0)        The rotation of the gear. (degrees).
+stroke (false)      Whether the object will be stroked.
+fill (true)         Whether the object will be filled.</code></pre>
+<h3 id="grid"><a name="grid"></a>Grid</h3>
+<p>A grid object is created with:</p>
+<pre><code>glc.renderList.addGrid(properties);</code></pre>
+<p>This draws a grid on the animation.</p>
+<figure>
+<img src="images/2.20.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (0)               The x position of the grid.
+y (0)               The y position of the grid.
+w (100)             The width of the grid.
+h (100)             The height of the grid.
+gridSize (20)       The size of one cell in the grid.</code></pre>
+<h3 id="heart"><a name="heart"></a>Heart</h3>
+<p>A heart object is created with:</p>
+<pre><code>glc.renderList.addHeart(properties);</code></pre>
+<p>This draws a heart shape.</p>
+<figure>
+<img src="images/2.15.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)         The x position of the heart.
+y (100)         The y position of the heart.
+w (50)          The width of the heart.
+h (50)          The height of the heart.
+rotation (0)    The rotation of the heart. (degrees).
+stroke (false)  Whether the object will be stroked.
+fill (true)     Whether the object will be filled.</code></pre>
+<h3 id="isobox"><a name="isobox"></a>Isobox</h3>
+<p>An isometric box object is created with:</p>
+<pre><code>glc.renderList.addIsobox(properties);</code></pre>
+<p>This draws an isometric box.</p>
+<figure>
+<img src="images/2.23.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)                 The x position of the isobox.
+y (100)                 The y position of the isobox.
+size (60)               The size of the isobox.
+h (40)                  The height of the isobox.
+colorTop (#eeeeee)      The color of the top of the isobox.
+colorLeft (#999999)     The color of the left side of the isobox.
+colorRight (#cccccc)    The color of the right side of the isobox.
+stroke (false)          Whether the object will be stroked.
+fill (true)             Whether the object will be filled.</code></pre>
+<p>Note: a good way to assign colors to the faces is to use <code>color.hsv()</code> with the same hue but differing values. For example:</p>
+<pre><code>list.addIsobox({
+    colorTop: color.hsv(40, 1, 1),       // bright 
+    colorRight: color.hsv(40, 1, 0.75),  // darker
+    colorLeft: color.hsv(40, 1, 0.5)     // darkest
+});</code></pre>
+<h3 id="line"><a name="line"></a>Line</h3>
+<p>A line object is created with:</p>
+<pre><code>glc.renderList.addLine(properties);</code></pre>
+<p>This simply draws a line between two points.</p>
+<figure>
+<img src="images/2.6.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x0 (0)      The x value of the first point.
+y0 (0)      The y value of the first point.
+x1 (100)    The x value of the second point.
+y1 (100)    The y value of the second point.</code></pre>
+<h3 id="oval"><a name="oval"></a>Oval</h3>
+<p>A oval object is created with:</p>
+<pre><code>glc.renderList.addOval(properties);</code></pre>
+<p>This draws an oval using values <code>rx</code> and <code>ry</code> for the x and y radius. Because this is done using the arc command in HTML5, this object also draws oval-based arcs by setting the start and end angles.</p>
+<figure>
+<img src="images/2.22.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)                 The x position of the oval.
+y (100)                 The y position of the oval.
+rx (50)                 The x radius of the oval.
+ry (50)                 The y radius of the oval.
+startAngle (0)          The start angle of the arc. (degrees)
+endAngle (360)          The end angle of the arc. (degrees)
+rotation (0)            The rotation of the oval. (degrees).
+stroke (false)          Whether the object will be stroked.
+fill (true)             Whether the object will be filled.
+drawFromCenter (false)  If true, starts and ends the drawing at the center of the oval rather than points on the radius.</code></pre>
+<h3 id="path"><a name="path"></a>Path</h3>
+<p>A path object is created with:</p>
+<pre><code>glc.renderList.addPath(properties);</code></pre>
+<p>This draws a series of line segments between a list of points.</p>
+<figure>
+<img src="images/2.17.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>path ([])           An array of points in the format [x0, y0, x1, y1, etc]
+startPercent (0)    Drawing will start at the specified percent of the path.
+endPercent (1)      Drawing will end at the specified percent of the path.</code></pre>
+<p>The path can be an array of arrays, in which case it will animate between the two different paths. Ideally, the paths would have the same number of points. If not, glc will use the length of the shorter array, and excess points in the longer one will be ignored.</p>
+<h3 id="poly"><a name="poly"></a>Poly</h3>
+<p>A poly object is created with:</p>
+<pre><code>glc.renderList.addPoly(properties);</code></pre>
+<p>This draws a multi-sided polygon.</p>
+<figure>
+<img src="images/2.7.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)         The x position of the polygon.
+y (100)         The y position of the polygon.
+radius (50)     The radius of the polygon.
+sides (5)       The number of sides in the polygon.
+rotation (0)    The rotation of the polygon. (degrees).
+stroke (false)  Whether the object will be stroked.
+fill (true)     Whether the object will be filled.</code></pre>
+<h3 id="rect"><a name="rect"></a>Rect</h3>
+<p>A rect object is created with:</p>
+<pre><code>glc.renderList.addRect(properties);</code></pre>
+<p>This draws a rectangle. By default the x, y position represents the center of the rectangle. This also means the rectangle will pivot on its center if rotated. This can be changed with the <code>drawFromCenter</code> property. Setting this to false means the rectangle will be drawn from and pivot on the top left corner.</p>
+<figure>
+<img src="images/2.8.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)         The x value of the rectangle.
+y (100)         The y value of the rectangle.
+w (100)         The width value of the rectangle.
+h (100)         The height value of the rectangle.
+rotation (0)    The rotation of the rectangle. (degrees)
+drawFromCenter  (true)  Whether the rectangle is drawn from the center or the top left corner.
+stroke (false)  Whether the object will be stroked.
+fill (true)     Whether the object will be filled.</code></pre>
+<h3 id="ray"><a name="ray"></a>Ray</h3>
+<p>A ray object is created with:</p>
+<pre><code>glc.renderList.addRay(properties);</code></pre>
+<p>This simply draws a line the same as the line object, but rather than specifying the line with x0, y0, x1, y1 properties, here you specify the starting point of the line, a length and an angle. You could do this with a line by manually calculating the end points. This just makes it easier.</p>
+<figure>
+<img src="images/2.16.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)         The x value of the line.
+y (100)         The y value of the line.
+length (100)    The length value of the line.
+angle (0)       The angle value of the line.</code></pre>
+<h3 id="spiral"><a name="spiral"></a>Spiral</h3>
+<p>A spiral object is created with:</p>
+<pre><code>glc.renderList.addSpiral(properties);</code></pre>
+<p>This draws a spiral.</p>
+<figure>
+<img src="images/2.18.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)             The x position of the spiral.
+y (100)             The y position of the spiral.
+innerRadius (10)    The inner radius of the spiral.
+outerRadius (90)    The outer radius of the spiral.
+turns (6)           The number of turns in the spiral (negative values make it turn in the other direction).
+res (1)             The spiral is drawn as a series of tiny line segments. This is the angle of each of those segments (degrees).
+rotation (0)        The rotation of the spiral. (degrees).
+stroke (false)      Whether the object will be stroked.
+fill (true)         Whether the object will be filled.</code></pre>
+<h3 id="star"><a name="star"></a>Star</h3>
+<p>A star object is created with:</p>
+<pre><code>glc.renderList.addStar(properties);</code></pre>
+<p>This draws a multi-pointed star.</p>
+<figure>
+<img src="images/2.10.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)             The x position of the star.
+y (100)             The y position of the star.
+innerRadius (25)    The inner radius of the star.
+outerRadius (50)    The outer radius of the star.
+points (5)          The number of points in the star.
+rotation (0)        The rotation of the star. (degrees).
+stroke (false)      Whether the object will be stroked.
+fill (true)         Whether the object will be filled.</code></pre>
+<h3 id="text"><a name="text"></a>Text</h3>
+<p>A text object is created with:</p>
+<pre><code>glc.renderList.addText(properties);</code></pre>
+<p>This draws a string of text.</p>
+<figure>
+<img src="images/2.11.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)                     The x position of the text.
+y (100)                     The y position of the text.
+text (&quot;hello&quot;)              The string that will be drawn.
+fontSize (20)               The size of the font, in pixels.
+fontWeight (&quot;normal&quot;)       The weight of the font (normal, bold, etc).
+fontFamily (&quot;sans-serif&quot;)   The font family.
+fontStyle (&quot;normal&quot;)        The style of the font (normal, italic, etc).
+rotation (0)                The rotation of the text. (degrees).
+stroke (false)              Whether the object will be stroked.
+fill (true)                 Whether the object will be filled.</code></pre>
+<h2 id="segment-objects"><a name="segments"></a>Segment Objects</h2>
+<p>The next group of objects are special as they will animate even if you don't supply pairs of properties. They create a path - either a line, a curve, a bezier curve or an arc, and stroke a portion of that path on each frame. That segment will move along from the start of the path to the end of it, and then back again if you are in bounce mode. Looking at the examples below is the easiest way to understand it.</p>
+<p>Each of the segment objects has a property that controls how long that segment will be. For the line segment, it's simply a length. For the arc segment, it's an arc angle in degrees. For the two types of curve segments, it's a percentage value. How this relates to the actual length of the segment compared to the length of the curve is complex. It's not actually a percentage of the length. The segment will be longer at the start and end of the curve and shorter in the center. But it is true that the higher the percent value, the longer the segment will be.</p>
+<p>Of course, you can also animate any other properties of the arc objects the same way you can do with any other object. If done right, there are some great effects possible with these.</p>
+<h3 id="segment"><a name="segment"></a>Segment</h3>
+<p>A segment object is created with:</p>
+<pre><code>glc.renderList.addSegment(properties);</code></pre>
+<p>This creates a line using two points, but only draws a portion of that line. The drawn segment will animate from the beginning of the line to the end of it during the animation (and back to the beginning if mode = &quot;bounce&quot;).</p>
+<figure>
+<img src="images/2.9.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x0 (0)              The x value of the first point.
+y0 (0)              The y value of the first point.
+x1 (100)            The x value of the second point.
+y1 (100)            The y value of the second point.
+segmentLength (50)  The length of the segment that will be drawn.</code></pre>
+<h3 id="arcsegment"><a name="arcsegment"></a>ArcSegment</h3>
+<p>An arc segment object is created with:</p>
+<pre><code>glc.renderList.addArcSegment(properties);</code></pre>
+<p>This creates an arc at an x, y point with a radius and start/end angles, but only draws a portion of that arc. The drawn segment will animate from the start angle to the end angle during the animation (and back to the start angle if mode = &quot;bounce&quot;).</p>
+<figure>
+<img src="images/2.12.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)         The x position of the arc.
+y (100)         The y position of the arc.
+radius (50)     The radius of the arc.
+startAngle (0)  The start angle of the arc. (degrees)
+endAngle (360)  The end angle of the arc. (degrees)
+rotation (0)    The rotation of the arc. (degrees)
+stroke (false)  Whether the object will be stroked.
+arc (20)        The angle of the arc that will be drawn. (degrees)</code></pre>
+<h3 id="beziersegment"><a name="beziersegment"></a>BezierSegment</h3>
+<p>A bezier segment object is created with:</p>
+<pre><code>glc.renderList.addBezierSegment(properties);</code></pre>
+<p>This creates a standard bezier curve using four points, but only draws a portion of that curve. The drawn segment will animate from the beginning of the curve to the end of it during the animation (and back to the beginning if mode = &quot;bounce&quot;).</p>
+<figure>
+<img src="images/2.2.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x0 (50)             The x value of the first point.
+y0 (10)             The y value of the first point.
+x1 (200)            The x value of the second point.
+y1 (100)            The y value of the second point.
+x2 (0)              The x value of the third point.
+y2 (100)            The y value of the third point.
+x3 (150)            The x value of the fourth point.
+y3 (10)             The y value of the fourth point.
+percent (0.1)       The percent of the bezier curve on which the segment will be drawn. Higher percent means a longer segment.
+showPoints (false)  Whether the control points of the curve will be drawn.</code></pre>
+<h3 id="curvesegment"><a name="curvesegment"></a>CurveSegment</h3>
+<p>A curve segment object is created with:</p>
+<pre><code>glc.renderList.addCurveSegment(properties);</code></pre>
+<p>This creates a standard quadratic curve using three points, but only draws a portion of that curve. The drawn segment will animate from the beginning of the curve to the end of it during the animation (and back to the beginning if mode = &quot;bounce&quot;).</p>
+<figure>
+<img src="images/2.5.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x0 (20)             The x value of the first point.
+y0 (20)             The y value of the first point.
+x1 (100)            The x value of the second point.
+y1 (200)            The y value of the second point.
+x2 (180)            The x value of the third point.
+y2 (20)             The y value of the third point.
+percent (0.1)       The percent of the quadratic curve on which the segment will be drawn. Higher percent means a longer segment.
+showPoints (false)  Whether the control points of the curve will be drawn.</code></pre>
+<h3 id="ray-segment"><a name="raysegment"></a>Ray Segment</h3>
+<p>A ray segment object is created with:</p>
+<pre><code>glc.renderList.addRaySegment(properties);</code></pre>
+<p>This simply draws a segment the same as the segment object, but rather than specifying the line with x0, y0, x1, y1 properties, here you specify the starting point of the line, a length and an angle. You could do this with a segment by manually calculating the end points. This just makes it easier.</p>
+<figure>
+<img src="images/2.19.gif" alt="" />
+</figure>
+<p>In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.</p>
+<pre><code>x (100)             The x value of the line.
+y (100)             The y value of the line.
+length (100)        The length value of the line.
+angle (0)           The angle value of the line.
+segmentLength (50)  The length of the segment that will be drawn.</code></pre>
+</body>
+</html>

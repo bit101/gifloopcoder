@@ -7,8 +7,9 @@ This is the documentation for glc. I suggest you start by reading the [intro sec
 You can also check out the [GLC Blog](http://www.gifloopcoder.com/blog), where new features, sample code and small tutorials are posted from time to time.
 
 Table of Contents
-1.  [Introduction to GIF Loop Coder (GLC)](intro.html)
-2.  [Objects](objects.html)
-3.  [Styles](styles.html)
-4.  [Property Types](properties.html)
-5.  [Tips and Advanced Use](tips.html)
+
+1. [Introduction to GIF Loop Coder (GLC)](intro.html)
+2. [Objects](objects.html)
+3. [Styles](styles.html)
+4. [Property Types](properties.html)
+5. [Tips and Advanced Use](tips.html)
