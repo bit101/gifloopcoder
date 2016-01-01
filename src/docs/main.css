@@ -1,0 +1,43 @@
+<style type="text/css">
+body {
+    font-family: Verdana, Geneva, sans-serif;
+    margin: 0 2em;
+    color: #eeeeee;
+    background-color: #222222;
+}
+
+pre {
+    margin: 0 2em;
+    padding: 1em;
+    background-color: #000000;
+}
+
+a:visited {
+    color: #999999;
+}
+a {
+    color: #999999;
+}
+
+b {
+    font-weight: bold;
+    color: #338833;
+}
+
+p code, li code {
+    color: #449944;
+    font-size: 1.2em;
+}
+
+h3 {
+    margin-top: 3em;
+}
+
+img {
+    margin: 0 2em;
+}
+
+li {
+    line-height: 1.5em;
+}
+</style>

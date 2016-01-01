@@ -1,0 +1,212 @@
+html, body, #content {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.toolbar {
+    width: 100%;
+    height: 50px;
+    background-color: #eeeeee;
+    border-bottom: solid 1px #999999;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.toolbar_button {
+    margin: 5px 15px;
+    text-align: center;
+    font-size: 10px;
+    font-family: sans-serif;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.toolbar_separator {
+    margin: 5px 15px 0px 15px;
+    width: 1px;
+    height: 39px;
+    background-color: #999999;
+    display: inline-block;
+}
+
+
+.code_panel {
+    position: absolute;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    width: 600px;
+}
+
+.splitter {
+    position: absolute;
+    left: 600px;
+    top: 51px;
+    width: 8px;
+    bottom: 0px;
+    background-color: #bbbbbb;
+    cursor: e-resize;
+}
+
+.canvas_panel {
+    position: absolute;
+    left: 608px; /* code panel width + splitter width */
+    right: 177px;
+    top: 51px;
+    bottom: 0;
+    background: #dddddd;
+    overflow: auto;
+}
+
+.scrubber_div {
+    background-color: #cccccc;
+    border-bottom: 2px #999999;
+    padding: 10px;
+}
+
+canvas {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: block;
+    background-color: #ffffff;
+    margin-top: 20px;
+    -webkit-box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.3);
+    box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.3);
+}
+
+.control_panel {
+    position: absolute;
+    width: 155px;
+    right: 0;
+    top: 51px;
+    bottom: 0;
+    background: #eeeeee;
+    border-left: solid 2px #bbbbbb;
+    padding: 10px;
+}
+
+.control_label {
+    font-size: 10px;
+    font-family: sans-serif;
+}
+
+.slider {
+    width: 100%;
+    margin: 0;
+}
+
+.slider:disabled {
+    opacity: 0.5;
+}
+
+.dropdown {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+}
+
+.blur {
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
+}
+
+.output_image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: white;
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+}
+
+.image_info {
+    text-align: center;
+    line-height: 15px;
+    background-color: white;
+    font-family: sans-serif;
+    font-size: 10px;
+    padding: 5px 10px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    -webkit-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+}
+
+.close_button {
+    background-color: white;
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 10px;
+    font-family: sans-serif;
+    cursor: pointer;
+    -webkit-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+}
+
+.about_info {
+    padding: 0px 20px;
+    background-color: white;
+    font-family: sans-serif;
+    font-size: 10px;
+    width: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: white;
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);    
+}
+
+.about_info h1 {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.about_info h2 {
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+.about_info h3 {
+    font-size: 11px;
+    margin-bottom: 0;
+}
+
+.about_info p {
+    margin-top: 0;
+}
+
+.about_info a:visited {
+    margin-top: 0;
+}
