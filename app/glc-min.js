@@ -3088,6 +3088,10 @@ define('app/render/shapes/shape',["app/render/ValueParser", "app/render/ColorPar
 			}
 			this.draw = type.draw;
 			this.list = [];
+            if(type.init) {
+                this.init = type.init;
+				this.init();
+            }
 		},
 
 		add: function(item) {
@@ -3099,17 +3103,16 @@ define('app/render/shapes/shape',["app/render/ValueParser", "app/render/ColorPar
 			this.list.length = 0;
 		},
 
-		render: function(context, t, skipInterpolation) {
-			if(!skipInterpolation) {
-				t *= this.props.speedMult || 1;
-				t += this.props.phase || 0;
-				var t = this.interpolation.interpolate(t);
-			}
+		render: function(context, t) {
+			var globalTime = t;
+			t *= this.props.speedMult || 1;
+			t += this.props.phase || 0;
+			var t = this.interpolation.interpolate(t);
 
 			this.startDraw(context, t);
 			this.draw(context, t);
 			for(var i in this.list) {
-				this.list[i].render(context, t, true);
+				this.list[i].render(context, globalTime);
 			}
 			this.endDraw(context, t);
 		},
@@ -3717,6 +3720,35 @@ define('app/render/shapes/heart',[],function() {
 	}
 });
 
+define('app/render/shapes/image',[],function() {
+	
+	return {
+		init: function() {
+			this.image = document.createElement("img");
+			this.image.src = this.props.url;
+			document.body.appendChild(this.image);
+		},
+		draw: function(context, t) {
+			var x = this.getNumber("x", t, 100),
+				y = this.getNumber("y", t, 100),
+				w = this.getNumber("w", t, this.image.width),
+				h = this.getNumber("h", t, this.image.height),
+				widthScale = w/this.image.width,
+				heightScale = h/this.image.height;
+
+			context.save();
+			context.translate(x, y);
+			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
+			context.save();
+			context.scale(widthScale, heightScale);
+			context.drawImage(this.image, -w / widthScale * 0.5, -h / heightScale * 0.5);
+			context.restore();
+			this.drawFillAndStroke(context, t, true, false);
+			context.restore();
+		}
+	}
+});
+
 define('app/render/shapes/isobox',[],function() {
 	
 	return {
@@ -4123,6 +4155,7 @@ define('app/render/RenderList',[
 	"app/render/shapes/gear",
 	"app/render/shapes/grid",
 	"app/render/shapes/heart",
+	"app/render/shapes/image",
 	"app/render/shapes/isobox",
 	"app/render/shapes/line",
 	"app/render/shapes/oval",
@@ -4150,6 +4183,7 @@ define('app/render/RenderList',[
 		Gear,
 		Grid,
 		Heart,
+		Image,
 		Isobox,
 		Line,
 		Oval,
@@ -4256,6 +4290,10 @@ define('app/render/RenderList',[
 		return add(Shape.create(Heart, props));
 	}
 
+	function addImage(props) {
+		return add(Shape.create(Image, props));
+	}
+
 	function addIsobox(props) {
 		return add(Shape.create(Isobox, props));
 	}
@@ -4355,6 +4393,7 @@ define('app/render/RenderList',[
 		addGear: addGear,
 		addGrid: addGrid,
 		addHeart: addHeart,
+		addImage: addImage,
 		addIsobox: addIsobox,
 		addLine: addLine,
 		addOval: addOval,
