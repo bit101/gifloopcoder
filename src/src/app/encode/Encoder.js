@@ -4,6 +4,7 @@ define(function(require) {
         encoding = false,
         maxColors = 256,
         fps = 30,
+        quality = 10,
         dataURL = null,
         width = 400,
         height = 400;
@@ -14,6 +15,7 @@ define(function(require) {
         GIFEncoder.setMaxColors(maxColors);
         GIFEncoder.setRepeat(0);
         GIFEncoder.setDelay(1000 / fps);
+        GIFEncoder.setQuality(quality);
         GIFEncoder.start();
         encoding = true;
     }
@@ -50,6 +52,10 @@ define(function(require) {
         fps = pFPS;
     }
 
+    function setQuality(pQuality) {
+        quality = pQuality;
+    }
+
 
     function encode64(input) {
         var output = "", i = 0, l = input.length,
@@ -83,7 +89,8 @@ define(function(require) {
         getDataURL: getDataURL,
         setSize: setSize,
         setMaxColors: setMaxColors,
-        setFPS: setFPS
+        setFPS: setFPS,
+        setQuality: setQuality
     }
 
 });

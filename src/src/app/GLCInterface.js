@@ -9,6 +9,7 @@ define(function(require) {
         this.setMaxColors = MainController.setMaxColors;
         this.setMode = MainController.setMode;
         this.setEasing = MainController.setEasing;
+        this.setQuality = MainController.setQuality;
         this.styles = Styles;
         this.renderList = RenderList;
         this.init = null;
@@ -24,7 +25,7 @@ define(function(require) {
         setMode: null,
         setEasing: null,
         setMaxColors: null,
-        setQuality: function() {},
+        setQuality: null,
         color: require("app/render/Color"),
         styles: null,
         renderList: null,

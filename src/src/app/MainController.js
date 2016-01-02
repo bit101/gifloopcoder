@@ -225,6 +225,10 @@ define(function(require) {
         PropertiesController.setEasing(easing);
     }
 
+    function setQuality(quality) {
+        Encoder.setQuality(quality);
+    }
+
 
     return {
         init: init,
@@ -250,7 +254,8 @@ define(function(require) {
         setFPS: setFPS,
         setMaxColors: setMaxColors,
         setMode: setMode,
-        setEasing: setEasing
+        setEasing: setEasing,
+        setQuality: setQuality
     }
 
 

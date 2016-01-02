@@ -1791,6 +1791,7 @@ define('app/encode/Encoder',['require','libs/GIFEncoder'],function(require) {
         encoding = false,
         maxColors = 256,
         fps = 30,
+        quality = 10,
         dataURL = null,
         width = 400,
         height = 400;
@@ -1801,6 +1802,7 @@ define('app/encode/Encoder',['require','libs/GIFEncoder'],function(require) {
         GIFEncoder.setMaxColors(maxColors);
         GIFEncoder.setRepeat(0);
         GIFEncoder.setDelay(1000 / fps);
+        GIFEncoder.setQuality(quality);
         GIFEncoder.start();
         encoding = true;
     }
@@ -1837,6 +1839,10 @@ define('app/encode/Encoder',['require','libs/GIFEncoder'],function(require) {
         fps = pFPS;
     }
 
+    function setQuality(pQuality) {
+        quality = pQuality;
+    }
+
 
     function encode64(input) {
         var output = "", i = 0, l = input.length,
@@ -1870,7 +1876,8 @@ define('app/encode/Encoder',['require','libs/GIFEncoder'],function(require) {
         getDataURL: getDataURL,
         setSize: setSize,
         setMaxColors: setMaxColors,
-        setFPS: setFPS
+        setFPS: setFPS,
+        setQuality: setQuality
     }
 
 });
@@ -2516,6 +2523,10 @@ define('app/MainController',['require','app/encode/Encoder','app/encode/SpriteSh
         PropertiesController.setEasing(easing);
     }
 
+    function setQuality(quality) {
+        Encoder.setQuality(quality);
+    }
+
 
     return {
         init: init,
@@ -2541,7 +2552,8 @@ define('app/MainController',['require','app/encode/Encoder','app/encode/SpriteSh
         setFPS: setFPS,
         setMaxColors: setMaxColors,
         setMode: setMode,
-        setEasing: setEasing
+        setEasing: setEasing,
+        setQuality: setQuality
     }
 
 
@@ -3099,17 +3111,16 @@ define('app/render/shapes/shape',["app/render/ValueParser", "app/render/ColorPar
 			this.list.length = 0;
 		},
 
-		render: function(context, t, skipInterpolation) {
-			if(!skipInterpolation) {
-				t *= this.props.speedMult || 1;
-				t += this.props.phase || 0;
-				var t = this.interpolation.interpolate(t);
-			}
+		render: function(context, t) {
+			var globalTime = t;
+			t *= this.props.speedMult || 1;
+			t += this.props.phase || 0;
+			var t = this.interpolation.interpolate(t);
 
 			this.startDraw(context, t);
 			this.draw(context, t);
 			for(var i in this.list) {
-				this.list[i].render(context, t, true);
+				this.list[i].render(context, globalTime);
 			}
 			this.endDraw(context, t);
 		},
@@ -4634,6 +4645,7 @@ define('app/GLCInterface',['require','app/render/Color'],function(require) {
         this.setMaxColors = MainController.setMaxColors;
         this.setMode = MainController.setMode;
         this.setEasing = MainController.setEasing;
+        this.setQuality = MainController.setQuality;
         this.styles = Styles;
         this.renderList = RenderList;
         this.init = null;
@@ -4649,7 +4661,7 @@ define('app/GLCInterface',['require','app/render/Color'],function(require) {
         setMode: null,
         setEasing: null,
         setMaxColors: null,
-        setQuality: function() {},
+        setQuality: null,
         color: require("app/render/Color"),
         styles: null,
         renderList: null,
