@@ -12,4 +12,4 @@ pandoc docs/properties.md -f markdown -t html5 -s -o ../docs/properties.html -H 
 pandoc docs/styles.md -f markdown -t html5 -s -o ../docs/styles.html -H docs/main.css
 pandoc docs/tips.md -f markdown -t html5 -s -o ../docs/tips.html -H docs/main.css
 
-cp docs/images ../docs/ -r
+cp -R docs/images ../docs/
