@@ -20,6 +20,10 @@ define(["app/render/ValueParser", "app/render/ColorParser"], function(ValueParse
 			}
 			this.draw = type.draw;
 			this.list = [];
+            if(type.init) {
+                this.init = type.init;
+				this.init();
+            }
 		},
 
 		add: function(item) {
