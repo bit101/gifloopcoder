@@ -1,7 +1,6 @@
 define(function(require) {
 
     var ToolbarView = require("ui/toolbar/ToolbarView"),
-        isStandalone = false,
         MainController = null,
         CanvasController = null;
         Scheduler = null,
@@ -15,7 +14,7 @@ define(function(require) {
             ToolbarView.addButton("new_btn", "icons/new.png", "NEW", MainController.newFile);
             ToolbarView.addButton("open_btn", "icons/open.png", "OPEN", MainController.open);
             ToolbarView.addButton("save_btn", "icons/save.png", "SAVE", MainController.save);
-            if(isStandalone) {
+            if(glcConfig.isStandalone) {
                 ToolbarView.addButton("saveas_btn", "icons/saveas.png", "SAVE AS", MainController.saveAs);
             }
             ToolbarView.addButton("compile_btn", "icons/compile.png", "COMPILE", MainController.compile);

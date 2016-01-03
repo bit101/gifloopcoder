@@ -18,6 +18,9 @@ define(function(require) {
     init();
 
     function init() {
+        if(window.nodeRequire != null) {
+            glcConfig.isStandalone = true;
+        }
         window.addEventListener("error", function (event) {
             window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
         });
