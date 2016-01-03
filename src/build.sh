@@ -13,3 +13,4 @@ pandoc docs/styles.md -f markdown -t html5 -s -o ../docs/styles.html -H docs/mai
 pandoc docs/tips.md -f markdown -t html5 -s -o ../docs/tips.html -H docs/main.css
 
 cp -R docs/images ../docs/
+cp docs/GLCCheatSheet.pdf ../docs/

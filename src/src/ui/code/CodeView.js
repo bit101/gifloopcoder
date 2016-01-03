@@ -24,7 +24,8 @@ define(function(require) {
             smartIndent: true,
             indentUnit: 4,
             lineNumbers: true,
-            autoCloseBrackets: true
+            autoCloseBrackets: true,
+            indentWithTabs: glcConfig.useTabs
         });
         cm.on("change", cacheCode);
         setWidth(width);
@@ -36,7 +37,12 @@ define(function(require) {
     }
 
     function newFile() {
-        cm.setValue("function onGLC(glc) {\n    glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+        var template = "function onGLC(glc) {\n\tglc.loop();\n//\tglc.size(400, 400);\n//\tglc.setDuration(5);\n//\tglc.setFPS(20);\n//\tglc.setMode('single');\n//\tglc.setEasing(false);\n\tvar list = glc.renderList,\n\t\twidth = glc.w,\n\t\theight = glc.h,\n\t\tcolor = glc.color;\n\n\t// your code goes here:\n\n\n\n}\n";
+        if(!glcConfig.useTabs) {
+            template = template.replace(/\/\/\t/g, "//     ");
+            template = template.replace(/\t/g, "    ");
+        }
+        cm.setValue(template);
     }
 
     function onResize() {

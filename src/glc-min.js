@@ -2033,7 +2033,6 @@ define('ui/toolbar/ToolbarView',['require','utils/UIUtil'],function(require) {
 define('ui/toolbar/ToolbarController',['require','ui/toolbar/ToolbarView'],function(require) {
 
     var ToolbarView = require("ui/toolbar/ToolbarView"),
-        isStandalone = false,
         MainController = null,
         CanvasController = null;
         Scheduler = null,
@@ -2047,7 +2046,7 @@ define('ui/toolbar/ToolbarController',['require','ui/toolbar/ToolbarView'],funct
             ToolbarView.addButton("new_btn", "icons/new.png", "NEW", MainController.newFile);
             ToolbarView.addButton("open_btn", "icons/open.png", "OPEN", MainController.open);
             ToolbarView.addButton("save_btn", "icons/save.png", "SAVE", MainController.save);
-            if(isStandalone) {
+            if(glcConfig.isStandalone) {
                 ToolbarView.addButton("saveas_btn", "icons/saveas.png", "SAVE AS", MainController.saveAs);
             }
             ToolbarView.addButton("compile_btn", "icons/compile.png", "COMPILE", MainController.compile);
@@ -14689,7 +14688,8 @@ define('ui/code/CodeView',['require','utils/UIUtil','libs/codemirror/lib/codemir
             smartIndent: true,
             indentUnit: 4,
             lineNumbers: true,
-            autoCloseBrackets: true
+            autoCloseBrackets: true,
+            indentWithTabs: glcConfig.useTabs
         });
         cm.on("change", cacheCode);
         setWidth(width);
@@ -14701,7 +14701,12 @@ define('ui/code/CodeView',['require','utils/UIUtil','libs/codemirror/lib/codemir
     }
 
     function newFile() {
-        cm.setValue("function onGLC(glc) {\n    glc.loop();\n//     glc.size(400, 400);\n//     glc.setDuration(5);\n//     glc.setFPS(20);\n//     glc.setMode('single');\n//     glc.setEasing(false);\n    var list = glc.renderList,\n        width = glc.w,\n        height = glc.h,\n        color = glc.color;\n\n    // your code goes here:\n\n\n\n}\n");
+        var template = "function onGLC(glc) {\n\tglc.loop();\n//\tglc.size(400, 400);\n//\tglc.setDuration(5);\n//\tglc.setFPS(20);\n//\tglc.setMode('single');\n//\tglc.setEasing(false);\n\tvar list = glc.renderList,\n\t\twidth = glc.w,\n\t\theight = glc.h,\n\t\tcolor = glc.color;\n\n\t// your code goes here:\n\n\n\n}\n";
+        if(!glcConfig.useTabs) {
+            template = template.replace(/\/\/\t/g, "//     ");
+            template = template.replace(/\t/g, "    ");
+        }
+        cm.setValue(template);
     }
 
     function onResize() {
@@ -14960,6 +14965,9 @@ define('main',['require','ui/canvas/CanvasController','ui/properties/PropertiesC
     init();
 
     function init() {
+        if(window.nodeRequire != null) {
+            glcConfig.isStandalone = true;
+        }
         window.addEventListener("error", function (event) {
             window.alert(event.message + "\nLine: " + event.lineno + "\nColumn: " + event.colno);
         });
