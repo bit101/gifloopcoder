@@ -139,6 +139,10 @@ define('ui/canvas/CanvasView',['require','utils/UIUtil'],function(require) {
         canvas = UIUtil.createCanvas(null, div);
         canvas.width = glcConfig.canvasWidth;
         canvas.height = glcConfig.canvasHeight;
+        if(!glcConfig.canvasCanScale) {
+            canvas.style.width = (canvas.width / window.devicePixelRatio) + "px";
+            canvas.style.height = (canvas.height / window.devicePixelRatio) + "px";
+        }
         context = canvas.getContext("2d");
     }
 
@@ -2596,7 +2600,6 @@ define('ui/output/OutputView',['require','utils/UIUtil'],function(require) {
         image.style.maxHeight = window.innerHeight - 40 + "px";
         image.style.maxWidth = window.innerWidth - 40 + "px";
         document.body.appendChild(overlay);
-        contentDiv.className += " blur";
         closeButton.addEventListener("click", hide);
         document.body.addEventListener("keyup", onKeyUp);
     }
@@ -2614,7 +2617,6 @@ define('ui/output/OutputView',['require','utils/UIUtil'],function(require) {
         }
         closeButton.removeEventListener("click", hide);
         document.body.removeEventListener("keyup", onKeyUp);
-        contentDiv.className = "content";
     }
 
     return {
@@ -14796,7 +14798,7 @@ define('ui/code/CodeController',['require','ui/code/CodeView','utils/UIUtil'],fu
         if(result) {
             filename = result;
             if(filename.split(".").length < 2) {
-                filename += ".js";
+                filename += ".glc";
             }
             var link = document.createElement("a");
             link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(CodeView.getCode()));

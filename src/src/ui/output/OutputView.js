@@ -37,7 +37,6 @@ define(function(require) {
         image.style.maxHeight = window.innerHeight - 40 + "px";
         image.style.maxWidth = window.innerWidth - 40 + "px";
         document.body.appendChild(overlay);
-        contentDiv.className += " blur";
         closeButton.addEventListener("click", hide);
         document.body.addEventListener("keyup", onKeyUp);
     }
@@ -55,7 +54,6 @@ define(function(require) {
         }
         closeButton.removeEventListener("click", hide);
         document.body.removeEventListener("keyup", onKeyUp);
-        contentDiv.className = "content";
     }
 
     return {

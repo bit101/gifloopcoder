@@ -24,6 +24,10 @@ define(function(require) {
         canvas = UIUtil.createCanvas(null, div);
         canvas.width = glcConfig.canvasWidth;
         canvas.height = glcConfig.canvasHeight;
+        if(!glcConfig.canvasCanScale) {
+            canvas.style.width = (canvas.width / window.devicePixelRatio) + "px";
+            canvas.style.height = (canvas.height / window.devicePixelRatio) + "px";
+        }
         context = canvas.getContext("2d");
     }
 

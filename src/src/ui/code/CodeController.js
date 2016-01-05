@@ -49,7 +49,7 @@ define(function(require) {
         if(result) {
             filename = result;
             if(filename.split(".").length < 2) {
-                filename += ".js";
+                filename += ".glc";
             }
             var link = document.createElement("a");
             link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(CodeView.getCode()));
