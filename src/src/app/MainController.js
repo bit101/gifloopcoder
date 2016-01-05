@@ -114,6 +114,7 @@ define(function(require) {
         setMaxColors(256);
         setMode("bounce");
         setEasing(true);
+        setQuality(10);
         setSize(glcConfig.canvasWidth, glcConfig.canvasHeight);
         GLCInterface.styles.reset();
         GLCInterface.onEnterFrame = null;
