@@ -57,6 +57,7 @@ define(function(require) {
 
     function setKeys() {
         document.body.addEventListener("keyup", function(event) {
+            // console.log(event.keyCode);
             if(event.ctrlKey && event.keyCode === 191) {
                 cm.toggleComment();
             }
@@ -71,13 +72,18 @@ define(function(require) {
         return cm.getValue();
     }
 
+    function insertCode(code) {
+        cm.replaceSelection(code);
+    }
+
 
     return {
         init: init,
         setWidth: setWidth,
         setCode: setCode,
         getCode: getCode,
-        newFile: newFile
+        newFile: newFile,
+        insertCode: insertCode
     };
 
 });

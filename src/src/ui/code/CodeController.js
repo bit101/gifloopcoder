@@ -2,6 +2,7 @@ define(function(require) {
 
     var CodeView = require("ui/code/CodeView"),
         UIUtil = require("utils/UIUtil"),
+        SnippetMap = require("utils/SnippetMap"),
         fileInput = null,
         filename = "",
         GLCInterface = null,
@@ -94,6 +95,10 @@ define(function(require) {
         CodeView.setCode(code);
     }
 
+    function onSnippet(snippetName) {
+        CodeView.insertCode(SnippetMap.getSnippet(snippetName));
+    }
+
 
     return {
         init: init,
@@ -103,7 +108,8 @@ define(function(require) {
         saveAs: saveAs,
         compile: compile,
         getView: getView,
-        setCode: setCode
+        setCode: setCode,
+        onSnippet: onSnippet
     };
 
 });

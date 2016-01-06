@@ -12,7 +12,9 @@ define(function(require) {
         modeSelect,
         easingCheckBox,
         easingLabel,
-        status;
+        status,
+        objectSelect,
+        snippetSelect;
 
     function init(pListener) {
         listener = pListener;
@@ -49,6 +51,47 @@ define(function(require) {
 
         status = UIUtil.createDiv("control_label", div, { marginTop: "20px"});
         setStatus("stopped");
+
+        UIUtil.createElement("hr", null, div);
+
+        objectSelect = UIUtil.createSelect("dropdown", div, null, [
+            "Arc Segment",
+            "Arrow",
+            "Bezier Curve",
+            "Bezier Segment",
+            "Circle",
+            "Container",
+            "Cube",
+            "Curve",
+            "Curve Segment",
+            "Gear",
+            "Grid",
+            "Heart",
+            "Iso Box",
+            "Line",
+            "Oval",
+            "Path",
+            "Poly",
+            "Ray",
+            "Ray Segment",
+            "Rect",
+            "Segment",
+            "Spiral",
+            "Star",
+            "Text"
+        ]);
+        var objectBtn = UIUtil.createInput("button", null, div, null, "click", onObjectSnippet);
+        objectBtn.value = "Insert Object";
+
+        UIUtil.createElement("hr", null, div);
+
+        snippetSelect = UIUtil.createSelect("dropdown", div, null, [
+            "Shadow",
+            "Grid Layout",
+            "Iso Grid Layout"
+        ]);
+        var snippetBtn = UIUtil.createInput("button", null, div, null, "click", onSnippet);
+        snippetBtn.value = "Insert Snippet";
 
     }
 
@@ -116,6 +159,14 @@ define(function(require) {
         durationSlider.disabled = false;
         modeSelect.disabled = false;
         easingCheckBox.disabled = false;
+    }
+
+    function onObjectSnippet() {
+        listener.onSnippet(objectSelect.value);
+    }
+
+    function onSnippet() {
+        listener.onSnippet(snippetSelect.value);
     }
 
     return {

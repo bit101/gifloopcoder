@@ -230,6 +230,10 @@ define(function(require) {
         Encoder.setQuality(quality);
     }
 
+    function onSnippet(snippet) {
+        CodeController.onSnippet(snippet);
+    }
+
 
     return {
         init: init,
@@ -256,7 +260,8 @@ define(function(require) {
         setMaxColors: setMaxColors,
         setMode: setMode,
         setEasing: setEasing,
-        setQuality: setQuality
+        setQuality: setQuality,
+        onSnippet: onSnippet
     }
 
 

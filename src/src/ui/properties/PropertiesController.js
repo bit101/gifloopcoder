@@ -38,6 +38,10 @@ define(function(require) {
         MainController.setEasing(easing);
     }
 
+    function onSnippet(snippet) {
+        MainController.onSnippet(snippet);
+    }
+
     function setDuration(pDuration) {
         if(duration !== pDuration) {
             duration = pDuration;
@@ -100,6 +104,7 @@ define(function(require) {
         onMaxColorsChange: onMaxColorsChange,
         onModeChange: onModeChange,
         onEasingChange: onEasingChange,
+        onSnippet: onSnippet,
         setDuration: setDuration,
         getDuration: getDuration,
         setFPS: setFPS,
