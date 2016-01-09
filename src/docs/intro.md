@@ -216,6 +216,8 @@ Then there's the Control Panel. From top to bottom, here's what it does:
 *   The **Mode** select allows you to choose "bounce" or "single". Modes will be explained a bit more below.
 *   The **Easing** checkbox gives the animation an ease-in and ease-out to the animation if checked. Otherwise, it performs a straight linear interpolation.
 *   The **Status** indicator lets you know what's happening
+*   The **Object Snippets** dropdown lets you insert a pre-written snippet of code into the code panel that will define an object. Place the cursor at the point you want in the code, choose a snippet and click the insert button.
+*   The **Other Snippets** dropdown lets you insert a useful, pre-defined snipped of code into the code panel. Place the cursor at the point you want in the code, choose a snippet and click the insert button.
 
 If you ever have a hard time getting one of the sliders to land on a specific value, you can also use the left and right cursor keys on your keyboard. Pressing these will move the slider in single increments one way or the other.
 

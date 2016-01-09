@@ -20,7 +20,7 @@ To compile any changes into `glc-min.js` in the app directory, follow these step
 ### Grunt commands:
 - `grunt clean` deletes the `app` and `docs` directories.
 - `grunt build` builds the app into the `app` directory.
-- `grunt build+` builds the app and launches it in the default browser.
+- `grunt buildx` builds the app and launches it in the default browser.
 - `grunt docs` builds all the docs into the `docs` directory.
-- `grunt docs+` builds the docs and launches them in the default browser.
+- `grunt docsx` builds the docs and launches them in the default browser.
 - `grunt` cleans and builds both the app and the docs

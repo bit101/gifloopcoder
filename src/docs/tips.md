@@ -596,7 +596,7 @@ By default, that is set to false, and the integrated editor is shown. Just set t
 
 ![](images/5.10.png)
 
-You'll also notice that the New, Open, Save and Compile buttons in the toolbar are hidden, as these only apply to code in the integrated editor.
+You'll also notice that the New, Open, Save and Compile buttons in the toolbar are hidden, as these only apply to code in the integrated editor. And the snippets dropdowns are gone as there would be no place to insert a snippet.
 
 However, now you'll need a way of loading the script that you are working on in your external editor.
 
