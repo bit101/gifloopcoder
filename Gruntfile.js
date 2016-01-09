@@ -46,8 +46,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask("default", ["clean", "build", "docs"]);
 
-    grunt.registerTask("build_launch", ["build", "open:build"]);
-    grunt.registerTask("docs_launch", ["docs", "open:docs"]);
+    grunt.registerTask("build+", ["build", "open:build"]);
+    grunt.registerTask("docs+", ["docs", "open:docs"]);
 
     grunt.registerTask("clean", function() {
         if(grunt.file.exists("app")) {
