@@ -57,7 +57,7 @@ define({
         return select;
     },
 
-    createCheckbox(className, labelText, parent, style, handler) {
+    createCheckbox: function(className, labelText, parent, style, handler) {
         var label = this.createElement("label", className, parent, style);
         label.textContent = labelText;
         var checkbox = this.createInput("checkbox", className, null, style, "change", handler);
