@@ -14,6 +14,13 @@ module.exports = function(grunt) {
                     "pandoc src/docs/styles.md -f markdown -t html5 -s -o docs/styles.html -H src/docs/main.css",
                     "pandoc src/docs/tips.md -f markdown -t html5 -s -o docs/tips.html -H src/docs/main.css"
                 ].join(" && ")
+            },
+
+            electron: {
+                command: [
+                    "cd ../../electron/app36/",
+                    "electron.exe ../../gifloopcoder/gifloopcoder/src"
+                ].join(" && ")  
             }
         },
 
@@ -77,6 +84,20 @@ module.exports = function(grunt) {
         });
         grunt.file.copy("src/docs/GLCCheatSheet.pdf", "docs/GLCCheatSheet.pdf");
         grunt.task.run("exec:make_docs");
+    });
+
+    grunt.registerTask("standalone", function() {
+        grunt.task.run("requirejs");
+        grunt.file.copy("app/glc-min.js", "standalone/glc-min.js");
+
+        grunt.file.recurse("src/icons/", function(file, rootdir, subdir, filename) {
+            grunt.file.copy(file, "standalone/icons/" + filename);
+        });
+        grunt.file.recurse("src/styles/", function(file, rootdir, subdir, filename) {
+            grunt.file.copy(file, "standalone/styles/" + filename);
+        });
+
+        grunt.task.run("exec:electron");
     });
 
 };

@@ -12,6 +12,7 @@ define([
 	"app/render/shapes/gear",
 	"app/render/shapes/grid",
 	"app/render/shapes/heart",
+	"app/render/shapes/image",
 	"app/render/shapes/isobox",
 	"app/render/shapes/line",
 	"app/render/shapes/oval",
@@ -39,6 +40,7 @@ define([
 		Gear,
 		Grid,
 		Heart,
+		Image,
 		Isobox,
 		Line,
 		Oval,
@@ -145,6 +147,10 @@ define([
 		return add(Shape.create(Heart, props));
 	}
 
+	function addImage(props) {
+		return add(Shape.create(Image, props));
+	}
+
 	function addIsobox(props) {
 		return add(Shape.create(Isobox, props));
 	}
@@ -225,7 +231,7 @@ define([
 		return context;
 	}
 
-	return {
+	var returnValue = {
 		init: init,
 		setSize: setSize,
 		getCanvas: getCanvas,
@@ -258,5 +264,10 @@ define([
 		addText: addText,
 		render: render
 	};
+
+	if(glcConfig.isStandalone) {
+		returnValue.addImage = addImage;
+	}
+	return returnValue;
 
 });
