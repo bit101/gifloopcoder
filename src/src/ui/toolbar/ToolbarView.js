@@ -57,6 +57,17 @@ define(function(require) {
         buttons[id].className = "toolbar_button disabled";
     }
 
+    function setDirty(dirty) {
+        if(glcConfig.isStandalone && buttons["save_btn"]) {
+            if(dirty) {
+                buttons["save_btn"].className = "toolbar_button dirty";
+            }
+            else {
+                buttons["save_btn"].className = "toolbar_button";
+            }
+        }
+    }
+
 
     return {
         init: init,
@@ -64,7 +75,8 @@ define(function(require) {
         addSeparator: addSeparator,
         enableBtn: enableBtn,
         disableBtn: disableBtn,
-        setKey: setKey
+        setKey: setKey,
+        setDirty: setDirty
     }
 
 });

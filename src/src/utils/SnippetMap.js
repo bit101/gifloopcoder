@@ -89,8 +89,14 @@ define(function() {
         "Heart": 
             "list.addHeart({\n\t\t" +
                 "x: width / 2,\n\t\t" +
-                "y: height / 2,w: 100,\n\t\t" +
+                "y: height / 2,\n\t\t" + 
+                "w: 100,\n\t\t" +
                 "h: 100\n\t});\n\t",
+        "Image": 
+            "list.addImage({\n\t\t" +
+                "x: width / 2,\n\t\t" +
+                "y: height / 2,\n\t\t" +
+                "url: \"path/to/image\"\n\t});\n\t",
         "Iso Box": 
             "list.addIsobox({\n\t\t" +
                 "x: width / 2,\n\t\t" +

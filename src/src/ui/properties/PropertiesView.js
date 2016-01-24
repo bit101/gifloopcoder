@@ -55,8 +55,7 @@ define(function(require) {
         if(!glcConfig.externalEditor) {
 
             UIUtil.createElement("hr", null, div);
-
-            objectSelect = UIUtil.createSelect("dropdown", div, null, [
+            var snippets = [                
                 "Arc Segment",
                 "Arrow",
                 "Bezier Curve",
@@ -81,7 +80,14 @@ define(function(require) {
                 "Spiral",
                 "Star",
                 "Text"
-            ]);
+            ];
+
+            if(glcConfig.isStandalone) {
+                snippets.push("Image");
+            }
+            snippets.sort();
+
+            objectSelect = UIUtil.createSelect("dropdown", div, null, snippets);
             var objectBtn = UIUtil.createInput("button", null, div, null, "click", onObjectSnippet);
             objectBtn.value = "Insert Object";
 

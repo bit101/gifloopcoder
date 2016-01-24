@@ -148,7 +148,14 @@ define([
 	}
 
 	function addImage(props) {
-		return add(Shape.create(Image, props));
+		if(glcConfig.isStandalone) {
+			var image = document.createElement("img");
+			image.src = props.url;
+			props.image = image;
+			return add(Shape.create(Image, props));
+		}
+		alert("The Image object is only supported in the standalone version of GLC.");
+		return null;
 	}
 
 	function addIsobox(props) {
@@ -231,7 +238,7 @@ define([
 		return context;
 	}
 
-	var returnValue = {
+	return {
 		init: init,
 		setSize: setSize,
 		getCanvas: getCanvas,
@@ -250,6 +257,7 @@ define([
 		addGear: addGear,
 		addGrid: addGrid,
 		addHeart: addHeart,
+		addImage: addImage,
 		addIsobox: addIsobox,
 		addLine: addLine,
 		addOval: addOval,
@@ -264,10 +272,4 @@ define([
 		addText: addText,
 		render: render
 	};
-
-	if(glcConfig.isStandalone) {
-		returnValue.addImage = addImage;
-	}
-	return returnValue;
-
 });

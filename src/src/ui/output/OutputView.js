@@ -4,7 +4,9 @@ define(function(require) {
         image = null,
         imageInfo = null,
         closeButton = null,
-        contentDiv = null;
+        contentDiv = null,
+        saveButton = null;
+
 
     function init() {
         overlay = UIUtil.createDiv("overlay");
@@ -12,7 +14,18 @@ define(function(require) {
         imageInfo = UIUtil.createDiv("image_info", overlay);
         closeButton = UIUtil.createDiv("close_button", overlay);
         closeButton.innerHTML = "CLOSE (ESC)";
-        contentDiv = document.getElementById("content");
+        contentDiv = document.getElementById("content"),
+        onSaveImage = null;
+
+        if(glcConfig.isStandalone) {
+            saveButton = UIUtil.createDiv("save_button", overlay);
+            saveButton.innerHTML = "SAVE IMAGE";
+            saveButton.addEventListener("click", function() {
+                if(onSaveImage != null) {
+                    onSaveImage();
+                }
+            });
+        }
     }
 
     function setImage(dataURL, w, h) {
@@ -29,16 +42,17 @@ define(function(require) {
             scale = Math.round((window.innerWidth - 40) / w * 100);
         }
         info += "Shown at scale: " + scale + "%<br/>";
-        info += "Right click image to save.";
-        
+        if(!glcConfig.isStandalone) {
+            info += "Right click image to save.";
+        }    
 
         imageInfo.innerHTML = info;
         image.src = dataURL;
         image.style.maxHeight = window.innerHeight - 40 + "px";
         image.style.maxWidth = window.innerWidth - 40 + "px";
         document.body.appendChild(overlay);
-        closeButton.addEventListener("click", hide);
         document.body.addEventListener("keyup", onKeyUp);
+        closeButton.addEventListener("click", hide);
     }
 
     function onKeyUp(event) {
@@ -56,9 +70,14 @@ define(function(require) {
         document.body.removeEventListener("keyup", onKeyUp);
     }
 
+    function setOnSaveImage(listener) {
+        onSaveImage = listener;
+    }
+
     return {
         init: init,
-        setImage: setImage
+        setImage: setImage,
+        setOnSaveImage: setOnSaveImage
     }
 
 });

@@ -2,16 +2,19 @@ define(function(require) {
 
     var UIUtil = require("utils/UIUtil"),
         CodeMirror = require("libs/codemirror/lib/codemirror"), 
+        CodeController = null,
         div = null,
         cm = null,
         width = 0,
-        toolbarHeight = 51;
+        toolbarHeight = 51,
+        ignoreChange = false;
 
     require("libs/codemirror/mode/javascript/javascript");
     require("libs/codemirror/addon/edit/closebrackets");
     require("libs/codemirror/addon/comment/comment");
 
-    function init() {
+    function init(pCodeController) {
+        CodeController = pCodeController;
         div = UIUtil.createDiv("code_panel", document.getElementById("content"));
         width = div.offsetWidth;
         createCodeMirror();
@@ -34,6 +37,10 @@ define(function(require) {
 
     function cacheCode() {
         localStorage.setItem("glcCode", cm.getValue());
+        if(!ignoreChange) {
+            CodeController.setDirty(true);
+        }
+        ignoreChange = false;
     }
 
     function newFile() {
@@ -64,7 +71,8 @@ define(function(require) {
         })
     }
 
-    function setCode(pCode) {
+    function setCode(pCode, pIgnoreChange) {
+        ignoreChange = pIgnoreChange;
         cm.setValue(pCode);
     }
 

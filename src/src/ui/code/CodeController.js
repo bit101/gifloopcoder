@@ -5,15 +5,18 @@ define(function(require) {
         SnippetMap = require("utils/SnippetMap"),
         fileInput = null,
         filename = "",
+        filePath = localStorage.getItem("glcFilePath"),
         GLCInterface = null,
-        MainController = null;
+        MainController = null,
+        isDirty = localStorage.getItem("glcIsDirty", "false") === "true";
 
 
     function init(pGLCInterface, pMainController) {
         GLCInterface = pGLCInterface;
         MainController = pMainController;
-        CodeView.init();
+        CodeView.init(this);
         setUpFileInput();
+        setTitleWithPath();
     }
 
     function setUpFileInput() {
@@ -35,17 +38,79 @@ define(function(require) {
     }
 
     function newFile(ignoreChanges) {
-        if(ignoreChanges === true || window.confirm("Any unsaved changes will be lost. Create new file?")) {
+        if(ignoreChanges === true || !isDirty || window.confirm("Any unsaved changes will be lost. Create new file?")) {
             CodeView.newFile();
             MainController.reset();
+            setFilePath(null),
+            setDirty(true);
         }
     }
 
     function open() {
-        fileInput.click();
+        if(!isDirty || window.confirm("Any unsaved changes will be lost. Open new file?")) {
+            if(glcConfig.isStandalone) {
+                openNative();
+            }
+            else {
+                fileInput.click();
+            }
+        }
+    }
+
+    function openNative() {
+        var remote = nodeRequire("remote"),
+            dialog = remote.require("dialog"),
+            options = {
+                filters: [
+                    {
+                        name: "GLC Source Files", 
+                        extensions: ["js", "glc"]
+                    }
+                ]
+            }; 
+            
+        dialog.showOpenDialog(options, onOpenFileChosen);
+    }
+
+    function onOpenFileChosen(files) {
+        var fs = nodeRequire("fs");
+        setFilePath(files[0]);
+        fs.readFile(filePath, function(err, data) {
+            CodeView.setCode(data.toString());
+            setDirty(false);
+        });
     }
 
     function save() {
+        if(glcConfig.isStandalone) {
+            saveNative();
+        }
+        else {
+            saveWeb();
+        }
+    }
+
+    function saveNative() {
+        console.log("filename is " + filePath);
+        if(filePath == null || filePath === "" || filePath === "null") {
+            console.log("saving as");
+            saveAs();
+        }
+        else {
+            console.log("saving");
+            var fs = nodeRequire("fs");
+            fs.writeFile(filePath, CodeView.getCode(), function(err) {
+                if(err) {
+                    alert(err);
+                }
+                else {
+                    setDirty(false);
+                }
+            });
+        }
+    }
+
+    function saveWeb() {
         var result = window.prompt("Please enter a file name. File will be saved in current browser download location.", filename);
         if(result) {
             filename = result;
@@ -63,7 +128,25 @@ define(function(require) {
     }
 
     function saveAs() {
+        var remote = nodeRequire("remote"),
+            dialog = remote.require("dialog"),
+            options = {
+                filters: [
+                    {
+                        name: "GLC Source Files", 
+                        extensions: ["js", "glc"]
+                    }
+                ]
+            }; 
+            
+        dialog.showSaveDialog(options, onSaveFileChosen);
+    }
 
+    function onSaveFileChosen(file) {
+        if(file) {
+            setFilePath(file);
+            saveNative();
+        }
     }
 
     function compile() {
@@ -91,12 +174,40 @@ define(function(require) {
         return CodeView;
     }
 
-    function setCode(code) {
-        CodeView.setCode(code);
+    function setCodeFromCache(code) {
+        CodeView.setCode(code, true);
     }
 
     function onSnippet(snippetName) {
         CodeView.insertCode(SnippetMap.getSnippet(snippetName));
+    }
+
+    function setDirty(dirty) {
+        isDirty = dirty;
+        MainController.setDirty(isDirty);
+        localStorage.setItem("glcIsDirty", isDirty ? "true" : "false");
+    }
+
+    function getDirty() {
+        return isDirty;
+    }
+
+    function setFilePath(path) {
+        filePath = path;
+        localStorage.setItem("glcFilePath", filePath);
+        setTitleWithPath();
+    }
+
+    function setTitleWithPath() {
+        if(glcConfig.isStandalone) {
+            var electron = nodeRequire("electron");
+            if(filePath == null || filePath === "" || filePath === "null") {
+                electron.remote.getCurrentWindow().setTitle("GIF Loop Coder");
+            }
+            else {
+                electron.remote.getCurrentWindow().setTitle("GIF Loop Coder - " + filePath);
+            }
+        }
     }
 
 
@@ -108,8 +219,10 @@ define(function(require) {
         saveAs: saveAs,
         compile: compile,
         getView: getView,
-        setCode: setCode,
-        onSnippet: onSnippet
+        setCodeFromCache: setCodeFromCache,
+        onSnippet: onSnippet,
+        setDirty: setDirty,
+        getDirty: getDirty
     };
 
 });

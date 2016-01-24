@@ -24,6 +24,10 @@ html, body, #content {
     display: inline-block;
 }
 
+.dirty {
+  color: red;
+}
+
 .disabled {
     opacity: 0.5;
     pointer-events: none;
@@ -152,6 +156,21 @@ canvas {
     position: absolute;
     right: 10px;
     top: 10px;
+    padding: 10px;
+    font-family: sans-serif;
+    cursor: pointer;
+    -webkit-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 10px 20px 0px rgba(0,0,0,0.5);
+}
+
+.save_button {
+    background-color: white;
+    font-size: 12px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
     padding: 10px;
     font-family: sans-serif;
     cursor: pointer;

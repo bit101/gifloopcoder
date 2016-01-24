@@ -67,10 +67,15 @@ define(function(require) {
         ToolbarView.disableBtn("sprite_btn");
     }
 
+    function setDirty(dirty) {
+        ToolbarView.setDirty(dirty);
+    }
+
 
     return {
         init: init,
         enablePlay: enablePlay,
-        disablePlay: disablePlay
+        disablePlay: disablePlay,
+        setDirty: setDirty
     };
 });

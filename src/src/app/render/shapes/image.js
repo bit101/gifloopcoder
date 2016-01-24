@@ -22,7 +22,6 @@ define(function() {
 		    }
 		    context.imageSmoothingEnabled = smooth;
 		    context.mozImageSmoothingEnabled = smooth;
-			context.webkitImageSmoothingEnabled = smooth;
  			context.msImageSmoothingEnabled = smooth
 		    this.setShadowParams(context, t);
 		    if(drawFromCenter) {

@@ -38,7 +38,8 @@ define(function(require) {
             newFile(true);
         }
         else {
-            CodeController.setCode(cachedCode);
+            CodeController.setCodeFromCache(cachedCode);
+            setDirty(CodeController.getDirty());
             compile();
         }
     }
@@ -119,6 +120,10 @@ define(function(require) {
         GLCInterface.styles.reset();
         GLCInterface.onEnterFrame = null;
         GLCInterface.onExitFrame = null;
+    }
+
+    function setDirty(dirty) {
+        ToolbarController.setDirty(dirty);
     }
 
 
@@ -242,6 +247,7 @@ define(function(require) {
         save: save,
         saveAs: saveAs,
         compile: compile,
+        setDirty: setDirty,
         loop: loop,
         toggleLoop: toggleLoop,
         playOnce: playOnce,

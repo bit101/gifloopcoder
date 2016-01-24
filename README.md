@@ -10,9 +10,13 @@ If you make any changes to the source code, you can run the app directly from `i
 To compile any changes into `glc-min.js` in the app directory, follow these steps.
 
 ### Install the build tools on your system:
+- [node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
 - grunt-cli `npm install -g grunt-cli`
-- [Pandoc](http://pandoc.org/) if you will be building documentation.
+
+### optional:
+- [pandoc](http://pandoc.org/) if you will be building documentation.
+- [electron](http://electron.atom.io/) if you want to compile a standalone executable for your platform. You'll need to set the path to your electron install and project `src` path in `Gruntfile.js`
 
 ### Add project dependencies:
 - `npm-install`
