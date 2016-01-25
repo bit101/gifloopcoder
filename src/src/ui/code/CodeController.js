@@ -73,12 +73,14 @@ define(function(require) {
     }
 
     function onOpenFileChosen(files) {
-        var fs = nodeRequire("fs");
-        setFilePath(files[0]);
-        fs.readFile(filePath, function(err, data) {
-            CodeView.setCode(data.toString());
-            setDirty(false);
-        });
+        if(files && files.length > 0) {
+            var fs = nodeRequire("fs");
+            setFilePath(files[0]);
+            fs.readFile(filePath, function(err, data) {
+                CodeView.setCode(data.toString());
+                setDirty(false);
+            });
+        }
     }
 
     function save() {
