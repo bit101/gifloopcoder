@@ -21,7 +21,7 @@ module.exports = function(grunt) {
                 command: "/Users/keithpeters/Desktop/electron-v0.36.3-darwin-x64/Electron.app/Contents/MacOS/Electron /Users/keithpeters/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"
             },
             pc: {
-                command: "c:/Users/keith/Dropbox/projects/electron/app36/electron.exe c:/Users/keith/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"
+                command: "c:/Users/keith/Dropbox/projects/electron/glc-windows/GIFLoopCoder.exe c:/Users/keith/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"
             },
             linux: {
                 command: "~/Desktop/electron/electron ~/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"

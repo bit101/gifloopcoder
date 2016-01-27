@@ -39,11 +39,24 @@ define(function(require) {
 
     function newFile(ignoreChanges) {
         if(ignoreChanges === true || !isDirty || window.confirm("Any unsaved changes will be lost. Create new file?")) {
-            CodeView.newFile();
+            if(glcConfig.isStandalone) {
+                loadTemplate();
+            }
+            else {
+                CodeView.newFile();
+            }
             MainController.reset();
             setFilePath(null),
             setDirty(true);
         }
+    }
+
+    function loadTemplate() {
+        var fs = nodeRequire("fs");
+        fs.readFile(__dirname + "/config/template.js", function(err, data) {
+            console.log("data: " + data);
+            CodeView.setCode(data.toString());
+        });
     }
 
     function open() {
