@@ -15,6 +15,7 @@ Table of Contents
   - [Gear](#gear)
   - [Grid](#grid)
   - [Heart](#heart)
+  - [Image](#image)
   - [Isobox](#isobox)
   - [Line](#line)
   - [Oval](#oval)
@@ -329,6 +330,40 @@ In addition to the standard style properties described in the next section, this
     rotation (0)    The rotation of the heart. (degrees).
     stroke (false)  Whether the object will be stroked.
     fill (true)     Whether the object will be filled.
+
+
+
+
+### <a name="image"></a>Image
+
+
+
+An image object is created with:
+
+
+
+    glc.renderList.addImage(properties);
+
+
+
+This loads and draws an image from an external file.
+
+![](images/2.24.gif)
+
+In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.
+
+
+
+    x (100)                 The x position of the image.
+    y (100)                 The y position of the image.
+    w (50)                  The width of the image.
+    h (50)                  The height of the image.
+    rotation (0)            The rotation of the image. (degrees).
+    url ("")                The url of the image you want to load.
+    drawFromCenter  (true)  Whether the image is drawn from the center or the top left corner.
+    smooth (true)           Whether imageSmoothingEnabled is applied when drawing the image.
+
+The image object can load files from the local file system or from any available network source. Images will be drawn at their original size if `w` and `h` are not set. Note that large images may take a few seconds to load. The animation will begin immediately however, drawing an empty image until such time as the image does finally load.
 
 
 

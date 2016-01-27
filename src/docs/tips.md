@@ -553,64 +553,7 @@ Another trick that can be used to improve how some images look is dithering. Wit
 
 ### <a name="external"></a>Using an External Editor
 
-
-
-Although many will find the integrated editor in GLC useful, you may want to use another editing program that you are more comfortable with. This is the way GLC worked originally, and it's still possible to use it this way.
-
-If you open up the `index.html` file in the main app folder, you will see the following:
-
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title></title>
-
-        <link rel="stylesheet" type="text/css" href="styles/styles.css">
-        <link rel="stylesheet" type="text/css" href="styles/codemirror.css">
-
-    </head>
-    <body>
-        <div id="content"></div>
-        <script type="text/javascript">
-        glcConfig = {
-            externalEditor: false,
-            canvasWidth: 400,
-            canvasHeight: 400
-        };
-        </script>
-        <!-- To use an external editor, set externalEditor to true above. -->
-        <!-- Then uncomment the following line and set the path to your sketch JavaScript file. -->
-        <!-- <script type="text/javascript" src="path/to/sketch.js"></script> -->
-        <script type="text/javascript" src="glc-min.js"></script>
-    </body>
-    </html>
-
-There are two important points here for using external editor. The first is the `glcConfig` object:
-
-    glcConfig = {
-        externalEditor: false,
-        canvasWidth: 400,
-        canvasHeight: 400
-    };
-
-By default, that is set to false, and the integrated editor is shown. Just set that to true, and the editor will be hidden. This is what you will see:
-
-![](images/5.10.png)
-
-You'll also notice that the New, Open, Save and Compile buttons in the toolbar are hidden, as these only apply to code in the integrated editor. And the snippets dropdowns are gone as there would be no place to insert a snippet.
-
-However, now you'll need a way of loading the script that you are working on in your external editor.
-
-Below the `glcConfig` script there are some commented-out lines. The last is actually a commented-out script tag.
-
-    <!-- To use an external editor, set externalEditor to true above. -->
-    <!-- Then uncomment the following line and set the path to your sketch JavaScript file. -->
-    <!-- <script type="text/javascript" src="path/to/sketch.js"></script> -->
-
-
-If you uncomment that script tag and insert the path to your own script, that script will be loaded and executed in GLC.
-
-Note that these two modes are not mixable. If you set `externalEditor` to false but also try to load a sketch via a script tag, that loaded sketch will be overridden by whatever is in the editor.
-
+With the current standalone executable version of GLC, it is not possible to use an external editor. I will be working on adding that functionality back in soon.
 
 ### <a name="gif"></a>GIF or JIF?
 

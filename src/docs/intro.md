@@ -21,7 +21,7 @@ Then you can use the [Objects](objects.html), [Styles](styles.html), [Property T
 
 GIF Loop Coder (glc) is a JavaScript-based tool for creating looping animated gifs.
 
-The program is a local web application that you run in a browser.
+As of Version 1.3.0, the program is a standalone executable program that runs on Windows, OS X and Linux.
 
 It provides a text editor where you can write JavaScript code to add animated objects to a render list.
 
@@ -29,21 +29,11 @@ Your code is then executed. This creates and animates the ojects you defined, gi
 
 ![](images/1.1.png)
 
-You can check out the entire source repository from [https://github.com/bit101/gifloopcoder](https://github.com/bit101/gifloopcoder). Or, you can simply download a zip file that contains the files you need to run the app, some examples and this documentation. That zip is at [https://github.com/bit101/gifloopcoder/releases](https://github.com/bit101/gifloopcoder/releases).
+You can check out the entire source repository from [https://github.com/bit101/gifloopcoder](https://github.com/bit101/gifloopcoder). Or, you can simply download a zip file that contains the files you need to run the app, some examples and this documentation. That latest zips for each platform are at [https://github.com/bit101/gifloopcoder/releases](https://github.com/bit101/gifloopcoder/releases).
 
-If you've downloaded the zip file, the file structure should look something like this:
+On OS X, you'll see a `GIFLoopCoder.app` file and folders containing the documentation and example files. On Windows and Linux, you'll have the `docs` and `examples` folders plus an `app` folder containing the executable program and other support files. On Windows, the executable will be `GIFLoopCoder.exe` and on Linux simply `GIFLoopCoder`.
 
-
-    - gifloopcoder
-      - app
-      - docs
-      - examples
-
-If you've checked out the full code repo, you'll also have a `src` folder containing the source code that is used to build the app. You'll only need that if you plan on hacking around or extending the system. If you just want to make animations, all you need is the app and examples folders.
-
-In previous versions of GLC, you needed to edit the `index.html` file to tell it which sketch file you wanted to run, and then create that sketch file, based on a template. Things are much simpler now. All you have to do is load that `index.html` file in a browser. GLC now has a built-in code editor which will be pre-loaded with a basic sketch template. Just start coding away.
-
-However, if you want to use and external editor and have that launch GLC with your sketch already loaded, that is still possible. This is covered in the [Tips](tips.html) section.
+Whatever platform you are on, just run that executable file and you'll be up and running.
 
 Now let's look at what makes up a sketch. The template looks like this:
 
@@ -198,7 +188,8 @@ First the toolbar. From left to right:
 
 * The **New** button creates a new sketch. This will wipe out any existing sketch in the editor, so you'll be warned before this takes effect.
 * The **Open** button lets you browse to and load a sketch file from your file system. This file will be loaded into the code editor and will be executed immediately. So if you set the sketch size, the canvas panel will resize and if you told the sketch to loop, it will start looping. Shortcut: Control-O
-* The **Save** button saves the current sketch to your file system. Due to the limitations of GLC being a browser based application, however, you cannot choose where to save the file. It will be saved in the browser's default download location, and will not overwrite the file you loaded in or previously saved versions. Shortcut: Control-S
+* The **Save** button saves your current sketch. If the sketch was opened from the file system or previously saved, it will silently save the file at the existing path. If it is a new file that has not been saved, it performs a "Save As" operation. Shortcut: Control-S
+* The **Save As** button opens a save file dialog allowing you to save the current sketch to your file system. 
 * The **Compile** button re-executes the code in the code editing area. You'll want to do this when you add or change some code and want to see what it does. The shortcut is Control-Enter. That's a good one to learn because you'll be using it a lot.
 * The **Loop** button simply starts the animation playing continuously. Shortcut Control-Space will toggle between playing and paused.
 * The **Once** button will play the animation through from start to finish one time.

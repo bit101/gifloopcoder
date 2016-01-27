@@ -76,21 +76,15 @@
 <p>Then you can use the <a href="objects.html">Objects</a>, <a href="styles.html">Styles</a>, <a href="properties.html">Property Types</a> and <a href="tips.html">Tips</a> sections as a reference as needed. And don't forget to visit the <a href="http://www.gifloopcoder.com/blog">GLC Blog</a> for new features, sample code and small tutorials.</p>
 <h3 id="getting-started"><a name="gettingstarted"></a>Getting Started</h3>
 <p>GIF Loop Coder (glc) is a JavaScript-based tool for creating looping animated gifs.</p>
-<p>The program is a local web application that you run in a browser.</p>
+<p>As of Version 1.3.0, the program is a standalone executable program that runs on Windows, OS X and Linux.</p>
 <p>It provides a text editor where you can write JavaScript code to add animated objects to a render list.</p>
 <p>Your code is then executed. This creates and animates the ojects you defined, gives you a control panel to control how the animation is rendered and lets you save the result as an animated gif.</p>
 <figure>
 <img src="images/1.1.png" alt="" />
 </figure>
-<p>You can check out the entire source repository from <a href="https://github.com/bit101/gifloopcoder" class="uri">https://github.com/bit101/gifloopcoder</a>. Or, you can simply download a zip file that contains the files you need to run the app, some examples and this documentation. That zip is at <a href="https://github.com/bit101/gifloopcoder/releases" class="uri">https://github.com/bit101/gifloopcoder/releases</a>.</p>
-<p>If you've downloaded the zip file, the file structure should look something like this:</p>
-<pre><code>- gifloopcoder
-  - app
-  - docs
-  - examples</code></pre>
-<p>If you've checked out the full code repo, you'll also have a <code>src</code> folder containing the source code that is used to build the app. You'll only need that if you plan on hacking around or extending the system. If you just want to make animations, all you need is the app and examples folders.</p>
-<p>In previous versions of GLC, you needed to edit the <code>index.html</code> file to tell it which sketch file you wanted to run, and then create that sketch file, based on a template. Things are much simpler now. All you have to do is load that <code>index.html</code> file in a browser. GLC now has a built-in code editor which will be pre-loaded with a basic sketch template. Just start coding away.</p>
-<p>However, if you want to use and external editor and have that launch GLC with your sketch already loaded, that is still possible. This is covered in the <a href="tips.html">Tips</a> section.</p>
+<p>You can check out the entire source repository from <a href="https://github.com/bit101/gifloopcoder" class="uri">https://github.com/bit101/gifloopcoder</a>. Or, you can simply download a zip file that contains the files you need to run the app, some examples and this documentation. That latest zips for each platform are at <a href="https://github.com/bit101/gifloopcoder/releases" class="uri">https://github.com/bit101/gifloopcoder/releases</a>.</p>
+<p>On OS X, you'll see a <code>GIFLoopCoder.app</code> file and folders containing the documentation and example files. On Windows and Linux, you'll have the <code>docs</code> and <code>examples</code> folders plus an <code>app</code> folder containing the executable program and other support files. On Windows, the executable will be <code>GIFLoopCoder.exe</code> and on Linux simply <code>GIFLoopCoder</code>.</p>
+<p>Whatever platform you are on, just run that executable file and you'll be up and running.</p>
 <p>Now let's look at what makes up a sketch. The template looks like this:</p>
 <pre><code>function onGLC(glc) {
     glc.loop();
@@ -218,7 +212,8 @@ list.addCircle({
 <ul>
 <li>The <strong>New</strong> button creates a new sketch. This will wipe out any existing sketch in the editor, so you'll be warned before this takes effect.</li>
 <li>The <strong>Open</strong> button lets you browse to and load a sketch file from your file system. This file will be loaded into the code editor and will be executed immediately. So if you set the sketch size, the canvas panel will resize and if you told the sketch to loop, it will start looping. Shortcut: Control-O</li>
-<li>The <strong>Save</strong> button saves the current sketch to your file system. Due to the limitations of GLC being a browser based application, however, you cannot choose where to save the file. It will be saved in the browser's default download location, and will not overwrite the file you loaded in or previously saved versions. Shortcut: Control-S</li>
+<li>The <strong>Save</strong> button saves your current sketch. If the sketch was opened from the file system or previously saved, it will silently save the file at the existing path. If it is a new file that has not been saved, it performs a &quot;Save As&quot; operation. Shortcut: Control-S</li>
+<li>The <strong>Save As</strong> button opens a save file dialog allowing you to save the current sketch to your file system.</li>
 <li>The <strong>Compile</strong> button re-executes the code in the code editing area. You'll want to do this when you add or change some code and want to see what it does. The shortcut is Control-Enter. That's a good one to learn because you'll be using it a lot.</li>
 <li>The <strong>Loop</strong> button simply starts the animation playing continuously. Shortcut Control-Space will toggle between playing and paused.</li>
 <li>The <strong>Once</strong> button will play the animation through from start to finish one time.</li>

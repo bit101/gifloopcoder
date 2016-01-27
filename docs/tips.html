@@ -469,50 +469,7 @@ function onGLC(glc) {
 <p>However, if you render something with lots of colors and it's not looking great, try cranking up the quality and see if that helps. It may. It may not. If there are a few million colors in your source image, the encoder is going to have a rough time bringing that down to 256 and have it look decent, no matter what quality you set.</p>
 <p>Another trick that can be used to improve how some images look is dithering. With dithering, if there's an area of color that doesn't match closely to anything in the palette, it will mix two or more other colors amongst the different pixels in that area. So from a distance, they will blend together to more closely match the original color. Unfortunately, the encoder used in GLC does not support dithering. However, there are other gif optimizing tools that do. You can run your animation through one of those tools and tell it do apply dithering and you may see better results.</p>
 <h3 id="using-an-external-editor"><a name="external"></a>Using an External Editor</h3>
-<p>Although many will find the integrated editor in GLC useful, you may want to use another editing program that you are more comfortable with. This is the way GLC worked originally, and it's still possible to use it this way.</p>
-<p>If you open up the <code>index.html</code> file in the main app folder, you will see the following:</p>
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;&lt;/title&gt;
-
-    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;styles/styles.css&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;styles/codemirror.css&quot;&gt;
-
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;div id=&quot;content&quot;&gt;&lt;/div&gt;
-    &lt;script type=&quot;text/javascript&quot;&gt;
-    glcConfig = {
-        externalEditor: false,
-        canvasWidth: 400,
-        canvasHeight: 400
-    };
-    &lt;/script&gt;
-    &lt;!-- To use an external editor, set externalEditor to true above. --&gt;
-    &lt;!-- Then uncomment the following line and set the path to your sketch JavaScript file. --&gt;
-    &lt;!-- &lt;script type=&quot;text/javascript&quot; src=&quot;path/to/sketch.js&quot;&gt;&lt;/script&gt; --&gt;
-    &lt;script type=&quot;text/javascript&quot; src=&quot;glc-min.js&quot;&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-<p>There are two important points here for using external editor. The first is the <code>glcConfig</code> object:</p>
-<pre><code>glcConfig = {
-    externalEditor: false,
-    canvasWidth: 400,
-    canvasHeight: 400
-};</code></pre>
-<p>By default, that is set to false, and the integrated editor is shown. Just set that to true, and the editor will be hidden. This is what you will see:</p>
-<figure>
-<img src="images/5.10.png" alt="" />
-</figure>
-<p>You'll also notice that the New, Open, Save and Compile buttons in the toolbar are hidden, as these only apply to code in the integrated editor. And the snippets dropdowns are gone as there would be no place to insert a snippet.</p>
-<p>However, now you'll need a way of loading the script that you are working on in your external editor.</p>
-<p>Below the <code>glcConfig</code> script there are some commented-out lines. The last is actually a commented-out script tag.</p>
-<pre><code>&lt;!-- To use an external editor, set externalEditor to true above. --&gt;
-&lt;!-- Then uncomment the following line and set the path to your sketch JavaScript file. --&gt;
-&lt;!-- &lt;script type=&quot;text/javascript&quot; src=&quot;path/to/sketch.js&quot;&gt;&lt;/script&gt; --&gt;</code></pre>
-<p>If you uncomment that script tag and insert the path to your own script, that script will be loaded and executed in GLC.</p>
-<p>Note that these two modes are not mixable. If you set <code>externalEditor</code> to false but also try to load a sketch via a script tag, that loaded sketch will be overridden by whatever is in the editor.</p>
+<p>With the current standalone executable version of GLC, it is not possible to use an external editor. I will be working on adding that functionality back in soon.</p>
 <h3 id="gif-or-jif"><a name="gif"></a>GIF or JIF?</h3>
 <p>The &quot;g&quot; in &quot;gif&quot; is pronounced exactly the same way it is in &quot;git&quot; and &quot;gin&quot;.</p>
 </body>
