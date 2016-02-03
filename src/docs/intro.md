@@ -197,6 +197,7 @@ First the toolbar. From left to right:
 * The **Make GIF** button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into an animated gif, which it displays in a lightbox-type overlay. Shortcut: Control-G
 * The **Capture Still** button will capture the single frame showing in the Canvas panel and display it in the lightbox overlay.
 * The **Sprite Sheet** button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into a sprite sheet, which it displays in the lightbox overlay.
+* The **Console** button opens up the developer console. This can be useful for debugging a script if it's not doing what you want it to.
 * The **About** button displays some information about the app.
 
 Then there's the Control Panel. From top to bottom, here's what it does:
@@ -208,7 +209,7 @@ Then there's the Control Panel. From top to bottom, here's what it does:
 *   The **Easing** checkbox gives the animation an ease-in and ease-out to the animation if checked. Otherwise, it performs a straight linear interpolation.
 *   The **Status** indicator lets you know what's happening
 *   The **Object Snippets** dropdown lets you insert a pre-written snippet of code into the code panel that will define an object. Place the cursor at the point you want in the code, choose a snippet and click the insert button.
-*   The **Other Snippets** dropdown lets you insert a useful, pre-defined snipped of code into the code panel. Place the cursor at the point you want in the code, choose a snippet and click the insert button.
+*   The **Other Snippets** dropdown lets you insert a useful, pre-defined snipped of code into the code panel. Place the cursor at the point you want in the code, choose a snippet and click the insert button. You can create your own snippets as well. This is covered in [the tips section](tips.html#snippets)
 
 If you ever have a hard time getting one of the sliders to land on a specific value, you can also use the left and right cursor keys on your keyboard. Pressing these will move the slider in single increments one way or the other.
 

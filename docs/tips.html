@@ -73,6 +73,7 @@
 <li><a href="#spritesheets">Creating Sprite Sheets</a></li>
 <li><a href="#quality">Encoding Quality</a></li>
 <li><a href="#external">Using an External Editor</a></li>
+<li><a href="#snippets">Snippets and Templates</a></li>
 <li><a href="#gif">GIF or JIF?</a></li>
 </ul>
 <h2 id="tips-and-advanced-use">Tips and Advanced Use</h2>
@@ -470,6 +471,10 @@ function onGLC(glc) {
 <p>Another trick that can be used to improve how some images look is dithering. With dithering, if there's an area of color that doesn't match closely to anything in the palette, it will mix two or more other colors amongst the different pixels in that area. So from a distance, they will blend together to more closely match the original color. Unfortunately, the encoder used in GLC does not support dithering. However, there are other gif optimizing tools that do. You can run your animation through one of those tools and tell it do apply dithering and you may see better results.</p>
 <h3 id="using-an-external-editor"><a name="external"></a>Using an External Editor</h3>
 <p>With the current standalone executable version of GLC, it is not possible to use an external editor. I will be working on adding that functionality back in soon.</p>
+<h3 id="snippets-and-templates"><a name="snippets"></a>Snippets and Templates</h3>
+<p>With the current standalone executable version of GLC, you can define your own custom template and snippets. To do this, you need to locate the <code>config</code> folder of the GLC installation. For Windows and Linux, this is <code>&lt;glc folder&gt;/resources/app/config/</code>. On OS X, it's a bit more complex. From the Finder, right click on <code>GIFLoopCoder.app</code> and choose &quot;Show Contents&quot;. From there, you can navigate down to <code>GIFLoopCoder.app/Contents/Resources/app/config</code>.</p>
+<p>Once you're in the <code>config</code> folder, you'll see a <code>template.js</code> file. This is what gets used when you create a new sketch in GLC. So you can edit this to create a template that you like.</p>
+<p>You'll also see a <code>snippets</code> folder which contains a few <code>.snippet</code> files. These are actually JavaScript files. The name of the file will show up in the custom snippets dropdown, and the contents is what will be inserted when you create a snippet. All you have to do is add the snippet file and restart GLC and it will add your snippet to the list.</p>
 <h3 id="gif-or-jif"><a name="gif"></a>GIF or JIF?</h3>
 <p>The &quot;g&quot; in &quot;gif&quot; is pronounced exactly the same way it is in &quot;git&quot; and &quot;gin&quot;.</p>
 </body>

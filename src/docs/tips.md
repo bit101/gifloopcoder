@@ -17,6 +17,7 @@ Table of Contents
   - [Creating Sprite Sheets](#spritesheets)
   - [Encoding Quality](#quality)
   - [Using an External Editor](#external)
+  - [Snippets and Templates](#snippets)
   - [GIF or JIF?](#gif)
 
 ## Tips and Advanced Use
@@ -554,6 +555,14 @@ Another trick that can be used to improve how some images look is dithering. Wit
 ### <a name="external"></a>Using an External Editor
 
 With the current standalone executable version of GLC, it is not possible to use an external editor. I will be working on adding that functionality back in soon.
+
+### <a name="snippets"></a>Snippets and Templates
+
+With the current standalone executable version of GLC, you can define your own custom template and snippets. To do this, you need to locate the `config` folder of the GLC installation. For Windows and Linux, this is `<glc folder>/resources/app/config/`. On OS X, it's a bit more complex. From the Finder, right click on `GIFLoopCoder.app` and choose "Show Contents". From there, you can navigate down to `GIFLoopCoder.app/Contents/Resources/app/config`.
+
+Once you're in the `config` folder, you'll see a `template.js` file. This is what gets used when you create a new sketch in GLC. So you can edit this to create a template that you like.
+
+You'll also see a `snippets` folder which contains a few `.snippet` files. These are actually JavaScript files. The name of the file will show up in the custom snippets dropdown, and the contents is what will be inserted when you create a snippet. All you have to do is add the snippet file and restart GLC and it will add your snippet to the list.
 
 ### <a name="gif"></a>GIF or JIF?
 
