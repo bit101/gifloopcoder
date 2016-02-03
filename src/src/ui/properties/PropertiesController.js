@@ -2,15 +2,17 @@ define(function(require) {
 
     var PropertiesView = require("ui/properties/PropertiesView"),
         MainController = null,
+        SnippetMap = null,
         duration = 2,
         fps = 30,
         maxColors = 256,
         mode = "bounce",
         easing = true;
 
-    function init(pMainController) {
+    function init(pMainController, pSnippetMap) {
         MainController = pMainController;
-        PropertiesView.init(this);
+        SnippetMap = pSnippetMap;
+        PropertiesView.init(this, SnippetMap);
     }
 
     function onDurationChange(pDuration) {

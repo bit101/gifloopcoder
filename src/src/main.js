@@ -1,7 +1,6 @@
 define(function(require) {
     // window.localStorage.clear();
 
-
     // This module creates all the controllers and other modules and sets up their relationships
 
     var CodeController = null,
@@ -13,7 +12,8 @@ define(function(require) {
         RenderList = require("app/render/RenderList"),
         Styles = require("app/render/Styles"),
         Interpolation = require("app/render/Interpolation"),
-        GLCInterface = require("app/GLCInterface");
+        GLCInterface = require("app/GLCInterface"),
+        SnippetMap = require("utils/SnippetMap");
 
     init();
 
@@ -27,13 +27,13 @@ define(function(require) {
         GLCInterface.canvas = CanvasController.getCanvas();
         GLCInterface.context = GLCInterface.canvas.getContext("2d");
         RenderList.init(GLCInterface, Styles, Interpolation, CanvasController.getCanvas());
-        PropertiesController.init(MainController);
+        PropertiesController.init(MainController, SnippetMap);
         if(glcConfig.externalEditor) {
             CanvasController.getView().setX(0);
         }
         else {
             CodeController = require("ui/code/CodeController"),
-            CodeController.init(GLCInterface, MainController);
+            CodeController.init(GLCInterface, MainController, SnippetMap);
             SplitterController = require("ui/splitter/SplitterController"),
             SplitterController.init(CodeController.getView(), CanvasController.getView());
         }

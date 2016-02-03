@@ -30,7 +30,7 @@ define(function(require) {
 		txt += "<h3>Code editor:</h3>";
 		txt += "<p><a href='https://codemirror.net/'>https://codemirror.net/</a></p>";
 		txt += "<h3>Icons:</h3>";
-		txt += "<p><a href='http://ionicons.com/'>http://ionicons.com/</a></p>";
+		txt += "<p><a href='http://ionicons.com/'>http://icons8.com/</a></p>";
 		aboutDiv.innerHTML = txt;
 
     }

@@ -35,6 +35,11 @@ define(function(require) {
         ToolbarView.addButton("sprite_btn", "icons/sprite.png", "SPRITE SHEET", MainController.makeSpriteSheet);
         ToolbarView.addSeparator();
 
+        if(glcConfig.isStandalone) {
+            ToolbarView.addButton("console_btn", "icons/console.png", "CONSOLE", showConsole);
+            ToolbarView.addSeparator();
+        }
+
         ToolbarView.addButton("icon_btn", "icons/help.png", "ABOUT", MainController.showAbout);
 
         ToolbarView.setKey(71, "keydown", makeGif); // G
@@ -69,6 +74,12 @@ define(function(require) {
 
     function setDirty(dirty) {
         ToolbarView.setDirty(dirty);
+    }
+
+    function showConsole() {
+        var electron = nodeRequire("electron");
+        electron.remote.getCurrentWindow().openDevTools();
+
     }
 
 

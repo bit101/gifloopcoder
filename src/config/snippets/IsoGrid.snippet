@@ -1,0 +1,22 @@
+    var isoSize = 50,
+        startX = width / 2,
+        startY = 100;
+
+    isoGrid(0, 0, 30, 30);
+    isoGrid(1, 0, 30, 40);
+    isoGrid(0, 1, 30, 40);
+    isoGrid(1, 1, 30, 50);
+
+    function isoGrid(x, y, h, hue) {
+        var xpos = startX + (x - y) * isoSize / 2,
+            ypos = startY + (x + y) * isoSize / 4;
+        list.addIsobox({
+            x: xpos,
+            y: ypos,
+            size: isoSize,
+            h: h,
+            colorTop: color.hsv(hue, 1, 1),
+            colorRight: color.hsv(hue, 1, 0.75),
+            colorLeft: color.hsv(hue, 1, 0.5),
+        });
+    }

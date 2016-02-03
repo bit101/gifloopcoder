@@ -2,7 +2,7 @@ define(function(require) {
 
     var CodeView = require("ui/code/CodeView"),
         UIUtil = require("utils/UIUtil"),
-        SnippetMap = require("utils/SnippetMap"),
+        SnippetMap = null,
         fileInput = null,
         filename = "",
         filePath = localStorage.getItem("glcFilePath"),
@@ -11,9 +11,10 @@ define(function(require) {
         isDirty = localStorage.getItem("glcIsDirty", "false") === "true";
 
 
-    function init(pGLCInterface, pMainController) {
+    function init(pGLCInterface, pMainController, pSnippetMap) {
         GLCInterface = pGLCInterface;
         MainController = pMainController;
+        SnippetMap = pSnippetMap;
         CodeView.init(this);
         setUpFileInput();
         setTitleWithPath();
@@ -54,7 +55,6 @@ define(function(require) {
     function loadTemplate() {
         var fs = nodeRequire("fs");
         fs.readFile(__dirname + "/config/template.js", function(err, data) {
-            console.log("data: " + data);
             CodeView.setCode(data.toString());
         });
     }
@@ -106,13 +106,10 @@ define(function(require) {
     }
 
     function saveNative() {
-        console.log("filename is " + filePath);
         if(filePath == null || filePath === "" || filePath === "null") {
-            console.log("saving as");
             saveAs();
         }
         else {
-            console.log("saving");
             var fs = nodeRequire("fs");
             fs.writeFile(filePath, CodeView.getCode(), function(err) {
                 if(err) {

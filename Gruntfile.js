@@ -14,17 +14,6 @@ module.exports = function(grunt) {
                     "pandoc src/docs/styles.md -f markdown -t html5 -s -o docs/styles.html -H src/docs/main.css",
                     "pandoc src/docs/tips.md -f markdown -t html5 -s -o docs/tips.html -H src/docs/main.css"
                 ].join(" && ")
-            },
-
-            // commands for testing electron app. Replace with path to electron install + path to src folder on local machine
-            mac: {
-                command: "/Users/keithpeters/Desktop/electron-v0.36.3-darwin-x64/Electron.app/Contents/MacOS/Electron /Users/keithpeters/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"
-            },
-            pc: {
-                command: "c:/Users/keith/Dropbox/projects/electron/glc-windows/GIFLoopCoder.exe c:/Users/keith/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"
-            },
-            linux: {
-                command: "~/Desktop/electron/electron ~/Dropbox/Projects/gifloopcoder/gifloopcoder/src/"
             }
         },
 
@@ -38,6 +27,9 @@ module.exports = function(grunt) {
                     include: "requireLib",
                     name: "glclauncher",
                     out: "app/glc-min.js"
+                    // out: "../../electron/glc-windows/resources/app/glc-min.js"
+                    // out: "../../electron/glc-linux/resources/app/glc-min.js"
+                    // out: "../../electron/glc-osx/GIFLoopCoder.app/Contents/resources/app/glc-min.js"
                 }
             }
         },
@@ -52,10 +44,16 @@ module.exports = function(grunt) {
             docs: {
                 path: "docs/index.html"
             }
+        },
+        
+        standalone: {
+            windows: "../../electron/glc-windows/resources/app/",
+            linux: "../../electron/glc-linux/resources/app/",
+            osx: "../../electron/glc-osx/GIFLoopCoder.app/Contents/resources/app/"
         }
     });
 
-    grunt.registerTask("default", ["clean", "build", "docs"]);
+    grunt.registerTask("default", ["clean", "build"]);
 
     grunt.registerTask("buildx", ["build", "open:build"]);
     grunt.registerTask("docsx", ["docs", "open:docs"]);
@@ -73,12 +71,21 @@ module.exports = function(grunt) {
         grunt.task.run("requirejs");
         
         grunt.file.copy("src/index.html", "app/index.html");
+        grunt.file.copy("src/index_standalone.html", "app/index_standalone.html");
+        grunt.file.copy("src/standalone.js", "app/standalone.js");
+        grunt.file.copy("src/package.json", "app/package.json");
         grunt.file.recurse("src/icons/", function(file, rootdir, subdir, filename) {
             grunt.file.copy(file, "app/icons/" + filename);
         });
         grunt.file.recurse("src/styles/", function(file, rootdir, subdir, filename) {
             grunt.file.copy(file, "app/styles/" + filename);
         });
+
+        grunt.file.copy("src/config/template.js", "app/config/template.js");
+        grunt.file.recurse("src/config/snippets/", function(file, rootdir, subdir, filename) {
+            grunt.file.copy(file, "app/config/snippets/" + filename);
+        });
+
     });
 
     grunt.registerTask("docs", function() {
@@ -90,18 +97,28 @@ module.exports = function(grunt) {
         grunt.task.run("exec:make_docs");
     });
 
-    grunt.registerTask("standalone", function() {
-        grunt.task.run("requirejs");
-        grunt.file.copy("app/glc-min.js", "standalone/glc-min.js");
 
-        grunt.file.recurse("src/icons/", function(file, rootdir, subdir, filename) {
-            grunt.file.copy(file, "standalone/icons/" + filename);
+    grunt.registerMultiTask("standalone", function() {
+        console.log("copying files to " + this.data);
+        var path = this.data;
+        if(grunt.file.exists(path)) {
+            grunt.file.delete(path, {force: true});
+        }
+        grunt.file.copy("app/glc-min.js", path + "glc-min.js");
+        grunt.file.copy("app/index_standalone.html", path + "index_standalone.html");
+        grunt.file.copy("app/standalone.js", path + "standalone.js");
+        grunt.file.copy("app/package.json", path + "package.json");
+        grunt.file.recurse("app/icons/", function(file, rootdir, subdir, filename) {
+            grunt.file.copy(file, path + "icons/" + filename);
         });
-        grunt.file.recurse("src/styles/", function(file, rootdir, subdir, filename) {
-            grunt.file.copy(file, "standalone/styles/" + filename);
+        grunt.file.recurse("app/styles/", function(file, rootdir, subdir, filename) {
+            grunt.file.copy(file, path + "styles/" + filename);
         });
 
-        grunt.task.run("exec:electron");
+        grunt.file.copy("app/config/template.js", path + "config/template.js");
+        grunt.file.recurse("app/config/snippets/", function(file, rootdir, subdir, filename) {
+            grunt.file.copy(file, path + "config/snippets/" + filename);
+        });
+
     });
-
 };

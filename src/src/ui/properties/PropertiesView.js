@@ -1,6 +1,7 @@
 define(function(require) {
 
     var UIUtil = require("utils/UIUtil"),
+        SnippetMap = null,
         listener = null,
         div = null,
         durationLabel,
@@ -16,8 +17,9 @@ define(function(require) {
         objectSelect,
         snippetSelect;
 
-    function init(pListener) {
+    function init(pListener, pSnippetMap) {
         listener = pListener;
+        SnippetMap = pSnippetMap;
         div = UIUtil.createDiv("control_panel", document.getElementById("content"));
         
         durationLabel = UIUtil.createDiv("control_label", div);
@@ -55,49 +57,14 @@ define(function(require) {
         if(!glcConfig.externalEditor) {
 
             UIUtil.createElement("hr", null, div);
-            var snippets = [                
-                "Arc Segment",
-                "Arrow",
-                "Bezier Curve",
-                "Bezier Segment",
-                "Circle",
-                "Container",
-                "Cube",
-                "Curve",
-                "Curve Segment",
-                "Gear",
-                "Grid",
-                "Heart",
-                "Iso Box",
-                "Line",
-                "Oval",
-                "Path",
-                "Poly",
-                "Ray",
-                "Ray Segment",
-                "Rect",
-                "Segment",
-                "Spiral",
-                "Star",
-                "Text"
-            ];
 
-            if(glcConfig.isStandalone) {
-                snippets.push("Image");
-            }
-            snippets.sort();
-
-            objectSelect = UIUtil.createSelect("dropdown", div, null, snippets);
+            objectSelect = UIUtil.createSelect("dropdown", div, null, SnippetMap.getObjectSnippets());
             var objectBtn = UIUtil.createInput("button", null, div, null, "click", onObjectSnippet);
             objectBtn.value = "Insert Object";
 
             UIUtil.createElement("hr", null, div);
 
-            snippetSelect = UIUtil.createSelect("dropdown", div, null, [
-                "Shadow",
-                "Grid Layout",
-                "Iso Grid Layout"
-            ]);
+            snippetSelect = UIUtil.createSelect("dropdown", div, null, SnippetMap.getCustomSnippets());
             var snippetBtn = UIUtil.createInput("button", null, div, null, "click", onSnippet);
             snippetBtn.value = "Insert Snippet";
         }
