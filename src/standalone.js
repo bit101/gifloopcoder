@@ -16,7 +16,11 @@ app.on("window-all-closed", function() {
 });
 
 app.on("ready", function() {
-	mainWindow = new BrowserWindow({width: 1080, height: 600});
+	mainWindow = new BrowserWindow({
+        width: 1080, 
+        height: 600,
+        icon: __dirname + "/icons/glc_icon.png"
+    });
 	mainWindow.loadURL("file://" + __dirname + "/index_standalone.html");
 
 	// mainWindow.webContents.openDevTools();
