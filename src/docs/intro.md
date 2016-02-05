@@ -197,6 +197,7 @@ First the toolbar. From left to right:
 * The **Make GIF** button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into an animated gif, which it displays in a lightbox-type overlay. Shortcut: Control-G
 * The **Capture Still** button will capture the single frame showing in the Canvas panel and display it in the lightbox overlay.
 * The **Sprite Sheet** button causes the animation to play through one time and begins capturing frames. When the animation is done, it assembles the captured frames into a sprite sheet, which it displays in the lightbox overlay.
+* The **Image Sequence** button will open a file dialog asking you for a location and name to save the images. When you choose this, it will render each frame of the animation and save it as a separate png file in the specified location, with the specified name plus an index. For example, if you chose the name `myAnim.png` for a 30-frame animation, this would create files `myAnim_0000.png` through `myAnim_0029.png` in the folder you chose. Any files with the same name will be overwritten. You can create an animation with these images using the software of your choice.
 * The **Console** button opens up the developer console. This can be useful for debugging a script if it's not doing what you want it to.
 * The **About** button displays some information about the app.
 

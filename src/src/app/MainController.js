@@ -12,6 +12,7 @@ define(function(require) {
         Interpolation = null,
         Encoder = require("app/encode/Encoder"),
         SpriteSheet = require("app/encode/SpriteSheet"),
+        ImageSequence = require("app/encode/ImageSequence"),
         ToolbarController = require("ui/toolbar/ToolbarController"),
         Scheduler = require("app/Scheduler"),
         AboutController = require("ui/about/AboutController");
@@ -62,6 +63,9 @@ define(function(require) {
         }
         else if(SpriteSheet.isEncoding()) {
             SpriteSheet.addFrame(CanvasController.getCanvas());
+        }
+        else if(ImageSequence.isEncoding()) {
+            ImageSequence.addFrame(CanvasController.getCanvas());
         }
     }
 
@@ -180,6 +184,14 @@ define(function(require) {
         }
     }
 
+    function makeImageSequence() {
+        ImageSequence.chooseFileLocation(function() {
+            ImageSequence.start();
+            PropertiesController.disable();
+            playOnce();
+        });
+    }
+
 
 
     ////////////////////////////////////////
@@ -255,6 +267,7 @@ define(function(require) {
         makeGif: makeGif,
         captureStill: captureStill,
         makeSpriteSheet: makeSpriteSheet,
+        makeImageSequence: makeImageSequence,
         showAbout: showAbout,
         onStart: onStart,
         onRender: onRender,

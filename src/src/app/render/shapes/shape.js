@@ -63,6 +63,7 @@ define(["app/render/ValueParser", "app/render/ColorParser"], function(ValueParse
 			if(lineDash) {
 				context.setLineDash(lineDash);
 			}
+			context.lineDashOffset = this.getNumber("lineDashOffset", t, this.styles.lineDashOffset);
 			context.beginPath();
 		},
 

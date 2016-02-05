@@ -7,6 +7,7 @@ define(function() {
 		lineCap: "round",
 		lineJoin: "round",
 		lineDash: [],
+		lineDashOffset: 0,
 		miterLimit: 10,
 		shadowColor: null,
 		shadowOffsetX: 0,

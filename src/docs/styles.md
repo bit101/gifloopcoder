@@ -27,6 +27,7 @@ The following properties can be set on any object when creating it. This also li
     lineCap         "round"
     lineJoin        "miter"
     lineDash        []
+    lineDashOffset  0
     miterLimit      10
     shadowColor     null
     shadowOffsetX   0

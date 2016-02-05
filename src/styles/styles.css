@@ -16,9 +16,9 @@ html, body, #content {
 }
 
 .toolbar_button {
-    margin: 5px 15px;
+    margin: 5px 10px;
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     font-family: sans-serif;
     cursor: pointer;
     display: inline-block;
@@ -34,7 +34,7 @@ html, body, #content {
 }
 
 .toolbar_separator {
-    margin: 5px 15px 0px 15px;
+    margin: 5px 5px 0px 5px;
     width: 1px;
     height: 39px;
     background-color: #999999;
