@@ -84,6 +84,9 @@ define(function(require) {
             var dataURL = SpriteSheet.getDataURL();
             OutputController.setImage(dataURL, SpriteSheet.getSpriteSheetSize(), SpriteSheet.getSpriteSheetSize());
         }
+        else if(ImageSequence.isEncoding()) {
+            ImageSequence.complete();
+        }
     }
 
 
