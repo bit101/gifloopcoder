@@ -8,11 +8,14 @@ define(function() {
 				fontSize = this.getNumber("fontSize", t, 20),
 				fontWeight = this.getString("fontWeight", t, "normal");
 				fontFamily = this.getString("fontFamily", t, "sans-serif");
-				fontStyle = this.getString("fontStyle", t, "normal");
+				fontStyle = this.getString("fontStyle", t, "normal"),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFamily;
 			var width = context.measureText(text).width;
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
 			var shadowsSet = false;
 			context.save();

@@ -7,9 +7,12 @@ define(function() {
 				innerRadius = this.getNumber("innerRadius", t, 25),
 				outerRadius = this.getNumber("outerRadius", t, 50),
 				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
-				points = this.getNumber("points", t, 5);
+				points = this.getNumber("points", t, 5),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(rotation);
 			context.moveTo(outerRadius, 0);
 			for(var i = 1; i < points * 2; i++) {

@@ -8,9 +8,12 @@ define(function() {
 				outerRadius = this.getNumber("outerRadius", t, 90),
 				turns = this.getNumber("turns", t, 6),
 				res = this.getNumber("res", t, 1) * Math.PI / 180,
-				fullAngle = Math.PI * 2 * turns;
+				fullAngle = Math.PI * 2 * turns,
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
 
 

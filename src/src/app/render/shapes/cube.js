@@ -8,7 +8,9 @@ define(function() {
 				size = this.getNumber("size", t, 100),
 				rotationX = this.getNumber("rotationX", t, 0) * Math.PI / 180,
 				rotationY = this.getNumber("rotationY", t, 0) * Math.PI / 180,
-				rotationZ = this.getNumber("rotationZ", t, 0) * Math.PI / 180;
+				rotationZ = this.getNumber("rotationZ", t, 0) * Math.PI / 180,
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			var points = makePoints();
 			scale(points, size / 2);
@@ -21,6 +23,7 @@ define(function() {
 			context.lineWidth = this.getNumber("lineWidth", t, 1);
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 
 			context.moveTo(points[0].sx, points[0].sy);
 			context.lineTo(points[1].sx, points[1].sy);

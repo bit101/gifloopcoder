@@ -12,9 +12,12 @@ define(function() {
 				toothAngle = this.getNumber("toothAngle", t, 0.3),
 				face = 0.5 - toothAngle / 2,
 				side = 0.5 - face,
-				innerRadius = radius - toothHeight;
+				innerRadius = radius - toothHeight,
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(rotation);
 			context.save();
 			context.moveTo(radius, 0);

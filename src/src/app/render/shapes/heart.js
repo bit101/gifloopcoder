@@ -5,7 +5,9 @@ define(function() {
 			var x = this.getNumber("x", t, 100),
 				y = this.getNumber("y", t, 100),
 				w = this.getNumber("w", t, 50),
-				h = this.getNumber("h", t, 50);
+				h = this.getNumber("h", t, 50),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			var x0 = 0,
 				y0 = -.25,
@@ -18,6 +20,7 @@ define(function() {
 
 		    context.save();
 		    context.translate(x, y);
+            context.scale(scaleX, scaleY);
 		    context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
 		    context.save();
 		    context.scale(w, h);

@@ -6,9 +6,12 @@ define(function() {
 				y = this.getNumber("y", t, 100),
 				radius = this.getNumber("radius", t, 50),
 				rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
-				sides = this.getNumber("sides", t, 5);
+				sides = this.getNumber("sides", t, 5),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(rotation);
 			context.moveTo(radius, 0);
 			for(var i = 1; i < sides; i++) {

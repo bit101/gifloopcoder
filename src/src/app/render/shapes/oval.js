@@ -8,7 +8,9 @@ define(function() {
 				ry = this.getNumber("ry", t, 50),
 				startAngle = this.getNumber("startAngle", t, 0),
 				endAngle = this.getNumber("endAngle", t, 360),
-				drawFromCenter = this.getBool("drawFromCenter", t, false);
+				drawFromCenter = this.getBool("drawFromCenter", t, false),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			// guard against negative radii, which will break.
 			// alternate handling: Math.max(rx, 0);
@@ -17,6 +19,7 @@ define(function() {
 			ry = Math.abs(ry);
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
 			context.save();
 			context.scale(rx / 100, ry / 100);

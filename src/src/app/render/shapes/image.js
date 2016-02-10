@@ -9,10 +9,13 @@ define(function() {
 				h = this.getNumber("h", t, -1),
 			    rotation = this.getNumber("rotation", t, 0) * Math.PI / 180,
 			    drawFromCenter = this.getBool("drawFromCenter", t, true),
-			    smooth = this.getBool("smooth", t, true);
+			    smooth = this.getBool("smooth", t, true),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 
 		    context.translate(x, y);
+            context.scale(scaleX, scaleY);
 		    context.rotate(rotation);
 		    if(w === -1) {
 		    	w = image.width;

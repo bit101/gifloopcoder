@@ -9,9 +9,12 @@ define(function() {
                 h = this.getNumber("h", t, 40),
                 colorLeft = this.getColor("colorLeft", t, "#999999"),
                 colorRight = this.getColor("colorRight", t, "#cccccc"),
-                colorTop = this.getColor("colorTop", t, "#eeeeee");
+                colorTop = this.getColor("colorTop", t, "#eeeeee"),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
                 
             context.translate(x, y);
+            context.scale(scaleX, scaleY);
 
             var gradient = context.createLinearGradient(-radius, 0, radius, 0);
 

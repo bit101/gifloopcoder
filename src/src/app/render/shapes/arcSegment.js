@@ -6,7 +6,9 @@ define(function() {
 				y = this.getNumber("y", t, 100),
 				radius = this.getNumber("radius", t, 50),
 				startAngle = this.getNumber("startAngle", t, 0),
-				endAngle = this.getNumber("endAngle", t, 360);
+				endAngle = this.getNumber("endAngle", t, 360),
+                scaleX = this.getNumber("scaleX", t, 1),
+                scaleY = this.getNumber("scaleY", t, 1);
 
 			if(startAngle > endAngle) {
 				var temp = startAngle;
@@ -25,6 +27,7 @@ define(function() {
 			}
 
 			context.translate(x, y);
+            context.scale(scaleX, scaleY);
 			context.rotate(this.getNumber("rotation", t, 0) * Math.PI / 180);
 			context.arc(0, 0, radius, start * Math.PI / 180, end * Math.PI / 180);
 
