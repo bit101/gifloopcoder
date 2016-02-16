@@ -17,6 +17,7 @@ Table of Contents
   - [Heart](#heart)
   - [Image](#image)
   - [Isobox](#isobox)
+  - [Isotube](#isotube)
   - [Line](#line)
   - [Oval](#oval)
   - [Path](#path)
@@ -73,6 +74,8 @@ In addition to the standard style properties described in the next section, this
     rotation (0)        The rotation of the object.
     stroke (false)      Whether the object will be stroked.
     fill (true)         Whether the object will be filled.
+    scaleX (1)          The scale of the object on the x axis.
+    scaleY (1)          The scale of the object on the y axis.
 
 
 
@@ -141,6 +144,8 @@ In addition to the standard style properties described in the next section, this
     stroke (false)          Whether the object will be stroked.
     fill (true)             Whether the object will be filled.
     drawFromCenter (false)  If true, starts and ends the drawing at the center of the circle rather than points on the radius.
+    scaleX (1)              The scale of the object on the x axis.
+    scaleY (1)              The scale of the object on the y axis.
 
 
 
@@ -166,9 +171,11 @@ Because the container does not draw anything, any style properties will be ignor
 
 
 
-    x (0)                 The x position of the container.
-    y (0)                 The y position of the container.
-    rotation (0)            The rotation of the container. (degrees).
+    x (0)               The x position of the container.
+    y (0)               The y position of the container.
+    rotation (0)        The rotation of the container. (degrees).
+    scaleX (1)          The scale of the object on the x axis.
+    scaleY (1)          The scale of the object on the y axis.
 
 
 
@@ -201,6 +208,8 @@ In addition to the standard style properties described in the next section, this
     rotationX (0)   The rotation of the cube on the x-axis (degrees).
     rotationY (0)   The rotation of the cube on the y-axis (degrees).
     rotationZ (0)   The rotation of the cube on the z-axis (degrees).
+    scaleX (1)      The scale of the object on the x axis.
+    scaleY (1)      The scale of the object on the y axis.
 
 
 
@@ -268,6 +277,9 @@ In addition to the standard style properties described in the next section, this
     rotation (0)        The rotation of the gear. (degrees).
     stroke (false)      Whether the object will be stroked.
     fill (true)         Whether the object will be filled.
+    scaleX (1)          The scale of the object on the x axis.
+    scaleY (1)          The scale of the object on the y axis.
+
 
 
 
@@ -330,6 +342,8 @@ In addition to the standard style properties described in the next section, this
     rotation (0)    The rotation of the heart. (degrees).
     stroke (false)  Whether the object will be stroked.
     fill (true)     Whether the object will be filled.
+    scaleX (1)      The scale of the object on the x axis.
+    scaleY (1)      The scale of the object on the y axis.
 
 
 
@@ -362,6 +376,8 @@ In addition to the standard style properties described in the next section, this
     url ("")                The url of the image you want to load.
     drawFromCenter  (true)  Whether the image is drawn from the center or the top left corner.
     smooth (true)           Whether imageSmoothingEnabled is applied when drawing the image.
+    scaleX (1)              The scale of the object on the x axis.
+    scaleY (1)              The scale of the object on the y axis.
 
 The image object can load files from the local file system or from any available network source. Images will be drawn at their original size if `w` and `h` are not set. Note that large images may take a few seconds to load. The animation will begin immediately however, drawing an empty image until such time as the image does finally load.
 
@@ -398,6 +414,8 @@ In addition to the standard style properties described in the next section, this
     colorRight (#cccccc)    The color of the right side of the isobox.
     stroke (false)          Whether the object will be stroked.
     fill (true)             Whether the object will be filled.
+    scaleX (1)              The scale of the object on the x axis.
+    scaleY (1)              The scale of the object on the y axis.
 
 
 
@@ -410,6 +428,58 @@ Note: a good way to assign colors to the faces is to use `color.hsv()` with the 
         colorRight: color.hsv(40, 1, 0.75),  // darker
         colorLeft: color.hsv(40, 1, 0.5)     // darkest
     });
+
+
+
+
+
+### <a name="isotube"></a>Isotube
+
+
+
+An isometric tube object is created with:
+
+
+
+    glc.renderList.addIsotube(properties);
+
+
+
+This draws an isometric tube.
+
+![](images/2.25.gif)
+
+In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.
+
+
+
+    x (100)                 The x position of the isotube.
+    y (100)                 The y position of the isotube.
+    size (60)               The size of the isotube.
+    h (40)                  The height of the isotube.
+    colorTop (#eeeeee)      The color of the top of the isotube.
+    colorLeft (#999999)     The color of the left side of the isotube.
+    colorRight (#cccccc)    The color of the right side of the isotube.
+    stroke (false)          Whether the object will be stroked.
+    fill (true)             Whether the object will be filled.
+    scaleX (1)              The scale of the object on the x axis.
+    scaleY (1)              The scale of the object on the y axis.
+
+
+
+Note: a good way to assign colors to the faces is to use `color.hsv()` with the same hue but differing values. For example:
+
+    list.addIsotube({
+        colorTop: color.hsv(40, 1, 1),       // bright 
+        colorRight: color.hsv(40, 1, 0.75),  // darker
+        colorLeft: color.hsv(40, 1, 0.5)     // darkest
+    });
+
+Note 2: the isotube object uses a linear gradient to shade the bottom part of the tube. This can result in many different colors being used in the image, which can result in poor gif rendering where there are only 256 colors available. If you use this object and want to render to gif, consider the following guidelines:
+
+- Try not to use multiple isotubes in a single animation.
+- If you do have multiple isotubes, try to make them use the same colors.
+- An isotube with a smaller radius will have a smaller gradient and probably fewer colors than one with a larger radius.
 
 
 
@@ -474,6 +544,8 @@ In addition to the standard style properties described in the next section, this
     stroke (false)          Whether the object will be stroked.
     fill (true)             Whether the object will be filled.
     drawFromCenter (false)  If true, starts and ends the drawing at the center of the oval rather than points on the radius.
+    scaleX (1)              The scale of the object on the x axis.
+    scaleY (1)              The scale of the object on the y axis.
 
 
 
@@ -536,6 +608,8 @@ In addition to the standard style properties described in the next section, this
     rotation (0)    The rotation of the polygon. (degrees).
     stroke (false)  Whether the object will be stroked.
     fill (true)     Whether the object will be filled.
+    scaleX (1)      The scale of the object on the x axis.
+    scaleY (1)      The scale of the object on the y axis.
 
 
 
@@ -569,6 +643,8 @@ In addition to the standard style properties described in the next section, this
     drawFromCenter  (true)  Whether the rectangle is drawn from the center or the top left corner.
     stroke (false)  Whether the object will be stroked.
     fill (true)     Whether the object will be filled.
+    scaleX (1)      The scale of the object on the x axis.
+    scaleY (1)      The scale of the object on the y axis.
 
 
 
@@ -632,7 +708,8 @@ In addition to the standard style properties described in the next section, this
     rotation (0)        The rotation of the spiral. (degrees).
     stroke (false)      Whether the object will be stroked.
     fill (true)         Whether the object will be filled.
-
+    scaleX (1)          The scale of the object on the x axis.
+    scaleY (1)          The scale of the object on the y axis.
 
 
 
@@ -665,7 +742,8 @@ In addition to the standard style properties described in the next section, this
     rotation (0)        The rotation of the star. (degrees).
     stroke (false)      Whether the object will be stroked.
     fill (true)         Whether the object will be filled.
-
+    scaleX (1)          The scale of the object on the x axis.
+    scaleY (1)          The scale of the object on the y axis.
 
 
 
@@ -700,6 +778,8 @@ In addition to the standard style properties described in the next section, this
     rotation (0)                The rotation of the text. (degrees).
     stroke (false)              Whether the object will be stroked.
     fill (true)                 Whether the object will be filled.
+    scaleX (1)                  The scale of the object on the x axis.
+    scaleY (1)                  The scale of the object on the y axis.
 
 
 

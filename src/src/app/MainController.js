@@ -213,6 +213,8 @@ define(function(require) {
     ////////////////////////////////////////
 
     function setSize(w, h) {
+        w = Math.round(w);
+        h = Math.round(h);
         CanvasController.setCanvasSize(w, h);
         RenderList.setSize(w, h);
         Encoder.setSize(w, h);

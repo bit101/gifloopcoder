@@ -108,6 +108,16 @@ define(function() {
                     "colorRight: color.hsv(30, 1, 0.75),\n\t\t" +
                     "colorLeft: color.hsv(30, 1, 0.5),\n\t" + 
                 "});\n\t",
+            "Iso Tube": 
+                "list.addIsotube({\n\t\t" +
+                    "x: width / 2,\n\t\t" +
+                    "y: height / 2,\n\t\t" +
+                    "radius: 50,\n\t\t" +
+                    "h: 60,\n\t\t" + 
+                    "colorTop: color.hsv(30, 1, 1),\n\t\t" +
+                    "colorRight: color.hsv(30, 1, 0.75),\n\t\t" +
+                    "colorLeft: color.hsv(30, 1, 0.5),\n\t" + 
+                "});\n\t",
             "Line": 
                 "list.addLine({\n\t\t" +
                     "x0: 0,\n\t\t" +

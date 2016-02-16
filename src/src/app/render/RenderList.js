@@ -14,6 +14,7 @@ define([
 	"app/render/shapes/heart",
 	"app/render/shapes/image",
 	"app/render/shapes/isobox",
+	"app/render/shapes/isotube",
 	"app/render/shapes/line",
 	"app/render/shapes/oval",
 	"app/render/shapes/path",
@@ -42,6 +43,7 @@ define([
 		Heart,
 		Image,
 		Isobox,
+		Isotube,
 		Line,
 		Oval,
 		Path,
@@ -162,6 +164,10 @@ define([
 		return add(Shape.create(Isobox, props));
 	}
 
+	function addIsotube(props) {
+		return add(Shape.create(Isotube, props));
+	}
+
 	function addLine(props) {
 		return add(Shape.create(Line, props));
 	}
@@ -259,6 +265,7 @@ define([
 		addHeart: addHeart,
 		addImage: addImage,
 		addIsobox: addIsobox,
+		addIsotube: addIsotube,
 		addLine: addLine,
 		addOval: addOval,
 		addPath: addPath,
