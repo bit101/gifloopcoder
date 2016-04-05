@@ -12,6 +12,7 @@ Table of Contents
   - [Container](#container)
   - [Cube](#cube)
   - [Curve](#curve)
+  - [Crescent](#crescent)
   - [Gear](#gear)
   - [Grid](#grid)
   - [Heart](#heart)
@@ -176,6 +177,40 @@ Because the container does not draw anything, any style properties will be ignor
     rotation (0)        The rotation of the container. (degrees).
     scaleX (1)          The scale of the object on the x axis.
     scaleY (1)          The scale of the object on the y axis.
+
+
+
+
+
+### <a name="crescent"></a>Crescent
+
+
+
+A crescent object is created with:
+
+
+
+    glc.renderList.addCrescent(properties);
+
+
+
+This draws a crescent. In GLC, a crescent is a circle with part of another circle of the same radius subtracted from it.
+
+![](images/2.26.gif)
+
+In addition to the standard style properties described in the next section, this method can accept the following properties. Defaults are listed in parentheses. All of these properties are animatable.
+
+
+
+    x (100)                 The x position of the crescent.
+    y (100)                 The y position of the crescent.
+    radius (50)             The radius of the crescent.
+    percent (0.5)           How much of the original circle will be visible. At 0, the circle will be completely eclipsed. At 1, it will be completely visible.
+    rotation (0)            The rotation of the crescent. (degrees).
+    stroke (false)          Whether the object will be stroked.
+    fill (true)             Whether the object will be filled.
+    scaleX (1)              The scale of the object on the x axis.
+    scaleY (1)              The scale of the object on the y axis.
 
 
 
