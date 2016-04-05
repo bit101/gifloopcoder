@@ -6,6 +6,7 @@ define([
 	"app/render/shapes/beziersegment",
 	"app/render/shapes/circle",
 	"app/render/shapes/container",
+	"app/render/shapes/crescent",
 	"app/render/shapes/cube",
 	"app/render/shapes/curve",
 	"app/render/shapes/curvesegment",
@@ -35,6 +36,7 @@ define([
 		BezierSegment, 
 		Circle,
 		Container,
+		Crescent,
 		Cube,
 		Curve,
 		CurveSegment,
@@ -123,6 +125,10 @@ define([
 
 	function addContainer(props) {
 		return add(Shape.create(Container, props));
+	}
+
+	function addCrescent(props) {
+		return add(Shape.create(Crescent, props));
 	}
 
 	function addCube(props) {
@@ -257,6 +263,7 @@ define([
 		addBezierSegment: addBezierSegment,
 		addCircle: addCircle,
 		addContainer: addContainer,
+		addCrescent: addCrescent,
 		addCube: addCube,
 		addCurve: addCurve,
 		addCurveSegment: addCurveSegment,

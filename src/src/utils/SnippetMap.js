@@ -49,6 +49,13 @@ define(function() {
                     "x: width / 2,\n\t\t" +
                     "y: height / 2\n\t" + 
                 "});\n\t",
+            "Crescent":
+                "list.addCrescent({\n\t\t" +
+                    "x: width / 2,\n\t\t" + 
+                    "y: height / 2,\n\t\t" +
+                    "radius: 100,\n\t\t" + 
+                    "percent: 0.5\n\t" +
+                "});",
             "Cube": 
                 "list.addCube({\n\t\t" +
                     "x: width / 2,\n\t\t" +
