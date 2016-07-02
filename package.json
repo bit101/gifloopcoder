@@ -7,7 +7,13 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -e \"require('grunt').tasks(['buildx']);\"",
+    "clean": "node -e \"require('grunt').tasks(['clean']);\"",
+    "build": "node -e \"require('grunt').tasks(['build']);\"",
+    "buildx": "node -e \"require('grunt').tasks(['buildx']);\"",
+    "docs": "node -e \"require('grunt').tasks(['buildx']);\"",
+    "default": "node -e \"require('grunt').tasks(['default']);\""
   },
   "author": "Keith Peters",
   "license": "MIT",
