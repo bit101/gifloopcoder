@@ -12,7 +12,6 @@ To compile any changes into `glc-min.js` in the app directory, follow these step
 ### Install the build tools on your system:
 - [node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
-- grunt-cli `npm install -g grunt-cli`
 
 ### optional:
 - [pandoc](http://pandoc.org/) if you will be building documentation.
@@ -21,10 +20,10 @@ To compile any changes into `glc-min.js` in the app directory, follow these step
 ### Add project dependencies:
 - `npm-install`
 
-### Grunt commands:
-- `grunt clean` deletes the `app` and `docs` directories.
-- `grunt build` builds the app into the `app` directory.
-- `grunt buildx` builds the app and launches it in the default browser.
-- `grunt docs` builds all the docs into the `docs` directory.
-- `grunt docsx` builds the docs and launches them in the default browser.
-- `grunt` cleans and builds both the app and the docs
+### Build commands:
+- `npm run clean` deletes the `app` and `docs` directories.
+- `npm run build` builds the app into the `app` directory.
+- `npm run buildx` or `npm start` builds the app and launches it in the default browser.
+- `npm run docs` builds all the docs into the `docs` directory.
+- `npm run docsx` builds the docs and launches them in the default browser.
+- `npm run default` cleans and builds both the app and the docs.
