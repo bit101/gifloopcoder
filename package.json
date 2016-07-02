@@ -12,7 +12,8 @@
     "clean": "node -e \"require('grunt').tasks(['clean']);\"",
     "build": "node -e \"require('grunt').tasks(['build']);\"",
     "buildx": "node -e \"require('grunt').tasks(['buildx']);\"",
-    "docs": "node -e \"require('grunt').tasks(['buildx']);\"",
+    "docs": "node -e \"require('grunt').tasks(['docs']);\"",
+    "docsx": "node -e \"require('grunt').tasks(['docsx']);\"",
     "default": "node -e \"require('grunt').tasks(['default']);\""
   },
   "author": "Keith Peters",
