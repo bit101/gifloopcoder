@@ -3,3 +3,4 @@ index_dev.html
 node_modules
 /app
 /docs
+.DS_Store
