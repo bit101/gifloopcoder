@@ -256,8 +256,7 @@ define(function(require) {
         CodeController.onSnippet(snippet);
     }
 
-
-    return {
+    var result = {
         init: init,
         newFile: newFile,
         open: open,
@@ -288,5 +287,7 @@ define(function(require) {
         onSnippet: onSnippet
     }
 
+    window.GLCMainController = result;
 
+    return result;
 });
