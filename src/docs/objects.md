@@ -40,7 +40,7 @@ Table of Contents
 
 ## Objects
 
-Objects are created by calling various "add" methods on the `glc.renderList`, passing in a generic object with properties. All of the add methods can be called with no paramters or an empty object to create a default object of that type. The properties passed in override any defaults. Each object has its own specific properties that will define that object, such as, `x, y, radius`, etc. for a circle, or `x0, y0, x1, y1`, etc. for a line.
+Objects are created by calling various "add" methods on the `glc.renderList`, passing in a generic object with properties. All of the add methods can be called with no parameters or an empty object to create a default object of that type. The properties passed in override any defaults. Each object has its own specific properties that will define that object, such as, `x, y, radius`, etc. for a circle, or `x0, y0, x1, y1`, etc. for a line.
 
 In addition, all objects can accept a number of "style" properties, such as `strokeStyle, fillStyle, lineWidth`, various shadow properties, etc. Of course, some of these style properties may not be applicable to a particular object, such as a fill style when drawing a line.
 
