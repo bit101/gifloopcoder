@@ -8,6 +8,7 @@ define(function(require) {
         filePath = localStorage.getItem("glcFilePath"),
         GLCInterface = null,
         MainController = null,
+        PropertiesController = require("ui/properties/PropertiesController"),
         isDirty = localStorage.getItem("glcIsDirty", "false") === "true";
 
 
@@ -170,6 +171,22 @@ define(function(require) {
 
         script = UIUtil.createScript("loaded_script", CodeView.getCode(), document.head);
 
+        var canvas = document.querySelector("canvas");
+        var stream = canvas.captureStream();
+        var duration = PropertiesController.getDuration();
+        var recorder = new MediaRecorder(stream);
+        recorder.start(3000);
+        var videoCase = [];
+        recorder.ondataavailable = function(e) {
+          videoCase.push(e.data);
+        }
+
+        setTimeout(function() {
+          recorder.requestData();
+          recorder.stop();
+          var player = document.getElementById('replay');
+          player.src = window.URL.createObjectURL(videoCase[0]);
+        }, 10000);
 
         reload();
     }
