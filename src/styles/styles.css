@@ -309,7 +309,14 @@ input[type=range].slider:focus::-ms-fill-upper {
   background: #d9d9d9;
 }
 
-
+#replay {
+  position: absolute;
+  top: 410px;
+  right: 12px;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+}
 
 /* SELECT */
 
