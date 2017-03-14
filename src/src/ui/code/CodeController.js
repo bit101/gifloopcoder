@@ -175,7 +175,7 @@ define(function(require) {
         var stream = canvas.captureStream();
         var duration = PropertiesController.getDuration();
         var recorder = new MediaRecorder(stream);
-        recorder.start(3000);
+        recorder.start(4000);
         var videoCase = [];
         recorder.ondataavailable = function(e) {
           videoCase.push(e.data);
@@ -183,12 +183,22 @@ define(function(require) {
 
         setTimeout(function() {
           recorder.requestData();
-          recorder.stop();
           var player = document.getElementById('replay');
-          player.src = window.URL.createObjectURL(videoCase[0]);
-        }, 10000);
+          var video = videoCase[0];
+          player.src = window.URL.createObjectURL(video);
+          sendData(video);
+        }, 7000);
 
         reload();
+    }
+
+    function sendData(blob) {
+      form = new FormData();
+      form.append('video', blob);
+      fetch('/upload', {
+        method: 'post',
+        body: form
+      });
     }
 
     function reload() {
